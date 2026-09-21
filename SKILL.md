@@ -111,6 +111,8 @@ When you do go interactive: in-memory state only, same greyscale rules, same wor
 
 Use whatever inline visual mechanism the current surface offers — in chat, the visualizer tool; in an agentic surface, a single self-contained HTML file. Keep the whole mock in one file with no external assets.
 
+When rendering to a file, give each screen's container `data-screen="<name>"` and mark generated content — values, posts, anything the product's data or the product itself produced — with `data-lint="data"`. If `mocklint` is available (see the repo's `lint/`), run it on the file before showing the render; it names the nodes that break Rules 1 and 2. Fix those nodes and re-render; do not argue with it, and do not show a render that failed. Lines it lists as ambiguous are yours to decide.
+
 If subagent delegation is available, delegate the render. The reason is **context isolation**, not speed: a few hundred lines of throwaway HTML per render would otherwise pile up in the main conversation and crowd out the actual thinking. Pass the subagent the running spec, not the transcript. Note that delegation does not make rendering concurrent with the conversation — the parent still waits. Only surfaces with real background tasks (Claude Code, Cowork) can render while the user keeps typing.
 
 ## Tone

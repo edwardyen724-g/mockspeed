@@ -1,0 +1,13 @@
+{
+  "name": "mocklint",
+  "version": "0.1.0",
+  "description": "Checks a mockspeed render against the skill's rules: Jev classifies each text node, code counts and decides.",
+  "type": "module",
+  "bin": { "mocklint": "./mocklint.mjs" },
+  "engines": { "node": ">=20" },
+  "license": "MIT",
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.6.0",
+    "node-html-parser": "^7.0.1"
+  }
+}

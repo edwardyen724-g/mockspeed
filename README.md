@@ -76,10 +76,49 @@ When the idea is ready to build, ask for the **running spec** and hand that to t
 
 In chat, it draws inline with the visualiser. In Claude Code and other agentic surfaces it writes a single self-contained HTML file to the session's scratch directory; open it in a browser, or ask for a screenshot. Native apps get a plain phone frame with a faked status bar and tab bar; plugins get a faint fake host painted around the panel so scale reads correctly. Both come with the honest caveat that a rendered rectangle cannot judge feel or integration — only screen count, order and what lives where.
 
+## Lint
+
+Rules 1 and 2 are lint-shaped — a word budget, no placeholders, no explanatory text, no section headers, at least one edge case — but the skill enforces them by having the author check its own work in the same breath as writing, which is why `SKILL.md` has to shout ("hard constraints, because vague instructions do not survive contact with generation"). [`lint/mocklint.mjs`](lint/mocklint.mjs) moves those checks out of the author's head into a judge that can't be talked out of them.
+
+It splits the work the way a judge-only model demands. **Jev** ([TypeSafe](https://docs.typesafe.ai)) gets one Choice per text node — *what role does this play on the screen: data, label, button, nav, heading, explanation, placeholder?* — and one Noul, *is this an edge value?* Roles are defined by who wrote the text (a user, the system, or the designer), not by how it reads, because Jev reads criteria literally and a post that *sounds* like an explanation is still data. **Code** does what Jev cannot: counts the words of non-data nodes against the budget, checks "at least one edge case", and decides. Nothing is fixed; offenders are named by node.
+
+```bash
+cd lint && npm install
+export TYPESAFE_API_KEY=…            # or put it in ./.env.local; it is never printed
+node mocklint.mjs ../examples/forecast/mock.html
+node mocklint.mjs ../examples/leadgen/mock.html --split hr.sep
+node mocklint.mjs mock.html --nodes   # dry run: show what would be judged, no Jev call
+```
+
+Output on the Forecast mock (three screens, ~150 questions, ~1.3 s, well under a cent):
+
+```
+Backtest — PASS · 11 / 20 non-data words (12 if the ambiguous lines count)
+  non-data:
+    [51] "guess"           1w  label   P(data) 0.01
+    [56] "views"           1w  label   P(data) 0.01
+    [73] "Run it again"    3w  button  P(data) 0.01
+    [74] "Forecast"        1w  nav     P(data) 0.00
+    …
+  ambiguous — decide yourself:
+    [52] "actual"          1w  label   P(data) 0.42
+  edge cases:
+    [71] "0"                           P 0.92
+```
+
+Three things the render can tell the lint, because the renderer knows them and a reader often can't:
+
+- `data-screen="Backtest"` on a container names a screen (the budget is per screen). `--screens <selector>` or `--split <selector>` work for mocks without it.
+- `data-lint="data"` on an element declares it and its children as data — a value, a post, something the system produced. Marked nodes are counted as data and not judged. This matters for screens that show generated content: on leadgen's Confirm step the inferred audience and pain phrases are the product's output, but to a reader they look like designer copy, and unmarked they fail the budget at 83 words. Marked, the verdict is the strict reading of Rule 2: the fine print (`first run free · up to 100 verified leads · then $39 per run`, 10 words, explanation 0.80) and the `or: …` alternates line are the violations, and `Who is this for?` is a section heading. The leadgen mock predates the lint and is kept as rendered, so it fails as shipped.
+- `data-lint="ignore"` leaves an element out (a fake host frame around a plugin panel, say).
+
+What to expect from the numbers: P(data) below 0.4 counts against the budget, above 0.6 is data, between is listed as *ambiguous* for you to decide, and the budget is reported both ways. Jev's answers drift by up to ~0.1 between identical runs, so a mixed line like `58 / 63 in band` will sometimes cross that band and a screen sitting exactly on 20 will sometimes read 24. That's the model, not the mock; the band is there so it shows up as a question rather than a flip. The edge-case check is a warning, not a failure — Jev judges each value alone and "far longer than its neighbours" needs a comparison it can't make.
+
 ## Layout
 
 ```
 SKILL.md                 the skill, verbatim
+lint/                    mocklint.mjs · package.json — the Jev-backed rule checker
 examples/
   leadgen/               mock.html · mock.png · spec.md
   forecast/              mock.html · mock.png · spec.md
