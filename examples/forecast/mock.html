@@ -1,0 +1,122 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>forecast mock</title>
+<style>
+body{margin:0;background:#fff;color:#111;font:14px/1.4 system-ui,-apple-system,sans-serif}
+.row{display:flex;gap:40px;justify-content:center;padding:40px 24px}
+.phone{width:360px;height:740px;border:2px solid #999;display:flex;flex-direction:column;flex:none;box-sizing:border-box}
+.status{display:flex;justify-content:space-between;padding:10px 18px 0;font-size:12px;color:#999}
+.status i{display:inline-block;width:10px;height:6px;border:1px solid #bbb;margin-left:4px;vertical-align:middle}
+.body{flex:1;padding:22px 20px 0;overflow:hidden}
+.tabs{display:flex;border-top:1px solid #ddd;padding:12px 0 22px}
+.tabs span{flex:1;text-align:center;font-size:11px;color:#bbb}
+.tabs span.on{color:#111;font-weight:600}
+.pill{display:block;background:#111;color:#fff;text-align:center;padding:14px;font-size:15px;font-weight:600;margin-top:16px}
+.lbl{font-size:11px;color:#aaa;letter-spacing:.06em;text-transform:uppercase}
+.h1{font-size:28px;font-weight:700;line-height:1.1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.muted{color:#999;font-size:13px}
+.faint{color:#bbb;font-size:12px}
+.tab{font-variant-numeric:tabular-nums}
+/* draft */
+.field{border:1px solid #bbb;padding:12px;min-height:118px;font-size:17px;line-height:1.35;margin-top:6px}
+.acct{display:flex;gap:14px;align-items:center;margin-top:40px}
+.av{width:56px;height:56px;border-radius:50%;background:#eee;color:#999;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.handle{font-size:22px;font-weight:700}
+.sub{color:#777;font-size:14px}
+/* result */
+.strip{margin:14px 0 8px}
+.strip svg{display:block}
+.stamp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#bbb;margin:10px 0 14px}
+.slice{border-left:1px solid #ddd;padding-left:14px;margin-left:5px}
+.e{display:flex;gap:8px;align-items:baseline;padding:4px 0;font-size:13px;color:#777;position:relative}
+.e:before{content:"";position:absolute;left:-18px;top:11px;width:6px;height:6px;border-radius:50%;background:#ddd}
+.e b{color:#111;font-weight:700;width:38px;flex:none;font-variant-numeric:tabular-nums}
+.e span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e small{color:#bbb;flex:none}
+.e.me{color:#111}.e.me:before{background:#111}.e.me b{color:#111}
+.trust{color:#999;font-size:13px;margin-top:14px;text-decoration:underline;text-decoration-color:#ddd}
+.alt{text-align:center;color:#999;font-size:13px;text-decoration:underline;margin-top:12px}
+/* backtest */
+.runs{color:#bbb;font-size:13px;margin-top:8px}.runs b{color:#111;font-weight:500}
+.scat{margin:12px 0 6px}
+.scat svg{display:block}
+.ax{display:flex;justify-content:space-between;color:#aaa;font-size:11px;width:200px}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th{text-align:left;font-weight:400;color:#aaa;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 0}
+td{padding:5px 0;border-top:1px solid #eee;font-size:13px;vertical-align:top;font-variant-numeric:tabular-nums}
+td.t{color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+td.x{color:#777;width:14px;text-align:right}
+td.n{width:52px;font-weight:500}
+</style></head><body><div class="row">
+
+<!-- DRAFT -->
+<div class="phone">
+  <div class="status"><span>9:41</span><span><i></i><i></i></span></div>
+  <div class="body">
+    <div class="lbl">Post</div>
+    <div class="field">jev-compactor is on npm. it compacts an agent's context by asking a model that cannot write, only judge. 1.2 MB of docs for a 40 KB library.</div>
+    <a class="pill">Place it</a>
+    <div class="acct"><div class="av">E</div><div><div class="handle">@edbuildthings</div><div class="sub">Solo founder shipping small AI tools in public</div><div class="muted tab">X · 63 posts · ρ 0.46 (0.24 – 0.64)</div></div></div>
+  </div>
+  <div class="tabs"><span class="on">Forecast</span><span>History</span><span>Backtest</span><span>Account</span></div>
+</div>
+
+<!-- RESULT -->
+<div class="phone">
+  <div class="status"><span>9:41</span><span><i></i><i></i></span></div>
+  <div class="body">
+    <div class="h1">190 – 1,900 views</div>
+    <div class="strip"><svg width="300" height="28" viewBox="0 0 300 28">
+      <line x1="0" y1="14" x2="300" y2="14" stroke="#ddd"/>
+      <g fill="#ccc"><circle cx="290.2" cy="14" r="2.5"/><circle cx="276.9" cy="14" r="2.5"/><circle cx="264.1" cy="14" r="2.5"/><circle cx="263.7" cy="14" r="2.5"/><circle cx="256.3" cy="14" r="2.5"/><circle cx="254.0" cy="14" r="2.5"/><circle cx="246.5" cy="14" r="2.5"/><circle cx="244.9" cy="14" r="2.5"/><circle cx="240.3" cy="14" r="2.5"/><circle cx="234.5" cy="14" r="2.5"/><circle cx="233.6" cy="14" r="2.5"/><circle cx="232.1" cy="14" r="2.5"/><circle cx="230.5" cy="14" r="2.5"/><circle cx="229.7" cy="14" r="2.5"/><circle cx="228.5" cy="14" r="2.5"/><circle cx="227.2" cy="14" r="2.5"/><circle cx="225.6" cy="14" r="2.5"/><circle cx="224.0" cy="14" r="2.5"/><circle cx="223.6" cy="14" r="2.5"/><circle cx="222.2" cy="14" r="2.5"/><circle cx="221.6" cy="14" r="2.5"/><circle cx="219.8" cy="14" r="2.5"/><circle cx="219.7" cy="14" r="2.5"/><circle cx="217.3" cy="14" r="2.5"/><circle cx="216.1" cy="14" r="2.5"/><circle cx="211.9" cy="14" r="2.5"/><circle cx="210.3" cy="14" r="2.5"/><circle cx="202.4" cy="14" r="2.5"/><circle cx="200.7" cy="14" r="2.5"/><circle cx="200.4" cy="14" r="2.5"/><circle cx="198.5" cy="14" r="2.5"/><circle cx="198.5" cy="14" r="2.5"/><circle cx="197.8" cy="14" r="2.5"/><circle cx="195.2" cy="14" r="2.5"/><circle cx="194.0" cy="14" r="2.5"/><circle cx="193.7" cy="14" r="2.5"/><circle cx="192.9" cy="14" r="2.5"/><circle cx="191.8" cy="14" r="2.5"/><circle cx="191.3" cy="14" r="2.5"/><circle cx="190.4" cy="14" r="2.5"/><circle cx="187.2" cy="14" r="2.5"/><circle cx="187.0" cy="14" r="2.5"/><circle cx="186.2" cy="14" r="2.5"/><circle cx="185.7" cy="14" r="2.5"/><circle cx="185.4" cy="14" r="2.5"/><circle cx="184.9" cy="14" r="2.5"/><circle cx="184.6" cy="14" r="2.5"/><circle cx="184.1" cy="14" r="2.5"/><circle cx="184.1" cy="14" r="2.5"/><circle cx="179.1" cy="14" r="2.5"/><circle cx="177.5" cy="14" r="2.5"/><circle cx="177.1" cy="14" r="2.5"/><circle cx="170.6" cy="14" r="2.5"/><circle cx="170.6" cy="14" r="2.5"/><circle cx="163.2" cy="14" r="2.5"/><circle cx="162.8" cy="14" r="2.5"/><circle cx="159.2" cy="14" r="2.5"/><circle cx="152.1" cy="14" r="2.5"/><circle cx="148.8" cy="14" r="2.5"/><circle cx="145.8" cy="14" r="2.5"/><circle cx="142.6" cy="14" r="2.5"/><circle cx="138.2" cy="14" r="2.5"/><circle cx="2.5" cy="14" r="2.5"/></g>
+      <line x1="196.6" y1="14" x2="282.9" y2="14" stroke="#999" stroke-width="2"/>
+      <line x1="213.7" y1="14" x2="237.1" y2="14" stroke="#111" stroke-width="4"/>
+      <line x1="226.3" y1="6" x2="226.3" y2="22" stroke="#111" stroke-width="2"/>
+      <circle cx="226.3" cy="14" r="4.5" fill="#fff" stroke="#111" stroke-width="2"/>
+    </svg></div>
+    <div class="muted tab">beats 45 of 63 · 50% 300 – 560</div>
+    <div class="stamp">Placed 12:41 · 0.4 s</div>
+    <div class="slice">
+      <div class="e"><b>460</b><span>the tool result that explains the error is the one every phrasing votes to drop…</span><small>Sep 7</small></div>
+      <div class="e"><b>445</b><span>week 1 of the build log: 41 commits, 0 users, one very long README</span><small>Aug 28</small></div>
+      <div class="e"><b>430</b><span>wrote the architecture doc before the code. two days. then the code took…</span><small>Sep 4</small></div>
+      <div class="e me"><b>≈420</b><span>jev-compactor is on npm. it compacts an agent's context by asking a model…</span><small>draft</small></div>
+      <div class="e"><b>412</b><span>jev-compactor v0.3: the safety gate blocks only the pending tool call…</span><small>Sep 18</small></div>
+      <div class="e"><b>395</b><span>every drop is attributable. that one rule cost me a day and saved the design.</span><small>Aug 21</small></div>
+      <div class="e"><b>370</b><span>the MCP server now lists four tools. that sentence would have meant nothing…</span><small>Sep 14</small></div>
+    </div>
+    <div class="trust tab">ρ 0.46 · 0.24 – 0.64 · n 63</div>
+    <a class="pill">Post it</a>
+    <div class="alt">Change it</div>
+  </div>
+  <div class="tabs"><span class="on">Forecast</span><span>History</span><span>Backtest</span><span>Account</span></div>
+</div>
+
+<!-- BACKTEST -->
+<div class="phone">
+  <div class="status"><span>9:41</span><span><i></i><i></i></span></div>
+  <div class="body">
+    <div class="h1">ρ 0.46</div>
+    <div class="muted tab">0.24 – 0.64 · n 63</div>
+    <div class="tab" style="margin-top:6px">58 / 63 in band</div>
+    <div class="runs tab"><b>0.46 · Sep 18 14:02</b> &nbsp; 0.43 · Sep 18 09:10 &nbsp; 0.41 · Sep 12</div>
+    <div class="stamp">Leave one out · 3,906 questions</div>
+    <div class="scat"><svg width="200" height="200" viewBox="0 0 200 200">
+      <rect x="0.5" y="0.5" width="199" height="199" fill="none" stroke="#ddd"/>
+      <line x1="8" y1="192" x2="192" y2="8" stroke="#ddd"/>
+      <g fill="#bbb"><circle cx="16.9" cy="192.0" r="2.5"/><circle cx="67.4" cy="189.0" r="2.5"/><circle cx="37.7" cy="186.1" r="2.5"/><circle cx="16.9" cy="183.1" r="2.5"/><circle cx="31.7" cy="180.1" r="2.5"/><circle cx="79.2" cy="177.2" r="2.5"/><circle cx="25.8" cy="174.2" r="2.5"/><circle cx="85.2" cy="171.2" r="2.5"/><circle cx="8.0" cy="168.3" r="2.5"/><circle cx="43.6" cy="165.3" r="2.5"/><circle cx="108.9" cy="162.3" r="2.5"/><circle cx="58.5" cy="159.4" r="2.5"/><circle cx="11.0" cy="156.4" r="2.5"/><circle cx="97.0" cy="153.4" r="2.5"/><circle cx="28.8" cy="150.5" r="2.5"/><circle cx="150.5" cy="147.5" r="2.5"/><circle cx="64.4" cy="144.5" r="2.5"/><circle cx="82.2" cy="141.5" r="2.5"/><circle cx="55.5" cy="138.6" r="2.5"/><circle cx="13.9" cy="135.6" r="2.5"/><circle cx="88.1" cy="132.6" r="2.5"/><circle cx="114.8" cy="129.7" r="2.5"/><circle cx="49.5" cy="126.7" r="2.5"/><circle cx="91.1" cy="123.7" r="2.5"/><circle cx="34.7" cy="120.8" r="2.5"/><circle cx="70.3" cy="117.8" r="2.5"/><circle cx="19.9" cy="114.8" r="2.5"/><circle cx="52.5" cy="111.9" r="2.5"/><circle cx="105.9" cy="108.9" r="2.5"/><circle cx="135.6" cy="105.9" r="2.5"/><circle cx="67.4" cy="103.0" r="2.5"/><circle cx="46.6" cy="100.0" r="2.5"/><circle cx="94.1" cy="97.0" r="2.5"/><circle cx="73.3" cy="94.1" r="2.5"/><circle cx="111.9" cy="91.1" r="2.5"/><circle cx="126.7" cy="88.1" r="2.5"/><circle cx="100.0" cy="85.2" r="2.5"/><circle cx="153.4" cy="82.2" r="2.5"/><circle cx="117.8" cy="79.2" r="2.5"/><circle cx="76.3" cy="76.3" r="2.5"/><circle cx="132.6" cy="73.3" r="2.5"/><circle cx="103.0" cy="70.3" r="2.5"/><circle cx="123.7" cy="67.4" r="2.5"/><circle cx="168.3" cy="64.4" r="2.5"/><circle cx="147.5" cy="61.4" r="2.5"/><circle cx="174.2" cy="58.5" r="2.5"/><circle cx="177.2" cy="55.5" r="2.5"/><circle cx="138.6" cy="52.5" r="2.5"/><circle cx="162.3" cy="49.5" r="2.5"/><circle cx="186.1" cy="46.6" r="2.5"/><circle cx="61.4" cy="43.6" r="2.5"/><circle cx="141.5" cy="40.6" r="2.5"/><circle cx="192.0" cy="37.7" r="2.5"/><circle cx="180.1" cy="34.7" r="2.5"/><circle cx="129.7" cy="31.7" r="2.5"/><circle cx="144.5" cy="28.8" r="2.5"/><circle cx="156.4" cy="25.8" r="2.5"/><circle cx="171.2" cy="22.8" r="2.5"/><circle cx="183.1" cy="19.9" r="2.5"/><circle cx="159.4" cy="16.9" r="2.5"/><circle cx="120.8" cy="13.9" r="2.5"/><circle cx="189.0" cy="11.0" r="2.5"/></g>
+      <circle cx="126.7" cy="8.0" r="3.5" fill="#111"/>
+    </svg><div class="ax"><span>guess</span><span>actual</span></div></div>
+    <div class="muted tab">forward · 4 posted · 3 in band</div>
+    <table>
+      <tr><th>guess</th><th>actual</th><th>views</th><th></th><th></th></tr>
+      <tr><td class="n">4</td><td class="n">1</td><td class="n">2,310</td><td class="t">ran the benchmark against ten products' own compaction…</td><td class="x"></td></tr>
+      <tr><td class="n">21</td><td class="n">2</td><td class="n">1,620</td><td class="t">compaction is a judgment problem wearing a tokenizer costume</td><td class="x">✕</td></tr>
+      <tr><td class="n">6</td><td class="n">3</td><td class="n">1,140</td><td class="t">anthropic's compaction api drops a system message in one of…</td><td class="x"></td></tr>
+      <tr><td class="n">41</td><td class="n">63</td><td class="n">0</td><td class="t">test</td><td class="x">✕</td></tr>
+    </table>
+    <a class="pill">Run it again</a>
+  </div>
+  <div class="tabs"><span>Forecast</span><span>History</span><span class="on">Backtest</span><span>Account</span></div>
+</div>
+
+</div></body></html>

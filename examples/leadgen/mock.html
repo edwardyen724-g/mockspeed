@@ -1,0 +1,132 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>leadgen mock</title>
+<style>
+body{margin:0;background:#fff;color:#111;font:14px/1.4 system-ui,-apple-system,sans-serif}
+.wrap{max-width:1080px;margin:32px auto;padding:0 24px}
+.bar{display:flex;gap:8px}
+.url{flex:1;border:1px solid #bbb;padding:10px 12px;font-size:15px;color:#111}
+.go{border:1px solid #bbb;background:#fff;color:#555;padding:10px 18px;font-size:14px}
+.read{color:#999;margin:8px 0 28px;font-size:13px}
+.read b{color:#555;font-weight:500}
+.sep{border:0;border-top:1px dashed #ccc;margin:56px 0 40px}
+/* confirm */
+.qs{max-width:720px}
+.q{margin:0 0 28px}
+.q h3{margin:0 0 8px;font-size:12px;font-weight:400;color:#aaa;letter-spacing:.06em;text-transform:uppercase}
+.ans{font-size:20px;font-weight:600;border-bottom:1px solid #111;padding-bottom:6px}
+.alt{color:#bbb;font-size:13px;margin-top:8px}
+.chips span{display:inline-block;border:1px solid #111;padding:4px 10px;margin:0 6px 6px 0;font-size:13px}
+.chips span.off{border-color:#ddd;color:#bbb}
+.srcl span{display:inline-block;margin:0 14px 6px 0;color:#333}
+.srcl span.off{color:#ccc;text-decoration:line-through}
+.deploy{display:inline-block;border:1px solid #111;background:#111;color:#fff;padding:12px 22px;font-size:15px;font-weight:600;margin-top:8px}
+.fine{color:#bbb;font-size:12px;margin-top:10px}
+/* results */
+.hero{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid #111;padding-bottom:12px}
+.n{font-size:56px;font-weight:600;line-height:1;letter-spacing:-1px}
+.sub{color:#888;font-size:13px;margin-top:6px}
+.sub i{font-style:normal;color:#bbb}
+.srcs{color:#bbb;font-size:12px;margin-top:4px}
+.exp{border:1px solid #111;background:#111;color:#fff;padding:10px 18px;font-size:14px;font-weight:600}
+table{width:100%;border-collapse:collapse;margin-top:4px}
+th{text-align:left;color:#aaa;font-weight:400;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 8px 6px;border-bottom:1px solid #ddd}
+td{vertical-align:top;padding:10px 8px;border-bottom:1px solid #eee}
+.fit{width:36px;color:#555;font-variant-numeric:tabular-nums}
+.who{white-space:nowrap;width:170px}
+.who small{display:block;color:#999;font-size:12px}
+.src{color:#aaa;font-size:12px}
+.qt{color:#555;margin-top:2px}
+.c{width:230px;font-weight:600;white-space:nowrap}
+.c small{display:block;font-weight:400;color:#aaa;font-size:12px}
+.c.dm{font-weight:400;color:#777}
+.c.ca{font-weight:400;color:#999}
+tr.lo td{opacity:.55}
+tr.lo2 td{opacity:.35}
+.more td{color:#bbb;text-align:center;border:0;padding:16px;opacity:1}
+</style></head><body><div class="wrap">
+
+<!-- CONFIRM -->
+<div class="bar"><div class="url">https://jev-compactor.dev</div><div class="go">Find leads</div></div>
+<div class="read"><b>jev-compactor — deterministic context compaction for AI agents · npm · TypeScript · MIT</b></div>
+
+<div class="qs">
+  <div class="q"><h3>Who is this for?</h3>
+    <div class="ans">People building LLM agents who hit context limits</div>
+    <div class="alt">or: teams running long-lived support / coding agents · LangChain and OpenAI Agents SDK users</div></div>
+
+  <div class="q"><h3>What are they saying?</h3>
+    <div class="chips"><span>context window overflow</span><span>truncation breaks tool_use pairs</span><span>token cost from repeated tool output</span><span>agent forgets the goal</span><span>summary memory loses tool results</span><span class="off">RAG chunking</span><span class="off">prompt caching</span></div></div>
+
+  <div class="q"><h3>Where?</h3>
+    <div class="srcl"><span>Hacker News</span><span>r/LangChain · r/LocalLLaMA · r/OpenAI · r/ClaudeAI</span><span>GitHub issues</span><span>Dev.to</span><span>Stack Overflow</span><span>X</span><span>Indie Hackers</span><span class="off">Discord</span><span class="off">LinkedIn</span></div></div>
+
+  <div class="deploy">Deploy agent</div>
+  <div class="fine">first run free · up to 100 verified leads · then $39 per run</div>
+</div>
+
+<hr class="sep">
+
+<!-- RESULTS -->
+<div class="hero">
+  <div>
+    <div class="n">1,012</div>
+    <div class="sub">912 email valid · 100 DM open · 3m 41s <i>· 61 catch-all free · 27 hopping · 40 dropped</i></div>
+    <div class="srcs">HN 341 · Reddit 288 · GitHub 174 · X 109 · Dev.to 52 · Indie Hackers 31 · Stack Overflow 17</div>
+  </div>
+  <div class="exp">Export CSV</div>
+</div>
+
+<table>
+<tr><th>Fit</th><th>Who</th><th>Signal</th><th>Contact</th></tr>
+
+<tr><td class="fit">.97</td><td class="who">Max Koenig<small>mkoenig</small></td>
+<td><div class="src">Hacker News · 3h</div><div class="qt">“we drop the oldest messages and it silently breaks tool_use pairs. embarrassing.”</div></td>
+<td class="c">m@koenig.io<small>valid · hn profile</small></td></tr>
+
+<tr><td class="fit">.96</td><td class="who">Priya Natarajan<small>@priya_builds</small></td>
+<td><div class="src">r/LangChain · 2h</div><div class="qt">“our agent blows past 128k after ~40 tool calls, anyone doing smart truncation?”</div></td>
+<td class="c">priya@stackline.dev<small>valid · reddit bio → stackline.dev</small></td></tr>
+
+<tr><td class="fit">.94</td><td class="who">Ben Whitfield<small>benw</small></td>
+<td><div class="src">Stack Overflow · 6h</div><div class="qt">“Anthropic tool_use pairs break when I truncate messages”</div></td>
+<td class="c">ben@whitfield.dev<small>valid · so → github profile</small></td></tr>
+
+<tr><td class="fit">.91</td><td class="who">Tom Aldous<small>tomaldous</small></td>
+<td><div class="src">github · openai/openai-agents-python #892 · 1d</div><div class="qt">“context window overflow in long-running loops, we're just slicing the array”</div></td>
+<td class="c">tom.aldous@gmail.com<small>valid · commit email</small></td></tr>
+
+<tr><td class="fit">.89</td><td class="who">Lena Fischer<small>lfischer</small></td>
+<td><div class="src">Hacker News · 1d</div><div class="qt">“rebuilt our agent's memory three times, it still leaks stale tool output into every turn”</div></td>
+<td class="c ca">lena@fischer.dev<small>catch-all · lena.fyi · not counted</small></td></tr>
+
+<tr><td class="fit">.88</td><td class="who">u/throwaway_agentdev<small>&nbsp;</small></td>
+<td><div class="src">r/LocalLLaMA · 1d</div><div class="qt">“how do you all handle 200-message tool loops without the model forgetting the goal halfway through, we tried summarizing every 20 turns and it just hallucinates what the user asked for”</div></td>
+<td class="c dm">DM · Reddit<small>open · active 2d ago</small></td></tr>
+
+<tr><td class="fit">.86</td><td class="who">Marcus Lindqvist<small>mlindqvist</small></td>
+<td><div class="src">Indie Hackers · 2d</div><div class="qt">“building a coding agent, spending $400/day on tokens and half of it is repeated tool output”</div></td>
+<td class="c">marcus@lindqvist.se<small>valid · ih profile</small></td></tr>
+
+<tr><td class="fit">.81</td><td class="who">Sarah Okafor<small>@sokafor_ai</small></td>
+<td><div class="src">X · 5h</div><div class="qt">“day 3 of fighting context bloat in our support agent”</div></td>
+<td class="c">sarah@okafor.co<small>valid · x bio → okafor.co</small></td></tr>
+
+<tr><td class="fit">.74</td><td class="who">Kofi Mensah<small>kofimensah</small></td>
+<td><div class="src">dev.to · 4d</div><div class="qt">“I built an agent and it costs more than my rent”</div></td>
+<td class="c">kofi.mensah@proton.me<small>valid · dev.to profile</small></td></tr>
+
+<tr class="lo"><td class="fit">.66</td><td class="who">Wei Zhang<small>weizh</small></td>
+<td><div class="src">github · weizh/agent-toolkit · 1.2k★</div><div class="qt">README: “TODO: context management”</div></td>
+<td class="c">wei@zhang.codes<small>valid · github profile</small></td></tr>
+
+<tr class="lo"><td class="fit">.52</td><td class="who">Jenna Park<small>jennap</small></td>
+<td><div class="src">Product Hunt · maker · 11d</div><div class="qt">Relay — an AI ops agent that runs your on-call</div></td>
+<td class="c ca">jenna@relay.so<small>catch-all · relay.so · not counted</small></td></tr>
+
+<tr class="lo2"><td class="fit">.41</td><td class="who">Aisha Rahman<small>Cortex Labs</small></td>
+<td><div class="src">YC S26</div><div class="qt">agents for compliance workflows</div></td>
+<td class="c">aisha@cortexlabs.ai<small>valid · yc profile</small></td></tr>
+
+<tr class="more"><td colspan="4">1,061 more ↓</td></tr>
+</table>
+</div></body></html>
