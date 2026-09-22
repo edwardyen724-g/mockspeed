@@ -84,7 +84,7 @@ Data shape:   <fields and types implied by the fake data>
 Decisions:    <what was ruled out and why>
 ```
 
-Keep that updated as the conversation goes. Hand that to the builder — never the HTML.
+Keep that updated as the conversation goes. Hand that to the builder — never the HTML. When the renderer is in use (see *Rendering mechanics*), the `spec.json` you rendered from *is* this document — screens, primary actions, elements with their tiers, `data`, `decisions` — so hand over the JSON.
 
 ## Escalating to clickable
 
@@ -111,7 +111,11 @@ When you do go interactive: in-memory state only, same greyscale rules, same wor
 
 Use whatever inline visual mechanism the current surface offers — in chat, the visualizer tool; in an agentic surface, a single self-contained HTML file. Keep the whole mock in one file with no external assets.
 
-When rendering to a file, give each screen's container `data-screen="<name>"` and mark generated content — values, posts, anything the product's data or the product itself produced — with `data-lint="data"`. If `mocklint` is available (see the repo's `lint/`), run it on the file before showing the render; it names the nodes that break Rules 1 and 2. Fix those nodes and re-render; do not argue with it, and do not show a render that failed. Lines it lists as ambiguous are yours to decide.
+When rendering to a file and the renderer is available (the repo's `render/`), do not write HTML. Write the spec as JSON — the format is the header of `render/render.mjs`: screens, each with its primary action and its elements in screen order, `tier` carrying the hierarchy, the fake data literal in the rows and values — and run `node render/render.mjs spec.json -o mock.html`. A spec is shorter than the HTML and none of it is layout — the fake data and the hierarchy are all you write — and the output already carries the screen and data marks the lint reads. The vocabulary is closed on purpose: if a screen needs an element the renderer does not have, say so and draw it with what exists. Keep the spec file; it is the running spec, made literal.
+
+Without the renderer, write HTML and mark it yourself: `data-screen="<name>"` on each screen's container, `data-lint="data"` on generated content — values, posts, anything the product's data or the product itself produced.
+
+If `mocklint` is available (see the repo's `lint/`), run it on the rendered file before showing it; it names the nodes that break Rules 1 and 2. Fix those nodes and re-render; do not argue with it, and do not show a render that failed. Lines it lists as ambiguous are yours to decide.
 
 If subagent delegation is available, delegate the render. The reason is **context isolation**, not speed: a few hundred lines of throwaway HTML per render would otherwise pile up in the main conversation and crowd out the actual thinking. Pass the subagent the running spec, not the transcript. Note that delegation does not make rendering concurrent with the conversation — the parent still waits. Only surfaces with real background tasks (Claude Code, Cowork) can render while the user keeps typing.
 

@@ -1,0 +1,67 @@
+{
+  "title": "leadgen",
+  "frame": "web",
+  "layout": "stack",
+  "screens": [
+    {
+      "name": "Confirm",
+      "primary": "Deploy agent — three pre-filled, editable confirmations",
+      "elements": [
+        { "kind": "row", "items": [
+          { "kind": "field", "label": "", "value": "https://jev-compactor.dev", "grow": true },
+          { "kind": "button", "label": "Find leads", "tier": "mid" }
+        ] },
+        { "kind": "text", "text": "jev-compactor — deterministic context compaction for AI agents · npm · TypeScript · MIT", "data": true, "tier": "mid" },
+        { "kind": "text", "label": "Who is this for?", "text": "People building LLM agents who hit context limits", "data": true, "tier": "heavy" },
+        { "kind": "text", "text": "or: teams running long-lived support / coding agents · LangChain and OpenAI Agents SDK users", "tier": "faint" },
+        { "kind": "chips", "label": "What are they saying?", "data": true,
+          "items": ["context window overflow", "truncation breaks tool_use pairs", "token cost from repeated tool output", "agent forgets the goal", "summary memory loses tool results", "RAG chunking", "prompt caching"],
+          "off": ["RAG chunking", "prompt caching"] },
+        { "kind": "chips", "label": "Where?", "style": "plain", "data": true,
+          "items": ["Hacker News", "r/LangChain · r/LocalLLaMA · r/OpenAI · r/ClaudeAI", "GitHub issues", "Dev.to", "Stack Overflow", "X", "Indie Hackers", "Discord", "LinkedIn"],
+          "off": ["Discord", "LinkedIn"] },
+        { "kind": "button", "label": "Deploy agent", "tier": "heavy" },
+        { "kind": "text", "text": "first run free · up to 100 verified leads · then $39 per run", "tier": "faint" }
+      ]
+    },
+    {
+      "name": "Results",
+      "primary": "Export CSV",
+      "elements": [
+        { "kind": "row", "justify": "between", "align": "end", "items": [
+          { "kind": "stat", "value": "1,012", "tier": "heavy",
+            "sub": "912 email valid · 100 DM open · 3m 41s · 61 catch-all free · 27 hopping · 40 dropped",
+            "note": "HN 341 · Reddit 288 · GitHub 174 · X 109 · Dev.to 52 · Indie Hackers 31 · Stack Overflow 17" },
+          { "kind": "button", "label": "Export CSV", "tier": "heavy" }
+        ] },
+        { "kind": "table", "columns": ["Fit", "Who", "Signal", "Contact"], "widths": ["36px", "170px", null, "230px"], "more": "1,061 more ↓", "rows": [
+          [".97", ["Max Koenig", "mkoenig"], ["“we drop the oldest messages and it silently breaks tool_use pairs. embarrassing.”", "Hacker News · 3h"], ["m@koenig.io", "valid · hn profile"]],
+          [".96", ["Priya Natarajan", "@priya_builds"], ["“our agent blows past 128k after ~40 tool calls, anyone doing smart truncation?”", "r/LangChain · 2h"], ["priya@stackline.dev", "valid · reddit bio → stackline.dev"]],
+          [".94", ["Ben Whitfield", "benw"], ["“Anthropic tool_use pairs break when I truncate messages”", "Stack Overflow · 6h"], ["ben@whitfield.dev", "valid · so → github profile"]],
+          [".91", ["Tom Aldous", "tomaldous"], ["“context window overflow in long-running loops, we're just slicing the array”", "github · openai/openai-agents-python #892 · 1d"], ["tom.aldous@gmail.com", "valid · commit email"]],
+          [".89", ["Lena Fischer", "lfischer"], ["“rebuilt our agent's memory three times, it still leaks stale tool output into every turn”", "Hacker News · 1d"], { "text": "lena@fischer.dev", "sub": "catch-all · lena.fyi · not counted", "fade": true }],
+          [".88", ["u/throwaway_agentdev", ""], ["“how do you all handle 200-message tool loops without the model forgetting the goal halfway through, we tried summarizing every 20 turns and it just hallucinates what the user asked for”", "r/LocalLLaMA · 1d"], { "text": "DM · Reddit", "sub": "open · active 2d ago", "fade": true }],
+          [".86", ["Marcus Lindqvist", "mlindqvist"], ["“building a coding agent, spending $400/day on tokens and half of it is repeated tool output”", "Indie Hackers · 2d"], ["marcus@lindqvist.se", "valid · ih profile"]],
+          [".81", ["Sarah Okafor", "@sokafor_ai"], ["“day 3 of fighting context bloat in our support agent”", "X · 5h"], ["sarah@okafor.co", "valid · x bio → okafor.co"]],
+          [".74", ["Kofi Mensah", "kofimensah"], ["“I built an agent and it costs more than my rent”", "dev.to · 4d"], ["kofi.mensah@proton.me", "valid · dev.to profile"]],
+          { "fade": 1, "cells": [".66", ["Wei Zhang", "weizh"], ["README: “TODO: context management”", "github · weizh/agent-toolkit · 1.2k★"], ["wei@zhang.codes", "valid · github profile"]] },
+          { "fade": 1, "cells": [".52", ["Jenna Park", "jennap"], ["Relay — an AI ops agent that runs your on-call", "Product Hunt · maker · 11d"], { "text": "jenna@relay.so", "sub": "catch-all · relay.so · not counted", "fade": true }] },
+          { "fade": 2, "cells": [".41", ["Aisha Rahman", "Cortex Labs"], ["agents for compliance workflows", "YC S26"], ["aisha@cortexlabs.ai", "valid · yc profile"]] }
+        ] }
+      ]
+    }
+  ],
+  "data": {
+    "lead": "{ fit: 0..1, name, handle?, source: { site, thread|repo|post, age }, signal: string, contact: { kind: email|dm, value, channel?, via?: string[] } | { kind: hopping, path: string[] } }",
+    "run": "{ url, productSummary, icp, painPhrases[], sources[], counts: { reachable, email, dm, hopping, dropped, bySource }, status }"
+  },
+  "decisions": [
+    "no outreach, no creatives, no marketing — the output is the list",
+    "unit of volume = reachable (email or DM); unreachable rows are dropped but counted",
+    "go one hop further (profile → site → /team) before dropping a row",
+    "the agent infers the ICP; the user confirms, never picks from a menu",
+    "fit shown raw, not bucketed; every lead is attributable to a source and a quote",
+    "catch-all emails are free in the CSV and never counted",
+    "one screen, not a dashboard: nothing on it that is not a lead or the button that gets them"
+  ]
+}

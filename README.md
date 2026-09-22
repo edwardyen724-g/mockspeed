@@ -2,7 +2,7 @@
 
 A Claude skill that renders fast, disposable greyscale mockups while an idea is still being talked through — so the screen in your head becomes something you and other people can look at, within one turn, cheap enough to throw away.
 
-The point is thinking speed, not fidelity. A mockspeed render is a napkin sketch: not a design, not a prototype, not the beginning of a build. The skill is one file, [`SKILL.md`](SKILL.md).
+The point is thinking speed, not fidelity. A mockspeed render is a napkin sketch: not a design, not a prototype, not the beginning of a build. The skill is one file, [`SKILL.md`](SKILL.md). Two tools sit next to it: a [renderer](#spec-and-renderer) that draws a mock from a short JSON spec in milliseconds, and a [lint](#lint) that judges the result against the rules.
 
 ## Examples
 
@@ -16,7 +16,7 @@ Two mocks from real sessions. Each is one screen's worth of HTML with no externa
 
 [![leadgen mock](examples/leadgen/mock.png)](examples/leadgen/mock.html)
 
-[`mock.html`](examples/leadgen/mock.html) · [`spec.md`](examples/leadgen/spec.md)
+[`mock.html`](examples/leadgen/mock.html) · [`spec.json`](examples/leadgen/spec.json) · [`spec.md`](examples/leadgen/spec.md)
 
 ### Forecast
 
@@ -26,9 +26,9 @@ Two mocks from real sessions. Each is one screen's worth of HTML with no externa
 
 [![Forecast mock](examples/forecast/mock.png)](examples/forecast/mock.html)
 
-[`mock.html`](examples/forecast/mock.html) · [`spec.md`](examples/forecast/spec.md)
+[`mock.html`](examples/forecast/mock.html) · [`spec.json`](examples/forecast/spec.json) · [`spec.md`](examples/forecast/spec.md)
 
-**Provenance.** The leadgen HTML is the file rendered during its session. Forecast's design session produced a judged running spec but never rendered the sketch to a file, so the mock here was rendered from that spec, under the skill's rules, for this repo. Both specs are trimmed to the mockspeed format; product decisions that belong to the build (pricing, vendors, pipeline) are left out. Most mockspeed renders never become files at all — in chat they are drawn inline and replaced by the next turn's render, which is the intended lifecycle.
+**Provenance.** The leadgen HTML is the file rendered during its session. Forecast's design session produced a judged running spec but never rendered the sketch to a file, so the mock here was rendered from that spec, under the skill's rules, for this repo. Both `spec.md` files are trimmed to the mockspeed format; product decisions that belong to the build (pricing, vendors, pipeline) are left out. The `spec.json` next to each is the same mock re-expressed for the [renderer](#spec-and-renderer), written after the fact; rendered, each gets the same lint verdict as the hand-written HTML. Most mockspeed renders never become files at all — in chat they are drawn inline and replaced by the next turn's render, which is the intended lifecycle.
 
 ## Principles
 
@@ -74,7 +74,36 @@ When the idea is ready to build, ask for the **running spec** and hand that to t
 
 ### Where the render shows up
 
-In chat, it draws inline with the visualiser. In Claude Code and other agentic surfaces it writes a single self-contained HTML file to the session's scratch directory; open it in a browser, or ask for a screenshot. Native apps get a plain phone frame with a faked status bar and tab bar; plugins get a faint fake host painted around the panel so scale reads correctly. Both come with the honest caveat that a rendered rectangle cannot judge feel or integration — only screen count, order and what lives where.
+In chat, it draws inline with the visualiser. In Claude Code and other agentic surfaces it writes a spec and runs the [renderer](#spec-and-renderer), which produces a single self-contained HTML file in the session's scratch directory; open it in a browser, or ask for a screenshot. Without the renderer it writes the HTML itself. Native apps get a plain phone frame with a faked status bar and tab bar; plugins get a faint fake host painted around the panel so scale reads correctly. Both come with the honest caveat that a rendered rectangle cannot judge feel or integration — only screen count, order and what lives where.
+
+## Spec and renderer
+
+A mock written as HTML costs a hundred-odd lines of generation per render, and most of those lines are layout and CSS decisions that Rule 5 says must never carry forward. [`render/render.mjs`](render/render.mjs) takes those decisions away: the mock is a short JSON **spec** — screens, each with its primary action and its elements in screen order — and the renderer draws it, in milliseconds, with no dependencies. What the author writes is the fake data and the hierarchy; what the author cannot write is a layout.
+
+```bash
+node render/render.mjs examples/forecast/spec.json -o mock.html
+```
+
+```json
+{ "title": "habits", "frame": "phone", "screens": [
+  { "name": "Today", "primary": "tick off today's habits", "elements": [
+    { "kind": "list", "tier": "heavy", "rows": [
+      { "n": "41", "text": "Write 200 words", "meta": "today", "on": true },
+      { "n": "12", "text": "Run", "meta": "yesterday" },
+      { "n": "0",  "text": "Call mum", "meta": "—", "off": true } ] },
+    { "kind": "button", "label": "Add habit" },
+    { "kind": "tabs", "items": ["Today", "Streaks", "Settings"], "on": "Today" } ] } ] }
+```
+
+The vocabulary is small and closed — `stat`, `text`, `field`, `button`, `chips`, `tabs`, `list`, `table`, `row`, `strip`, `scatter` — and each element has a `tier`: `heavy` for the one thing that matters on the screen, `mid` for supporting content, `faint` for chrome and metadata. That is Rule 3 made mechanical. Frames are `web`, `phone` (status bar, tab bar at the bottom) and `panel` (a plugin panel in a faint host); screens sit in a `row` or a `stack`. The full format, one line per kind, is the header of `render.mjs`. There is no heading kind, no colour, no icon, no free positioning; a caption above an element is allowed and gets judged like anything else the designer wrote.
+
+Three things fall out of the spec being the source:
+
+- **The lint marks are structural.** Rows, values and items declared `data` are marked as data by the renderer, so mocklint reads the output with nothing hand-placed, asks fewer questions, and the author cannot forget a mark. Anything the designer typed that is not data — a label, a button, a caption, a `text` line without `data: true` — is judged.
+- **Every element has an id.** `data-id="list1"` on each element and `data-screen` on each screen are what the next step — pointing at a node and saying what to change — will address.
+- **The spec is the running spec.** `data` and `decisions` are carried in the file and never rendered; `primary` sits on each screen. Rule 5's handoff document and the render input are the same JSON.
+
+A bad spec is refused with every offender named (`screens[0].elements[2]: unknown kind 'hero' (stat | text | …)`), which is the feedback an author needs when it is writing the file blind.
 
 ## Lint
 
@@ -109,7 +138,7 @@ Backtest — PASS · 11 / 20 non-data words (12 if the ambiguous lines count)
 Three things the render can tell the lint, because the renderer knows them and a reader often can't:
 
 - `data-screen="Backtest"` on a container names a screen (the budget is per screen). `--screens <selector>` or `--split <selector>` work for mocks without it.
-- `data-lint="data"` on an element declares it and its children as data — a value, a post, something the system produced. Marked nodes are counted as data and not judged. This matters for screens that show generated content: on leadgen's Confirm step the inferred audience and pain phrases are the product's output, but to a reader they look like designer copy, and unmarked they fail the budget at 83 words. Marked, the verdict is the strict reading of Rule 2: the fine print (`first run free · up to 100 verified leads · then $39 per run`, 10 words, explanation 0.80) and the `or: …` alternates line are the violations, and `Who is this for?` is a section heading. The leadgen mock predates the lint and is kept as rendered, so it fails as shipped.
+- `data-lint="data"` on an element declares it and its children as data — a value, a post, something the system produced. Marked nodes are counted as data and not judged. This matters for screens that show generated content: on leadgen's Confirm step the inferred audience and pain phrases are the product's output, but to a reader they look like designer copy, and unmarked they fail the budget at 83 words. Marked, the verdict is the strict reading of Rule 2: the fine print (`first run free · up to 100 verified leads · then $39 per run`, 10 words, explanation 0.80) and the `or: …` alternates line are the violations, and `Who is this for?` is a section heading. The leadgen mock predates the lint and is kept as rendered, so it fails as shipped; its `spec.json`, rendered, reaches the same verdict with the marks placed by the renderer.
 - `data-lint="ignore"` leaves an element out (a fake host frame around a plugin panel, say).
 
 What to expect from the numbers: P(data) below 0.4 counts against the budget, above 0.6 is data, between is listed as *ambiguous* for you to decide, and the budget is reported both ways. Jev's answers drift by up to ~0.1 between identical runs, so a mixed line like `58 / 63 in band` will sometimes cross that band and a screen sitting exactly on 20 will sometimes read 24. That's the model, not the mock; the band is there so it shows up as a question rather than a flip. The edge-case check is a warning, not a failure — Jev judges each value alone and "far longer than its neighbours" needs a comparison it can't make.
@@ -118,10 +147,11 @@ What to expect from the numbers: P(data) below 0.4 counts against the budget, ab
 
 ```
 SKILL.md                 the skill, verbatim
+render/                  render.mjs — spec → greyscale HTML, no dependencies
 lint/                    mocklint.mjs · package.json — the Jev-backed rule checker
 examples/
-  leadgen/               mock.html · mock.png · spec.md
-  forecast/              mock.html · mock.png · spec.md
+  leadgen/               spec.json · mock.html · mock.png · spec.md
+  forecast/              spec.json · mock.html · mock.png · spec.md
 ```
 
 ## License
