@@ -1,0 +1,266 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>canvas</title>
+<style>
+  :root{--line:#e3e3e3;--faint:#8a8a8a}
+  *{box-sizing:border-box}
+  body{margin:0;height:100vh;display:grid;grid-template-columns:1fr 340px;
+       font:13px/1.45 system-ui,-apple-system,sans-serif;color:#111;background:#f6f6f6}
+  iframe{width:100%;height:100vh;border:0;background:#fff}
+  aside{border-left:1px solid var(--line);background:#fff;display:flex;flex-direction:column;height:100vh}
+  header{padding:12px 14px;border-bottom:1px solid var(--line)}
+  h1{margin:0;font-size:13px;font-weight:600}
+  .sub{color:var(--faint);font-size:11px;margin-top:2px}
+  .marked{padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;min-height:44px}
+  .marked b{font-weight:600}
+  .none{color:var(--faint)}
+  button{font:inherit;font-size:12px;padding:4px 9px;border:1px solid #ccc;background:#fff;border-radius:3px;cursor:pointer}
+  button:hover:not(:disabled){background:#f0f0f0}
+  button:disabled{opacity:.4;cursor:default}
+  button.go{border-color:#111;background:#111;color:#fff}
+  .say{padding:12px 14px;border-bottom:1px solid var(--line)}
+  .say form{display:flex;gap:6px}
+  input{flex:1;font:inherit;padding:6px 8px;border:1px solid #ccc;border-radius:3px}
+  input:focus{outline:1px solid #111;border-color:#111}
+  #mic.on{background:#111;color:#fff;border-color:#111}
+  details{border-bottom:1px solid var(--line);font-size:12px}
+  summary{padding:8px 14px;cursor:pointer;color:var(--faint);list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"› ";display:inline-block;transition:transform .1s}
+  details[open] summary::before{content:"⌄ "}
+  dl{margin:0;padding:0 14px 10px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;align-items:baseline}
+  dt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#111;white-space:nowrap}
+  dd{margin:0;color:var(--faint);font-size:11px}
+  .note{padding:8px 14px;font-size:12px;min-height:34px;border-bottom:1px solid var(--line)}
+  .note.warn{color:#8a3a00}
+  .ask{display:flex;flex-direction:column;gap:4px;padding:0 14px 10px}
+  .ask button{text-align:left}
+  ol{flex:1;overflow:auto;margin:0;padding:10px 14px;list-style:none;font-size:12px}
+  ol li{padding:4px 0;border-bottom:1px solid #f0f0f0;color:#333}
+  ol li .meta{color:var(--faint);font-size:11px}
+  ol li .said{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#555;
+              white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  ol li.you{border-bottom:0;padding-top:10px;font-weight:600;color:#111}
+  ol li.done{color:var(--faint);font-size:11px;border-bottom:1px solid #ddd}
+  ol li.refused{color:#8a3a00}
+  ol li.route{border-bottom:0;padding:0 0 4px;font-size:11px;color:#333}
+  ol li.route b{font-weight:600}
+  ol li.said-back{font-style:italic;color:#333}
+  .busy #go{opacity:.4}
+  footer{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:6px}
+</style></head>
+<body>
+<iframe id="mock" src="/mock"></iframe>
+<aside>
+  <header><h1 id="title">canvas</h1><div class="sub" id="status">…</div></header>
+  <div class="marked" id="markedBox"><span class="none">click anything in the mock to mark it</span></div>
+  <div class="say">
+    <form id="form"><input id="utterance" placeholder="describe an app, or say a change…" autocomplete="off"><button id="mic" type="button" title="voice">●</button><button class="go" id="go" type="submit">say</button></form>
+  </div>
+  <details open><summary>what can I say?</summary>
+    <dl>
+      <dt>create an app for …</dt><dd>Jev routes it to the writer, which writes it line by line; Jev places every line</dd>
+      <dt>make this quieter</dt><dd>one step down the hierarchy — louder goes back up</dd>
+      <dt>this is the main thing</dt><dd>one element carries the screen; the old one steps back</dd>
+      <dt>move it above the list</dt><dd>reorder within the screen</dd>
+      <dt>call it "Download"</dt><dd>rename, in the words you typed</dd>
+      <dt>add a button called Export</dt><dd>new element — if you don't say the words, it asks</dd>
+      <dt>remove the fine print</dt><dd>always asks before it does</dd>
+      <dt>reset the canvas</dt><dd>everything goes, on one yes — undo brings it back</dd>
+    </dl>
+    <dl><dt>a plain edit</dt><dd>Jev does it alone — no model call, a fraction of a second</dd>
+        <dt>this / it / that</dt><dd>means whatever you clicked, every time</dd>
+        <dt>a question</dt><dd>changes nothing — ask freely</dd></dl>
+  </details>
+  <div class="note" id="note"></div>
+  <div class="ask" id="ask"></div>
+  <ol id="log"></ol>
+  <footer>
+    <button id="undo">undo</button>
+    <button id="save">save spec</button>
+    <button id="clear">unmark</button>
+  </footer>
+</aside>
+<script>
+const $ = (id) => document.getElementById(id);
+const mock = $("mock");
+let marked = null, els = [], pending = null, pendingAdd = null;
+
+const post = (path, body) => fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }).then((r) => r.json());
+
+// Keep your place: an edit to the fourth screen should not scroll you back to the first. The
+// position is read only from a mock that has finished loading — two edits landing back to back
+// would otherwise read 0 from the half-loaded one and restore that.
+let loading = false, keepY = 0;
+function redraw() {
+  if (!loading) { try { keepY = mock.contentWindow.scrollY; } catch {} }
+  loading = true;
+  mock.src = "/mock?" + Date.now();
+  mock.onload = () => {
+    loading = false;
+    try { mock.contentWindow.scrollTo(0, keepY); } catch {}
+    if (marked) mock.contentWindow.postMessage({ type: "mark", key: marked }, "*");
+  };
+  load();
+}
+
+async function load() {
+  const s = await fetch("/state").then((r) => r.json());
+  els = s.elements;
+  $("title").textContent = s.title;
+  $("status").textContent = `${els.length} elements · ${s.llm ? s.llm.replace(/^claude-/, "") : "no translator"} → jev ${s.jev ? "on" : "off"} · save → ${s.out.split("/").pop()}`;
+  $("undo").disabled = !s.canUndo;
+  document.body.classList.toggle("busy", Boolean(s.busy));
+  if (s.busy) $("note").textContent = `building "${s.busy}" · ${s.log.length && s.log[s.log.length - 1].note || ""}`;
+  // Newest first. A request reads as: what you typed, then each line the translator wrote with
+  // what Jev made of it, then the tally.
+  $("log").innerHTML = s.log.slice().reverse().map((e) => {
+    if (e.op === "ask") return `<li class="you">${esc(e.note)}</li>`;
+    if (e.op === "route") return `<li class="route">→ <b>${esc(e.route || "")}</b> · ${esc(e.note)}<div class="meta">${esc(e.source || "")}</div></li>`;
+    if (e.op === "said") return `<li class="said-back">“${esc(e.note)}”<div class="meta">${esc(e.source || "")} said</div></li>`;
+    if (e.op === "done") return `<li class="done">${esc(e.note)}</li>`;
+    const said = e.said ? `<div class="said" title="${esc(e.said)}">${esc(e.said)}</div>` : "";
+    const conf = e.conf ? " " + e.conf.toFixed(2) : "";
+    return `<li class="${e.refused ? "refused" : ""}">${said}${esc(e.note)}<div class="meta">${esc(e.op || "")}${conf}${e.ms ? " · " + e.ms + " ms" : ""}${e.source ? " · " + esc(e.source) : ""}</div></li>`;
+  }).join("");
+  $("log").scrollTop = 0;  // newest first, so the newest is what you see
+  if (marked && !els.some((e) => e.key === marked)) setMark(null);
+  else showMark();
+}
+
+const esc = (s) => String(s ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+
+function showMark() {
+  const e = els.find((x) => x.key === marked);
+  $("markedBox").innerHTML = e
+    ? `<b>${esc(e.kind)}</b> · ${esc(e.tier)} · <span class="none">${esc(e.screen)}/${esc(e.id)}</span><br>${esc(e.text)}`
+    : `<span class="none">click anything in the mock to mark it</span>`;
+}
+
+function setMark(key) {
+  marked = key;
+  showMark();
+  mock.contentWindow.postMessage({ type: "mark", key }, "*");
+}
+
+addEventListener("message", (e) => { if (e.data?.type === "mark") setMark(e.data.key); });
+
+// The mark lives in the mock's own DOM; the message that tells this page about it arrives a task
+// later. Read it back at the moment it is used, so a change said straight after a click binds to
+// the element that was clicked and not to the one before it.
+function currentMark() {
+  try {
+    const n = mock.contentDocument.querySelector("[data-id].marked");
+    if (!n) return null;
+    return n.closest("[data-screen]")?.dataset.screen + "/" + n.dataset.id;
+  } catch { return marked; }
+}
+
+// Enter sends, whatever the browser thinks about implicit submission.
+$("utterance").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); $("form").requestSubmit(); }
+});
+
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const utterance = $("utterance").value.trim();
+  if (!utterance) return;
+  $("note").textContent = "…";
+  $("ask").innerHTML = "";
+  $("utterance").value = "";
+  // If the canvas just asked what the new element should say, this line is the answer itself,
+  // not something to interpret.
+  if (pendingAdd) {
+    const add = pendingAdd;
+    clearAdd();
+    return say(await post("/say", { words: utterance, add }));
+  }
+  marked = currentMark() ?? marked;
+  // What you type goes to the translator, which writes the lines Jev decides on. The mock
+  // redraws as each line lands, through /events, while this request is still open.
+  const r = await post("/ask", { utterance, marked });
+  handle(r, r.said ?? utterance);
+});
+
+async function handle(r, utterance) {
+  if (r.needsConfirm) {
+    // A destructive edit asks in the page, not in a modal the browser owns.
+    $("ask").innerHTML = `<button class="go" data-yes>yes, do it</button><button data-no>leave it</button>`;
+    pending = utterance;
+    return say(r);
+  }
+  if (r.needsWords) {
+    pendingAdd = { kind: r.kind, screen: r.screen, anchor: r.anchor };
+    $("utterance").placeholder = `the ${r.kind}'s words…`;
+    $("utterance").focus();
+    $("ask").innerHTML = `<button data-cancel>never mind</button>`;
+    return say(r);
+  }
+  if (r.ask) {
+    mock.contentWindow.postMessage({ type: "pick", keys: r.ask.map((a) => a.key) }, "*");
+    $("ask").innerHTML = r.ask.map((a, i) => `<button data-key="${a.key}">${i + 1} · ${esc(a.kind)} on ${esc(a.screen)} — ${esc(a.text)}</button>`).join("");
+    pending = utterance;
+  }
+  say(r);
+}
+
+function clearAdd() { pendingAdd = null; $("utterance").placeholder = "say a change…"; $("ask").innerHTML = ""; }
+
+$("ask").addEventListener("click", async (e) => {
+  if (e.target.dataset?.cancel !== undefined) { clearAdd(); return say({ note: "left alone" }); }
+  if (e.target.dataset?.yes !== undefined) {
+    const u = pending; $("ask").innerHTML = "";
+    return say(await post("/say", { utterance: u, marked, confirm: true }));
+  }
+  if (e.target.dataset?.no !== undefined) { $("ask").innerHTML = ""; return say({ note: "left alone" }); }
+  const key = e.target.dataset?.key;
+  if (!key) return;
+  setMark(key);
+  $("ask").innerHTML = "";
+  mock.contentWindow.postMessage({ type: "pick", keys: [] }, "*");
+  // Back through handle(), not say(): the retry can itself come back needing a confirmation,
+  // and only handle() knows how to draw one.
+  if (pending) handle(await post("/say", { utterance: pending, marked: key }), pending);
+});
+
+function say(r) {
+  const bits = [r.note];
+  if (r.ms) bits.push(`${r.ms} ms`);
+  if (r.opConfidence) bits.push(`${r.op} ${r.opConfidence.toFixed(2)}`);
+  $("note").textContent = bits.filter(Boolean).join(" · ");
+  $("note").className = "note" + (r.changed === false && !r.ask && !r.needsConfirm ? " warn" : "");
+  if (r.changed) redraw(); else load();
+}
+
+$("undo").onclick = async () => say(await post("/undo"));
+$("save").onclick = async () => say(await post("/save"));
+$("clear").onclick = () => setMark(null);
+
+// Voice, where the browser has it: interim words land in the box, the final one is sent.
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR) {
+  const rec = new SR();
+  rec.continuous = false; rec.interimResults = true; rec.lang = "en-US";
+  let on = false;
+  $("mic").onclick = () => { on ? rec.stop() : rec.start(); };
+  rec.onstart = () => { on = true; $("mic").classList.add("on"); };
+  rec.onend = () => { on = false; $("mic").classList.remove("on"); };
+  rec.onresult = (e) => {
+    const last = e.results[e.results.length - 1];
+    $("utterance").value = last[0].transcript;
+    if (last.isFinal) $("form").requestSubmit();
+  };
+} else $("mic").disabled = true;
+
+mock.onload = () => { if (marked) mock.contentWindow.postMessage({ type: "mark", key: marked }, "*"); };
+
+// Changes can arrive from outside this page — Claude appending a screen, an element at a time.
+let seen = null;
+new EventSource("/events").onmessage = (e) => {
+  const now = JSON.parse(e.data);
+  if (seen && now.rev !== seen.rev) redraw();
+  else if (seen && now.seq !== seen.seq) load();
+  seen = now;
+};
+load();
+</script>
+</body></html>
