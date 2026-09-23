@@ -1,0 +1,154 @@
+app #n1 "Agent Orchestration" web
+  screen #n2 "Runs"
+    text #n5 "Runs" bold
+    button #n12 "New Run" primary size=l
+    row #n113 pad=3 gap=2 align=center
+      input #n114 "Search runs..." search grow
+    row #n3 h=fill
+      col #n4 w=200 fill=mid pad=3 gap=2
+        text #n6 "Agents" shade=mid
+        text #n7 "Workflows" shade=mid
+        text #n8 "Settings" shade=mid
+      col #n9 grow pad=4 gap=3
+        row #n10 justify=between align=center
+          text #n11 "Recent Runs" size=l bold
+        col #n13 gap=2
+          table #n170
+            tr #n171 "Run Name | Agents | Status | Duration"
+            tr #n172 "data_pipeline_sync | 3 | Completed | 2m 14s" data
+            tr #n173 "customer_support_batch | 5 | Running | 4m 32s" data
+            tr #n174 "report_generation | 2 | Queued | —" data
+            tr #n175 "email_dispatch | 4 | Failed | 1h ago" data
+  screen #n38 "Run Detail"
+    row #n39 h=fill
+      col #n40 w=200 fill=light pad=3 gap=2
+        text #n41 "Runs" shade=mid
+        text #n42 "Agents" shade=mid
+        text #n43 "Workflows" shade=mid
+        text #n44 "Settings" shade=mid
+      col #n45 grow pad=4 gap=3
+        row #n46 justify=between align=center
+          col #n47 gap=1
+            text #n48 "data_pipeline_sync" size=l bold data
+            text #n49 "Started 14:23 • 2m 14s" size=s shade=mid data
+          text #n50 "Completed" size=s shade=dark data
+        graph #n51 dir=right h=200
+          node #fetch "Fetch Data" sub=api_reader
+          node #validate "Validate" sub=schema_check
+          node #transform "Transform" sub=etl_agent
+          node #store "Store" sub=db_writer
+          edge #n52 fetch -> validate "rows: 2,847"
+          edge #n53 validate -> transform "valid"
+          edge #n54 transform -> store "batches: 8"
+        col #n55 gap=2
+          col #n56 border pad=3 gap=2
+            row #n57 justify=between align=center
+              text #n58 "api_reader" bold mono size=s
+              text #n59 "✓ Done" size=s shade=dark data
+            text #n60 "Connected to prod_db | Retrieved 2,847 rows" size=xs shade=mid data
+          col #n61 border pad=3 gap=2
+            row #n62 justify=between align=center
+              text #n63 "schema_check" bold mono size=s
+              text #n64 "✓ Done" size=s shade=dark data
+            text #n65 "Validated all records against schema v4" size=xs shade=mid data
+          col #n66 border pad=3 gap=2
+            row #n67 justify=between align=center
+              text #n68 "etl_agent" bold mono size=s
+              text #n69 "✓ Done" size=s shade=dark data
+            text #n70 "Transformed 2,847 rows in 8 batches" size=xs shade=mid data
+          col #n71 border pad=3 gap=2
+            row #n72 justify=between align=center
+              text #n73 "db_writer" bold mono size=s
+              text #n74 "✓ Done" size=s shade=dark data
+            text #n75 "Wrote all records to warehouse • 14:25" size=xs shade=mid data
+  screen #n76 "Workflows"
+    row #n77 h=fill
+      col #n78 w=200 fill=light pad=3 gap=2
+        text #n79 "Runs" shade=mid
+        text #n80 "Agents" bold
+        text #n81 "Workflows" shade=mid
+        text #n82 "Settings" shade=mid
+      col #n83 grow pad=4 gap=3
+        row #n84 justify=between align=center
+          text #n85 "Agents" size=l bold
+          button #n86 "Add Agent" primary
+        col #n87 gap=2
+          col #n88 border pad=3 gap=2
+            row #n89 justify=between align=center
+              text #n90 "api_reader" bold mono
+              text #n91 "Ready" size=xs shade=dark data
+            text #n92 "Fetches data from REST APIs • Last used 8m ago" size=xs shade=mid data
+          col #n93 border pad=3 gap=2
+            row #n94 justify=between align=center
+              text #n95 "schema_check" bold mono
+              text #n96 "Ready" size=xs shade=dark data
+            text #n97 "Validates JSON against schema • 847 runs" size=xs shade=mid data
+          col #n98 border pad=3 gap=2
+            row #n99 justify=between align=center
+              text #n100 "etl_agent" bold mono
+              text #n101 "Ready" size=xs shade=dark data
+            text #n102 "Transforms and enriches data • Last used 2m ago" size=xs shade=mid data
+          col #n103 border pad=3 gap=2
+            row #n104 justify=between align=center
+              text #n105 "db_writer" bold mono
+              text #n106 "Ready" size=xs shade=dark data
+            text #n107 "Writes to PostgreSQL and BigQuery • 1,243 runs" size=xs shade=mid data
+          col #n108 border pad=3 gap=2
+            row #n109 justify=between align=center
+              text #n110 "email_dispatcher" bold mono
+              text #n111 "Error" size=xs shade=mid data
+            text #n112 "Connection lost • Reconnecting..." size=xs shade=mid data
+  screen #n115 "Settings"
+    row #n116 h=fill
+      col #n117 w=200 fill=light pad=3 gap=2
+        text #n118 "Runs" shade=mid
+        text #n119 "Agents" shade=mid
+        text #n120 "Workflows" shade=mid
+        text #n121 "Settings" bold
+      col #n122 grow pad=4 gap=3
+        text #n123 "Settings" size=l bold
+        col #n124 gap=3
+          col #n125 gap=2
+            text #n126 "Organization" size=m bold
+            col #n127 border pad=3 gap=2
+              row #n128 justify=between align=center
+                col #n129 gap=1
+                  text #n130 "Workspace Name" bold
+                  text #n131 "acme_data_ops" mono size=s shade=mid data
+                button #n132 "Edit" ghost
+              row #n133 justify=between align=center
+                col #n134 gap=1
+                  text #n135 "API Base URL" bold
+                  text #n136 "https://api.agent-orchestration.io" mono size=xs shade=mid data
+                button #n137 "Edit" ghost
+          col #n138 gap=2
+            text #n139 "Integrations" size=m bold
+            col #n140 border pad=3 gap=2
+              row #n141 justify=between align=center
+                col #n142 gap=1
+                  text #n143 "Slack Notifications" bold
+                  text #n144 "Connected • #alerts channel" size=xs shade=mid data
+                button #n145 "Manage" ghost
+              row #n146 justify=between align=center
+                col #n147 gap=1
+                  text #n148 "PostgreSQL" bold
+                  text #n149 "acme-prod.us-east-1 • Connected" size=xs shade=mid data
+                button #n150 "Manage" ghost
+              row #n151 justify=between align=center
+                col #n152 gap=1
+                  text #n153 "BigQuery" bold
+                  text #n154 "project-acme • Connected" size=xs shade=mid data
+                button #n155 "Manage" ghost
+          col #n156 gap=2
+            text #n157 "Security" size=m bold
+            col #n158 border pad=3 gap=2
+              row #n159 justify=between align=center
+                col #n160 gap=1
+                  text #n161 "API Keys" bold
+                  text #n162 "2 active keys" size=xs shade=mid data
+                button #n163 "Manage" ghost
+              row #n164 justify=between align=center
+                col #n165 gap=1
+                  text #n166 "Audit Logs" bold
+                  text #n167 "Last 30 days • 1,247 events" size=xs shade=mid data
+                button #n168 "View" ghost

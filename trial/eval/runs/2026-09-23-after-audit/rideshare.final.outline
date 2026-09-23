@@ -1,0 +1,102 @@
+app #n1 "Driver" phone
+  screen #n2 "Active"
+    text #n115 "Ready" bold size=l
+    button #n122 "Accept" primary w=fill
+    row #n112 pad=3 gap=2
+      input #n113 "Search location" search w=fill
+    row #n114 pad=3 gap=2 align=center
+      shape #n116 circle w=12 h=12 fill=dark
+    col #n117 h=fill pad=3 gap=3 grow
+      table #n118
+        tr #n119 "Driver | Rating | Pickup | Dropoff | ETA | Fare"
+        tr #n120 "Marcus Chen | 4.8 ★ | Oak & 3rd | Union Station | 4 min | $12.40" data
+      row #n121 gap=2 pad=3 border
+        button #n123 "Decline" ghost w=fill
+    row #n124 pad=3 gap=2 justify=between
+      col #n125 align=center
+        text #n126 "Today" size=s shade=mid
+        text #n127 "$186" bold size=l
+      col #n128 align=center
+        text #n129 "Trips" size=s shade=mid
+        text #n130 "7" bold size=l
+      col #n131 align=center
+        text #n132 "Rating" size=s shade=mid
+        text #n133 "4.9" bold size=l
+  screen #n34 "Trip"
+    col #n35 h=fill gap=2
+      row #n36 pad=3 gap=2 align=center
+        text #n37 "En route" bold size=l
+        shape #n38 circle w=12 h=12 fill=dark
+      shape #n39 w=fill h=280
+      col #n40 pad=3 gap=3 grow
+        row #n41 gap=2
+          col #n42 grow
+            text #n43 "Marcus Chen" bold
+            text #n44 "2 min" size=s shade=mid
+          shape #n45 circle w=40 h=40
+        text #n46 "Oak & 3rd" bold size=m
+        text #n47 "Heading to pickup" size=s shade=mid
+        progress #n48 "ETA" value=45
+        row #n49 gap=2 pad=3 fill=light border
+          button #n50 "Call" ghost w=fill
+          button #n51 "Message" ghost w=fill
+      row #n52 gap=2 pad=3 justify=between
+        button #n53 "Cancel" ghost
+        button #n54 "Arrived" primary
+  screen #n55 "History"
+    col #n56 pad=3 gap=4
+      text #n57 "This week" bold size=l
+      col #n58 gap=3
+        col #n59 border pad=3 gap=2
+          row #n60 justify=between
+            text #n61 "Sarah Johnson" bold
+            text #n62 "4.9" size=s
+          row #n63 gap=2 justify=between
+            text #n64 "8:45 AM" size=s shade=mid
+            text #n65 "$8.60" bold
+          text #n66 "Downtown → Airport" size=s shade=mid
+        col #n67 border pad=3 gap=2
+          row #n68 justify=between
+            text #n69 "Alex Rivera" bold
+            text #n70 "5.0" size=s
+          row #n71 gap=2 justify=between
+            text #n72 "2:30 PM" size=s shade=mid
+            text #n73 "$24.80" bold
+          text #n74 "Station → Midtown" size=s shade=mid
+        col #n75 border pad=3 gap=2
+          row #n76 justify=between
+            text #n77 "Jordan Lee" bold
+            text #n78 "4.7" size=s
+          row #n79 gap=2 justify=between
+            text #n80 "6:15 PM" size=s shade=mid
+            text #n81 "$31.50" bold
+          text #n82 "Midtown → Harbor" size=s shade=mid
+  screen #n85 "Settings"
+    col #n134 pad=3 gap=2 fill=light border
+      text #n135 "Your account is verified" size=s shade=mid
+      text #n136 "All documents approved" size=xs shade=mid
+    col #n86 pad=3 gap=4
+      text #n87 "Account" bold size=l
+      col #n88 gap=2
+        row #n89 justify=between align=center pad=3 border
+          text #n90 "Full Name"
+          text #n91 "Marcus Chen" size=s shade=mid
+        row #n92 justify=between align=center pad=3 border
+          text #n93 "Phone Number"
+          text #n94 "+1 (555) 847-2931" size=s shade=mid
+        row #n95 justify=between align=center pad=3 border
+          text #n96 "Email"
+          text #n97 "marcus.chen@email.com" size=s shade=mid
+      text #n98 "Preferences" bold size=l
+      col #n99 gap=2
+        row #n100 justify=between align=center pad=3 border
+          text #n101 "Notifications"
+          text #n102 "On" size=s shade=mid
+        row #n103 justify=between align=center pad=3 border
+          text #n104 "Dark Mode"
+          text #n105 "Off" size=s shade=mid
+        row #n106 justify=between align=center pad=3 border
+          text #n107 "Vehicle Type"
+          text #n108 "Standard" size=s shade=mid
+      row #n109 pad=3 gap=2
+        button #n110 "Logout" ghost w=fill

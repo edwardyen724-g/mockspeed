@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trial runs</title>
+<style>
+  :root{--bg:#f6f6f5;--panel:#fff;--ink:#161616;--ink2:#5c5c5c;--ink3:#8d8d8d;--line:#e4e4e2;--soft:#efefed;--chip:#f0f0ee;--accent:#161616;--bad:#9a3412}
+  @media (prefers-color-scheme:dark){:root{--bg:#141414;--panel:#1d1d1d;--ink:#ededed;--ink2:#a9a9a9;--ink3:#7a7a7a;--line:#2e2e2e;--soft:#242424;--chip:#262626;--accent:#ededed;--bad:#fb923c}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  a{color:inherit}
+  .wrap{max-width:1200px;margin:0 auto;padding:28px 20px 60px}
+  header h1{margin:0;font-size:22px;letter-spacing:-.01em}
+  header p{margin:4px 0 0;color:var(--ink2);max-width:780px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:18px 0 6px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+  .stat b{display:block;font-size:20px;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+  .stat span{color:var(--ink2);font-size:12px}
+  nav{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0 16px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:2}
+  nav a{text-decoration:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:13px;color:var(--ink2)}
+  nav a.on{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+  h2{font-size:15px;margin:26px 0 8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .card{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none}
+  .card:hover{border-color:var(--ink3)}
+  .thumb{height:190px;background:#fff;border-bottom:1px solid var(--line);overflow:hidden;position:relative}
+  .thumb img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
+  .thumb.dim img{opacity:.25}
+  .thumb .over{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;color:#161616;font-weight:600;font-size:13px}
+  .card .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .card .name{font-weight:600;font-size:14px}
+  .card .prompt{color:var(--ink2);font-size:12.5px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:6px}
+  .chip{font-size:11.5px;background:var(--chip);border-radius:5px;padding:2px 7px;color:var(--ink2);white-space:nowrap}
+  .chip.b{color:var(--ink);font-weight:600}
+  .chip.bad{color:var(--bad);font-weight:600}
+  .back{display:inline-block;margin:0 0 14px;color:var(--ink2);text-decoration:none;font-size:13px}
+  .cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+  @media (max-width:900px){.cols{grid-template-columns:1fr}}
+  .shot{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .shot img{width:100%;display:block}
+  .toggle{display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap}
+  .toggle button{font:inherit;font-size:12.5px;padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);cursor:pointer}
+  .toggle button.on{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+  .side{display:flex;flex-direction:column;gap:12px}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .box h3{margin:0 0 8px;font-size:13px}
+  dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13px}
+  dt{color:var(--ink3)} dd{margin:0}
+  .btn{display:inline-block;text-decoration:none;background:var(--accent);color:var(--bg);border-radius:7px;padding:7px 12px;font-size:13px;font-weight:600}
+  .muted{color:var(--ink2);font-size:13px}
+  .warn{color:var(--bad)}
+  table{width:100%;border-collapse:collapse;font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;color:var(--ink3);font-weight:500;border-top:0;background:var(--soft)}
+  td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink2)}
+  .out{font-weight:600}
+  .out.bad{color:var(--bad)}
+  ul.clean{margin:0;padding-left:18px;font-size:13px} ul.clean li{margin:3px 0}
+  .issue{border-top:1px solid var(--line);padding:8px 0;font-size:13px} .issue:first-child{border-top:0}
+  .cat{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink3);margin-right:6px}
+  pre.outline{margin:0;max-height:520px;overflow:auto;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:12px;border-radius:8px;white-space:pre}
+  .full{margin-top:18px}
+</style></head>
+<body><div class="wrap" id="app"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const secs = (ms) => (ms / 1000).toFixed(1) + " s";
+const dots = (n) => "●".repeat(n) + "○".repeat(3 - n);
+const byKey = Object.fromEntries(D.items.map((i) => [i.key, i]));
+const runOf = (g) => D.runs.find((r) => r.group === g);
+// What the test meant each kind of sentence to do: the route it should take.
+const expected = (k) => k === "build" || /^(add|rewrite|several)/.test(k) ? "write" : k.startsWith("question") ? "none" : "direct";
+// The route the app took for the sentence itself, not a split part's.
+const routeOf = (st) => { const j = st.jev.find((x) => x.kind === "route" && x.said === st.sentence) ?? st.jev.find((x) => x.kind === "route"); return j?.route ?? (j?.detail.match(/^jev · (\w+)/) ?? [])[1]; };
+
+function score(group) {
+  const apps = D.items.filter((i) => i.group === group && !i.error);
+  const steps = apps.flatMap((i) => i.steps.map((st) => ({ ...st, app: i })));
+  const judged = steps.filter((st) => st.verdict && st.kind !== "build");
+  const subs = apps.filter((i) => i.judge).map((i) => i.judge.substance);
+  const count = (f) => steps.filter(f).length;
+  return {
+    apps, steps,
+    jev: apps.reduce((s, i) => s + i.jev, 0), humans: apps.reduce((s, i) => s + i.humans, 0),
+    routed: count((st) => routeOf(st) === expected(st.kind)),
+    builds: apps.filter((i) => i.built).length,
+    placed: [count((st) => st.kind.startsWith("add") && st.outcome === "changed"), count((st) => st.kind.startsWith("add"))],
+    moves: [count((st) => st.kind.startsWith("move") && st.outcome === "changed"), count((st) => st.kind.startsWith("move"))],
+    rewrites: [count((st) => st.kind.startsWith("rewrite") && st.outcome === "changed"), count((st) => st.kind.startsWith("rewrite"))],
+    asked: count((st) => st.asked.length && !st.human.length),
+    right: judged.length ? [judged.filter((st) => /^(right|correctly_nothing|fair_ask)$/.test(st.verdict.call)).length, judged.length] : null,
+    needless: judged.filter((st) => st.verdict.call === "needless_ask").length,
+    substance: subs.length ? (subs.reduce((a, b) => a + b, 0) / subs.length).toFixed(1) : null,
+  };
+}
+
+function header(active) {
+  const s = score(D.runs[0].group);
+  const stat = (b, t) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`;
+  return `<header><h1>Trial runs</h1>
+    <p>Ten app requests put through the trial app (trial/eval/run.mjs) — Jev's decisions, the questions put to the person, what changed, and the judges' verdicts. The scoreboard is for <b>${esc(D.runs[0].label)}</b>.</p></header>
+    <div class="stats">
+      ${stat(s.jev, `Jev decisions · ${s.humans} answered by the person`)}
+      ${stat(`${s.routed} / ${s.steps.length}`, "sentences routed the way the test meant")}
+      ${stat(`${s.builds} / ${s.apps.length}`, "builds")}
+      ${stat(`${s.placed[0]} / ${s.placed[1]}`, "new pieces placed without asking")}
+      ${stat(`${s.moves[0]} / ${s.moves[1]}`, "moves to a named place")}
+      ${stat(`${s.rewrites[0]} / ${s.rewrites[1]}`, "rewrites of an element Jev chose")}
+      ${stat(s.asked, "questions left for the person")}
+      ${s.right ? stat(`${s.right[0]} / ${s.right[1]}`, `follow-ups judged right (a fair question counts) · ${s.needless} needless questions`) : ""}
+      ${s.substance ? stat(`${s.substance} / 3`, "build substance, judged") : ""}
+    </div>
+    <nav>${D.runs.map((r) => `<a href="#/${r.group}" class="${active === r.group ? "on" : ""}">${esc(r.label)}</a>`).join("")}<a href="#/summary" class="${active === "summary" ? "on" : ""}">Summary</a></nav>`;
+}
+
+function card(i) {
+  const r0 = i.renders[0];
+  const dim = Boolean(i.error) || !i.built;
+  const chips = [`<span class="chip b">${esc(i.builder)}</span>`,
+    i.error ? `<span class="chip bad">no credits</span>` : !i.built ? `<span class="chip bad">no build</span>` : "",
+    i.time.ms ? `<span class="chip">built in ${secs(i.time.ms)}</span>` : "",
+    `<span class="chip">Jev ${i.jev}</span>`, `<span class="chip">you ${i.humans}</span>`,
+    i.judge ? `<span class="chip">${dots(i.judge.substance)} ${i.judge.substance}/3</span>` : "", `<span class="chip">${esc(i.frame)}</span>`].join("");
+  return `<a class="card" href="#/item/${i.key}"><div class="thumb${dim ? " dim" : ""}">${r0.shot ? `<img loading="lazy" src="shots/${r0.file}.png" alt="">` : ""}${dim ? `<div class="over">${esc(i.error ?? "no build")}</div>` : ""}</div>
+    <div class="body"><div class="name">${esc(i.appName)}</div><div class="prompt">“${esc(i.prompt)}”</div><div class="chips">${chips}</div></div></a>`;
+}
+
+function stepsTable(i) {
+  const judged = i.steps.some((st) => st.verdict);
+  const rows = i.steps.map((st, n) => {
+    const route = routeOf(st), right = route === expected(st.kind);
+    const jev = st.jev.map((j) => `<div><b>${j.kind}</b>${j.said && j.said !== st.sentence ? ` <span class="muted">(${esc(j.said)})</span>` : ""}${j.kind === "where" ? `: ${esc(j.text)}` : ""}<div class="muted">${esc(j.detail.replace(/^jev · /, ""))}</div></div>`).join("") || `<span class="muted">—</span>`;
+    const you = [...st.asked.map((a) => `<div>asked: <b>${esc(a.question)}</b><div class="muted">${a.options.map(esc).join(" · ")}</div></div>`), ...st.human.map((h) => `<div>answered: <b>${esc(h)}</b></div>`)].join("") || `<span class="muted">—</span>`;
+    const bad = /not built|asked you|error/.test(st.outcome) || !right;
+    const v = st.verdict ? `<span class="out${/wrong|needless|missed/.test(st.verdict.call) ? " bad" : ""}">${esc(st.verdict.call.replace(/_/g, " "))}</span><div class="muted">${esc(st.verdict.why)}</div>` : `<span class="muted">—</span>`;
+    return `<tr><td class="num">${n + 1}</td><td><b>${esc(st.sentence)}</b>${st.marked ? `<div class="muted">marked #${esc(st.marked)}</div>` : ""}<div class="muted">${esc(st.kind)}</div>${right ? "" : `<div class="warn">routed ${esc(route ?? "?")}, expected ${expected(st.kind)}</div>`}</td>
+      <td>${jev}</td><td>${you}</td><td><span class="out${bad ? " bad" : ""}">${esc(st.outcome)}</span><div class="muted">${esc(st.result)}</div></td>${judged ? `<td>${v}</td>` : ""}<td class="num">${(st.ms / 1000).toFixed(1)} s</td></tr>`;
+  }).join("");
+  return `<table><tr><th>#</th><th>You said</th><th>Jev decided</th><th>You were asked</th><th>What happened</th>${judged ? "<th>Judged</th>" : ""}<th>Time</th></tr>${rows}</table>`;
+}
+
+function detail(key) {
+  const i = byKey[key];
+  if (!i) return list(D.runs[0].group);
+  const t = i.time, j = i.judge, r0 = i.renders[0];
+  const facts = [["Builder", esc(i.builder)], ["Build", t.ms ? `${secs(t.ms)}${t.first ? ` · first line at ${t.first} ms` : ""}` : "—"],
+    t.lines ? ["Output", `${t.lines} lines · ${Number(t.tokens).toLocaleString()} tokens`] : null, ["Jev decisions", `<b>${i.jev}</b>`], ["Person's answers", i.humans],
+    ["Frame", esc(i.frame)], ["Screens", esc((i.screens ?? []).join(" · "))], ["Nodes", i.nodes]].filter(Boolean);
+  const judge = j ? `<div class="box"><h3>Build substance · ${dots(j.substance)} ${j.substance}/3</h3><p class="muted" style="margin:0 0 10px">${esc(j.substanceWhy)}</p>
+      <h3>Composed well</h3><ul class="clean">${j.composedWell.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+      <h3 style="margin-top:12px">Issues</h3>${j.issues.map((x) => `<div class="issue"><span class="cat">${esc(x.category)}</span>${esc(x.what)}<div class="muted">${esc(x.evidence)}</div></div>`).join("")}</div>` : "";
+  return header(i.group) + `<a class="back" href="#/${i.group}">← ${esc(runOf(i.group).label)}</a><h2 style="font-size:22px;margin:0">${esc(i.appName)}</h2><p class="muted">“${esc(i.prompt)}”</p>
+    <div class="cols"><div>
+      <div class="toggle">${i.renders.map((r, n) => `<button data-r="${n}" class="${n === 0 ? "on" : ""}">${esc(r.label)}</button>`).join("")}</div>
+      <div class="shot"><a id="shotlink" href="renders/${r0.file}.html" target="_blank"><img id="shotimg" src="shots/${r0.file}.png" alt=""></a></div>
+      <div class="box" style="margin-top:14px"><h3 id="outlinehead">The outline — ${esc(r0.label.toLowerCase())}</h3><pre class="outline" id="outline">${esc(r0.outlineText)}</pre></div>
+    </div><div class="side">
+      <div class="box"><a class="btn" id="openlink" href="renders/${r0.file}.html" target="_blank">Open the render ↗</a></div>
+      <div class="box"><h3>Built</h3><dl>${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl></div>
+      ${i.error ? `<div class="box"><p class="warn" style="margin:0">${esc(i.error)}</p></div>` : ""}${judge}
+    </div></div>
+    <div class="full"><h2>Every sentence, every decision</h2>${stepsTable(i)}</div>`;
+}
+
+function list(group) {
+  return header(group) + `<h2>${esc(runOf(group).label)}</h2><div class="grid">${D.items.filter((i) => i.group === group).map(card).join("")}</div>`;
+}
+
+function summary() {
+  return header("summary") + D.runs.map((r) => {
+    const s = score(r.group);
+    const kinds = {};
+    for (const st of s.steps) {
+      const k = (kinds[st.kind] ??= { outcomes: {}, verdicts: {} });
+      k.outcomes[st.outcome] = (k.outcomes[st.outcome] ?? 0) + 1;
+      if (st.verdict) k.verdicts[st.verdict.call] = (k.verdicts[st.verdict.call] ?? 0) + 1;
+    }
+    const fmt = (o) => Object.entries(o).map(([x, n]) => `${n} ${esc(x.replace(/_/g, " "))}`).join(" · ");
+    return `<h2>${esc(r.label)}</h2><table><tr><th>Kind of sentence</th><th>Expected route</th><th>What happened</th><th>Judged</th></tr>
+      ${Object.entries(kinds).map(([k, o]) => `<tr><td>${esc(k)}</td><td>${expected(k)}</td><td>${fmt(o.outcomes)}</td><td>${fmt(o.verdicts) || "—"}</td></tr>`).join("")}</table>`;
+  }).join("");
+}
+
+function route() {
+  const [a, b] = location.hash.replace(/^#\/?/, "").split("/");
+  $("#app").innerHTML = a === "item" ? detail(b) : a === "summary" ? summary() : list(runOf(a) ? a : D.runs[0].group);
+  if (a === "item" && byKey[b]) {
+    const i = byKey[b];
+    document.querySelectorAll(".toggle button").forEach((btn) => btn.addEventListener("click", () => {
+      const r = i.renders[+btn.dataset.r];
+      document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === btn));
+      $("#shotimg").src = `shots/${r.file}.png`;
+      $("#shotlink").href = $("#openlink").href = `renders/${r.file}.html`;
+      $("#outline").textContent = r.outlineText;
+      $("#outlinehead").textContent = `The outline — ${r.label.toLowerCase()}`;
+    }));
+  }
+  window.scrollTo(0, 0);
+}
+addEventListener("hashchange", route);
+route();
+</script></body></html>

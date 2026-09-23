@@ -1,0 +1,79 @@
+app #n1 "Studio" web
+  screen #n2 "Mixer"
+    row #n3 h=fill gap=4
+      col #n4 w=200 fill=light pad=3 gap=2
+        text #n5 "Tracks" bold shade=dark
+        text #n6 "Drums" bold
+        text #n7 "Bass" shade=mid
+        text #n8 "Guitar" shade=mid
+        text #n9 "Vocals" shade=mid
+        text #n10 "Synth" shade=mid
+      col #n11 grow pad=4 gap=3
+        row #n12 justify=between align=center
+          text #n13 "Studio Session" size=l bold
+          button #n14 "Export" primary
+        row #n15 gap=2 align=center
+          text #n16 "120 BPM" mono shade=mid
+          text #n17 "4:32" mono shade=mid
+          button #n18 "▶" primary
+        col #n19 grow border pad=3 gap=1
+          row #n20 align=center gap=2 pad=1
+            shape #n21 circle w=32 h=32 fill=mid
+            col #n22 grow gap=1
+              text #n23 "Drums" bold
+              text #n24 "8 clips" size=s shade=mid data
+            text #n25 "-12dB" mono size=s
+          row #n26 align=center gap=2 pad=1
+            shape #n27 circle w=32 h=32 fill=mid
+            col #n28 grow gap=1
+              text #n29 "Bass" bold
+              text #n30 "6 clips" size=s shade=mid data
+            text #n31 "-8dB" mono size=s
+          row #n32 align=center gap=2 pad=1
+            shape #n33 circle w=32 h=32 fill=mid
+            col #n34 grow gap=1
+              text #n35 "Guitar" bold
+              text #n36 "12 clips" size=s shade=mid data
+            text #n37 "-5dB" mono size=s
+          row #n38 align=center gap=2 pad=1
+            shape #n39 circle w=32 h=32 fill=mid
+            col #n40 grow gap=1
+              text #n41 "Vocals" bold
+              text #n42 "4 clips" size=s shade=mid data
+            text #n43 "-3dB" mono size=s
+          row #n44 align=center gap=2 pad=1
+            shape #n45 circle w=32 h=32 fill=mid
+            col #n46 grow gap=1
+              text #n47 "Synth" bold
+              text #n48 "5 clips" size=s shade=mid data
+            text #n49 "-10dB" mono size=s
+  screen #n50 "Timeline"
+    row #n51 h=fill gap=4
+      col #n52 w=200 fill=light pad=3 gap=2
+        text #n53 "Tracks" bold shade=dark
+        text #n54 "Drums" bold
+        text #n55 "Bass" shade=mid
+        text #n56 "Guitar" shade=mid
+        text #n57 "Vocals" shade=mid
+        text #n58 "Synth" shade=mid
+      col #n59 grow pad=4 gap=3
+        row #n60 gap=2 align=center
+          text #n61 "0:00" mono size=s shade=mid
+          text #n62 "1:00" mono size=s shade=mid
+          text #n63 "2:00" mono size=s shade=mid
+          text #n64 "3:00" mono size=s shade=mid
+          text #n65 "4:00" mono size=s shade=mid
+        col #n66 grow gap=1
+          row #n67 h=60 align=center gap=1 fill=light pad=1
+            shape #n68 pill w=120 h=40 shade=mid data
+            shape #n69 pill w=140 h=40 shade=mid data
+          row #n70 h=60 align=center gap=1 fill=light pad=1
+            shape #n71 pill w=200 h=40 shade=mid data
+          row #n72 h=60 align=center gap=1 fill=light pad=1
+            shape #n73 pill w=180 h=40 shade=mid data
+            shape #n74 pill w=160 h=40 shade=mid data
+          row #n75 h=60 align=center gap=1 fill=light pad=1
+            shape #n76 pill w=240 h=40 shade=mid data
+          row #n77 h=60 align=center gap=1 fill=light pad=1
+            shape #n78 pill w=130 h=40 shade=mid data
+            shape #n79 pill w=150 h=40 shade=mid data

@@ -1,0 +1,53 @@
+app #n1 "Support" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 w=280 fill=light pad=3 gap=2 border
+        text #n5 "Conversations" bold size=s
+        line #n6
+        col #n7 gap=2
+          row #n8 pad=2 fill=mid gap=2 align=center
+            shape #n9 circle w=24 h=24
+            col #n10 grow
+              text #n11 "Marcus Chen" bold size=s data
+              text #n12 "Can't login" shade=mid size=xs data
+            text #n13 "2m" shade=mid size=xs data
+          row #n14 pad=2 gap=2 align=center
+            shape #n15 circle w=24 h=24
+            col #n16 grow
+              text #n17 "Sarah Williams" bold size=s data
+              text #n18 "Billing question" shade=mid size=xs data
+            text #n19 "1h" shade=mid size=xs data
+          row #n20 pad=2 gap=2 align=center
+            shape #n21 circle w=24 h=24
+            col #n22 grow
+              text #n23 "James Rodriguez" bold size=s data
+              text #n24 "Feature request" shade=mid size=xs data
+            text #n25 "5h" shade=mid size=xs data
+      col #n26 grow pad=3 gap=3
+        col #n27 gap=2 border pad=3 fill=light
+          text #n28 "Marcus Chen" bold
+          text #n29 "Account security verified" shade=mid size=xs
+          text #n30 "Email: marcus.chen@company.com" shade=mid size=xs
+          text #n31 "Member since Jan 2023" shade=mid size=xs
+          line #n32
+          text #n33 "Last issue: Password reset" shade=mid size=xs
+        col #n34 grow gap=2
+          row #n35 gap=2
+            shape #n36 circle w=32 h=32
+            col #n37 grow
+              text #n38 "Marcus Chen" bold size=s data
+              text #n39 "I keep getting an error when I try to log in. Password reset didn't help." data
+              text #n40 "2m" shade=mid size=xs
+          row #n41 gap=2 justify=end
+            col #n42 grow align=end
+              text #n43 "Did you check if caps lock is on?" data
+              text #n44 "Just now" shade=mid size=xs
+          row #n45 gap=2
+            shape #n46 circle w=32 h=32
+            col #n47 grow
+              text #n48 "Marcus Chen" bold size=s data
+              text #n49 "Oh wow. Yes that was it. Thanks so much!" data
+              text #n50 "1m" shade=mid size=xs
+        row #n51 gap=2 pad=3 border
+          input #n52 "Type a reply..." grow
+          button #n53 "Send" primary

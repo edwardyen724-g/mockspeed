@@ -1,0 +1,20 @@
+app #n1 "Summarize" panel
+  screen #n2 "Summary"
+    col #n3 pad=3 gap=3
+      text #n4 "Page Summary" size=l bold
+      text #n5 "www.example.com/article" shade=mid size=s
+      col #n6 border pad=3 gap=2 fill=light
+        text #n7 "This article explores how modern AI systems are trained using reinforcement learning from human feedback. It discusses the techniques OpenAI used to develop GPT-4, including constitutional AI methods and safety considerations. The piece covers practical applications in customer service and content creation, with examples from real companies implementing these systems in production." size=s
+      row #n8 gap=2 pad=3 justify=between align=center
+        text #n9 "2 min read" shade=mid size=s
+        button #n10 "Copy" ghost size=s
+      col #n11 gap=1 pad=3 border
+        text #n12 "Key points" size=s bold shade=dark
+        text #n13 "• RLHF improves model alignment" size=xs
+        text #n14 "• Constitutional AI reduces bias" size=xs
+        text #n15 "• Enterprise adoption growing 40% YoY" size=xs
+      col #n16 gap=2 pad=3
+        text #n17 "Questions" size=s bold shade=dark
+        text #n18 "What is reinforcement learning?" size=xs shade=mid
+        text #n19 "How does constitutional AI work?" size=xs shade=mid
+        text #n20 "What are real-world applications?" size=xs shade=mid

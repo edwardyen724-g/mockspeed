@@ -1,0 +1,102 @@
+app #n1 "Design Studio" web
+  screen #n2 "Board"
+    row #n56 pad=3 gap=2 border
+      input #n57 "Search tasks..." search
+    row #n3 h=fill
+      col #n4 w=200 fill=light pad=3 gap=2
+        text #n5 "Backlog" bold size=l
+        text #n6 "Active" bold
+        text #n7 "Review" bold
+        text #n8 "Done" bold
+        line #n9
+        text #n10 "Team" shade=mid size=xs
+        text #n11 "Alice" size=s
+        text #n12 "Marcus" size=s
+        text #n13 "Yuki" size=s
+      col #n14 grow pad=3 gap=3
+        row #n15 gap=3 h=fill
+          col #n16 w=280 gap=2
+            text #n17 "Backlog" bold shade=mid size=s
+            col #n18 border pad=3 gap=2 fill=light
+              text #n19 "Homepage redesign" bold size=s
+              text #n20 "Alice" shade=mid size=xs
+              shape #n21 circle w=6 h=6 fill=mid
+            col #n22 border pad=3 gap=2 fill=light
+              text #n23 "Mobile app flows" bold size=s
+              text #n24 "Unassigned" shade=mid size=xs
+              shape #n25 circle w=6 h=6 fill=light
+            col #n26 border pad=3 gap=2 fill=light
+              text #n27 "Brand guidelines" bold size=s
+              text #n28 "Marcus" shade=mid size=xs
+              shape #n29 circle w=6 h=6 fill=mid
+          col #n30 w=280 gap=2
+            text #n31 "Active" bold shade=mid size=s
+            col #n32 border pad=3 gap=2
+              text #n33 "Logo concepts" bold size=s
+              text #n34 "Yuki" shade=mid size=xs
+              text #n35 "Due tomorrow" shade=mid size=xs
+              shape #n36 circle w=6 h=6 fill=dark
+            col #n37 border pad=3 gap=2
+              text #n38 "Pitch deck design" bold size=s
+              text #n39 "Alice" shade=mid size=xs
+              text #n40 "3 days left" shade=mid size=xs
+              shape #n41 circle w=6 h=6 fill=dark
+          col #n42 w=280 gap=2
+            text #n43 "Review" bold shade=mid size=s
+            col #n44 border pad=3 gap=2 fill=light
+              text #n45 "Website prototype" bold size=s
+              text #n46 "Marcus" shade=mid size=xs
+              text #n47 "Waiting on client" shade=mid size=xs
+              shape #n48 circle w=6 h=6 fill=mid
+          col #n49 w=280 gap=2
+            text #n50 "Done" bold shade=mid size=s
+            col #n51 border pad=3 gap=2 fill=light
+              text #n52 "Social media kit" bold size=s
+              text #n53 "Yuki" shade=mid size=xs
+              text #n54 "Completed Dec 12" shade=mid size=xs
+              shape #n55 circle w=6 h=6 fill=light
+  screen #n58 "Settings"
+    row #n59 pad=3 gap=2 border
+      text #n60 "Settings" bold size=l
+    row #n61 h=fill
+      col #n62 w=200 fill=light pad=3 gap=2
+        text #n63 "Board" shade=mid size=s
+        text #n64 "Settings" bold size=s
+        line #n65
+        text #n66 "Workspace" shade=mid size=xs
+        text #n67 "Members" size=s
+        text #n68 "Notifications" size=s
+        text #n69 "Integrations" size=s
+      col #n70 grow pad=3 gap=3
+        col #n71 gap=3
+          text #n72 "Workspace Settings" bold size=l
+          col #n73 gap=2
+            text #n74 "Workspace name" bold size=s
+            input #n75 "Design Studio" value="Design Studio"
+          col #n76 gap=2
+            text #n77 "Description" bold size=s
+            input #n78 "Optional workspace description" value="Our design team workspace" area
+          line #n79
+          text #n80 "Members" bold size=s
+          col #n81 gap=2
+            row #n82 justify=between align=center border pad=2 gap=2
+              text #n83 "Alice" size=s
+              text #n84 "Owner" shade=mid size=xs
+            row #n85 justify=between align=center border pad=2 gap=2
+              text #n86 "Marcus" size=s
+              text #n87 "Editor" shade=mid size=xs
+            row #n88 justify=between align=center border pad=2 gap=2
+              text #n89 "Yuki" size=s
+              text #n90 "Editor" shade=mid size=xs
+          line #n91
+          text #n92 "Notifications" bold size=s
+          col #n93 gap=2
+            row #n94 justify=between align=center pad=2
+              text #n95 "Task updates" size=s
+              input #n96 on toggle
+            row #n97 justify=between align=center pad=2
+              text #n98 "Daily digest" size=s
+              input #n99 on toggle
+            row #n100 justify=between align=center pad=2
+              text #n101 "Email notifications" size=s
+              input #n102 toggle

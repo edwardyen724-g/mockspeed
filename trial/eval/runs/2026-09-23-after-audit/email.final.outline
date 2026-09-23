@@ -1,0 +1,159 @@
+app #n1 "Mail" web
+  screen #n2 "Inbox"
+    button #n159 "Filter" ghost
+    row #n103 gap=2 align=center pad=2 border
+      input #n104 "Search messages" grow search
+      shape #n105 "filter" circle w=32 h=32 fill=light
+    row #n3 h=fill
+      col #n4 w=280 fill=mid pad=3 gap=2
+        text #n5 "Mail" size=l bold
+        text #n6 "Inbox" bold shade=dark
+        text #n7 "Sent" shade=mid
+        text #n8 "Drafts" shade=mid
+        text #n9 "Spam" shade=mid
+        text #n10 "Archive" shade=mid
+        line #n11
+        text #n12 "Labels" size=xs shade=mid
+        text #n13 "Work" shade=mid
+        text #n14 "Personal" shade=mid
+        text #n15 "Follow up" shade=mid
+      col #n16 grow pad=3 gap=2
+        row #n17 gap=2 align=center
+          input #n18 "Search" grow search
+          shape #n19 "settings" circle w=32 h=32 fill=light
+        col #n20 gap=1
+          row #n21 pad=2 border align=center gap=2
+            shape #n22 "avatar" circle w=40 h=40 fill=mid
+            col #n23 grow gap=0
+              text #n24 "Sarah Chen" bold data
+              text #n25 "Project kickoff scheduled" shade=mid size=s data
+            text #n26 "9:34 AM" size=s shade=mid data
+          row #n27 pad=2 border align=center gap=2
+            shape #n28 "avatar" circle w=40 h=40 fill=mid
+            col #n29 grow gap=0
+              text #n30 "Alex Rodriguez" bold data
+              text #n31 "Re: Budget approval needed" shade=mid size=s data
+            text #n32 "8:12 AM" size=s shade=mid data
+          row #n33 pad=2 border align=center gap=2
+            shape #n34 "avatar" circle w=40 h=40 fill=mid
+            col #n35 grow gap=0
+              text #n36 "Jordan Lee" bold data
+              text #n37 "Design review feedback" shade=mid size=s data
+            text #n38 "Yesterday" size=s shade=mid data
+          row #n39 pad=2 border align=center gap=2
+            shape #n40 "avatar" circle w=40 h=40 fill=mid
+            col #n41 grow gap=0
+              text #n42 "Casey Wilson" bold data
+              text #n43 "Meeting notes attached" shade=mid size=s data
+            text #n44 "Monday" size=s shade=mid data
+  screen #n45 "Message"
+    row #n46 h=fill
+      col #n47 w=280 fill=light pad=3 gap=2
+        text #n48 "Mail" size=l bold
+        text #n49 "Inbox" bold shade=dark
+        text #n50 "Sent" shade=mid
+        text #n51 "Drafts" shade=mid
+        text #n52 "Spam" shade=mid
+        text #n53 "Archive" shade=mid
+        line #n54
+        text #n55 "Labels" size=xs shade=mid
+        text #n56 "Work" shade=mid
+        text #n57 "Personal" shade=mid
+        text #n58 "Follow up" shade=mid
+      col #n59 grow pad=3 gap=3
+        row #n60 gap=2 align=center justify=between
+          text #n61 "← Inbox" shade=mid
+          row #n62 gap=2
+            button #n63 "Archive" ghost size=l
+            button #n64 "Delete" ghost
+            shape #n65 "more" circle w=32 h=32 fill=light
+        col #n66 gap=4
+          col #n67 gap=2
+            row #n68 gap=2 align=start
+              shape #n69 "avatar" circle w=48 h=48 fill=mid
+              col #n70 gap=1
+                text #n71 "Sarah Chen" bold size=m data
+                text #n72 "to me, Marcus" size=s shade=mid data
+                text #n73 "Today 9:34 AM" size=xs shade=mid data
+            text #n74 "Project kickoff scheduled for next Tuesday at 2 PM. Please confirm your attendance." data
+            text #n75 "Looking forward to discussing the Q1 roadmap with you." data
+          row #n76 gap=2 align=center pad=2 fill=light
+            input #n77 "Reply" area value="Type your message..." grow
+            button #n78 "Send" primary
+        col #n79 gap=2 pad=2 fill=light
+          text #n80 "Sarah Chen" bold size=s data
+          text #n81 "to me" size=xs shade=mid data
+          text #n82 "Today 9:34 AM" size=xs shade=mid data
+  screen #n83 "Compose"
+    row #n84 h=fill
+      col #n85 w=280 fill=light pad=3 gap=2
+        text #n86 "Mail" size=l bold
+        text #n87 "Inbox" bold shade=dark
+        text #n88 "Sent" shade=mid
+        text #n89 "Drafts" shade=mid
+        text #n90 "Spam" shade=mid
+        text #n91 "Archive" shade=mid
+      col #n92 grow pad=3 gap=3
+        row #n93 gap=2 justify=between align=center
+          text #n94 "← Inbox" shade=mid
+          button #n95 "Send" primary
+        col #n96 gap=2
+          input #n97 "To" value="" data
+          input #n98 "Subject" value="Re: Project kickoff scheduled" data
+          input #n99 "Compose" area value="Thanks for including me. I'll be there." grow h=fill data
+        row #n100 gap=2 pad=2 fill=light justify=between
+          text #n101 "Formatting" size=s shade=mid
+          text #n102 "Attach" size=s shade=mid
+  screen #n106 "Settings"
+    row #n107 h=fill
+      col #n108 w=280 fill=light pad=3 gap=2
+        text #n109 "Mail" size=l bold
+        text #n110 "Inbox" bold shade=dark
+        text #n111 "Sent" shade=mid
+        text #n112 "Drafts" shade=mid
+        text #n113 "Spam" shade=mid
+        text #n114 "Archive" shade=mid
+        line #n115
+        text #n116 "Labels" size=xs shade=mid
+        text #n117 "Work" shade=mid
+        text #n118 "Personal" shade=mid
+        text #n119 "Follow up" shade=mid
+      col #n120 grow pad=3 gap=3
+        row #n121 gap=2 align=center
+          text #n122 "← Inbox" shade=mid
+        col #n123 gap=4
+          col #n124 gap=2
+            text #n125 "Settings" size=l bold
+            line #n126
+          col #n127 gap=3
+            col #n128 gap=1
+              text #n129 "Display" size=s bold shade=dark
+              row #n130 gap=2 justify=between align=center
+                text #n131 "Dark mode" size=s
+                input #n132 "" toggle on data
+              row #n133 gap=2 justify=between align=center
+                text #n134 "Compact view" size=s
+                input #n135 "" toggle data
+            line #n136
+            col #n137 gap=1
+              text #n138 "Notifications" size=s bold shade=dark
+              row #n139 gap=2 justify=between align=center
+                text #n140 "Email notifications" size=s
+                input #n141 "" toggle on data
+              row #n142 gap=2 justify=between align=center
+                text #n143 "Desktop alerts" size=s
+                input #n144 "" toggle on data
+              row #n145 gap=2 justify=between align=center
+                text #n146 "Digest emails" size=s
+                input #n147 "" toggle data
+            line #n148
+            col #n149 gap=1
+              text #n150 "Signature" size=s bold shade=dark
+              input #n151 "Signature" area value="Best regards,&#10;Marcus" grow data
+            line #n152
+            col #n153 gap=1
+              text #n154 "Auto-reply" size=s bold shade=dark
+              row #n155 gap=2 justify=between align=center
+                text #n156 "Enable auto-reply" size=s
+                input #n157 "" toggle data
+              input #n158 "Message" area value="I am currently out of the office and will return on Monday." grow data

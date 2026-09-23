@@ -1,0 +1,111 @@
+app #n1 "Recipes & Meals" phone
+  screen #n2 "Meals This Week"
+    row #n3 h=60 pad=3 gap=2 align=center
+      text #n4 "Meals" bold size=l
+      col #n5 grow
+      shape #n6 circle w=40 h=40
+    col #n7 grow gap=3 pad=3
+      row #n8 gap=2 align=center
+        text #n9 "Monday" bold
+        text #n10 "18°C" shade=mid size=s
+      row #n11 gap=2
+        col #n12 w=120 border pad=2 gap=1
+          shape #n13 w=fill h=80
+          text #n14 "Pasta Carbonara" bold size=s
+          text #n15 "45 min" shade=mid size=xs
+        col #n16 w=120 border pad=2 gap=1
+          shape #n17 w=fill h=80
+          text #n18 "Greek Salad" bold size=s
+          text #n19 "15 min" shade=mid size=xs
+      row #n20 gap=2 align=center
+        text #n21 "Tuesday" bold
+        text #n22 "16°C" shade=mid size=s
+      row #n23 gap=2
+        col #n24 w=120 border pad=2 gap=1
+          shape #n25 w=fill h=80
+          text #n26 "Salmon Teriyaki" bold size=s
+          text #n27 "35 min" shade=mid size=xs
+        col #n28 w=120 border pad=2 gap=1
+          shape #n29 w=fill h=80
+          text #n30 "Miso Soup" bold size=s
+          text #n31 "20 min" shade=mid size=xs
+      row #n32 gap=2 align=center
+        text #n33 "Wednesday" bold
+        text #n34 "17°C" shade=mid size=s
+      row #n35 gap=2
+        col #n36 w=120 border pad=2 gap=1
+          shape #n37 w=fill h=80
+          text #n38 "Chicken Curry" bold size=s
+          text #n39 "50 min" shade=mid size=xs
+        col #n40 w=120 border pad=2 gap=1
+          shape #n41 w=fill h=80
+          text #n42 "Rice" bold size=s
+          text #n43 "25 min" shade=mid size=xs
+    row #n44 h=60 justify=between pad=3 align=center border
+      text #n45 "Meals" shade=mid size=s
+      text #n46 "Recipes" shade=mid size=s
+      text #n47 "List" shade=mid size=s
+      text #n48 "Me" shade=mid size=s
+  screen #n49 "Recipe Detail"
+    row #n50 h=60 pad=3 gap=2 align=center
+      text #n51 "←" size=l
+      text #n52 "Pasta Carbonara" bold size=l grow
+      text #n53 "♡" size=l shade=mid
+    col #n54 grow gap=3 pad=3
+      shape #n55 w=fill h=200
+      col #n56 gap=2
+        row #n57 justify=between align=center
+          text #n58 "4 servings" bold
+          text #n59 "45 min" shade=mid
+        line #n60
+        text #n61 "Ingredients" bold
+        col #n62 gap=1
+          text #n63 "400g spaghetti" data shade=mid size=s
+          text #n64 "200g guanciale" data shade=mid size=s
+          text #n65 "4 eggs" data shade=mid size=s
+          text #n66 "100g pecorino" data shade=mid size=s
+          text #n67 "Black pepper" data shade=mid size=s
+        line #n68
+        text #n69 "Method" bold
+        col #n70 gap=1
+          text #n71 "1. Cook pasta in salted water" shade=mid size=s
+          text #n72 "2. Whisk eggs with cheese" shade=mid size=s
+          text #n73 "3. Fry guanciale until crispy" shade=mid size=s
+          text #n74 "4. Toss hot pasta with mix" shade=mid size=s
+      button #n75 "Add to Week" primary w=fill
+  screen #n76 "Grocery List"
+    row #n77 h=60 pad=3 gap=2 align=center
+      text #n78 "Shopping" bold size=l
+      col #n79 grow
+      text #n80 "Edit" shade=mid size=s
+    col #n81 grow gap=2 pad=3
+      row #n82 gap=2 pad=2 border align=center
+        shape #n83 circle w=20 h=20
+        text #n84 "Produce" bold grow
+        text #n85 "5 items" shade=mid size=s
+      col #n86 gap=1 pad=2
+        row #n87 gap=2 align=center
+          input #n88 check
+          text #n89 "Guanciale 200g" data
+        row #n90 gap=2 align=center
+          input #n91 check
+          text #n92 "Eggs 4 pack" data
+        row #n93 gap=2 align=center
+          input #n94 check
+          text #n95 "Pecorino 100g" data
+      row #n96 gap=2 pad=2 border align=center
+        shape #n97 circle w=20 h=20
+        text #n98 "Pantry" bold grow
+        text #n99 "3 items" shade=mid size=s
+      col #n100 gap=1 pad=2
+        row #n101 gap=2 align=center
+          input #n102 check
+          text #n103 "Spaghetti 400g" data
+        row #n104 gap=2 align=center
+          input #n105 check
+          text #n106 "Black pepper" data
+    row #n107 h=60 justify=between pad=3 align=center border
+      text #n108 "Meals" shade=mid size=s
+      text #n109 "Recipes" bold size=s
+      text #n110 "List" shade=mid size=s
+      text #n111 "Me" shade=mid size=s

@@ -1,0 +1,97 @@
+app #n1 "Support" web
+  screen #n2 "Inbox"
+    text #n5 "Conversations" bold size=s
+    row #n54 pad=3 gap=2 border
+      input #n55 "Search conversations..." search grow
+    row #n3 h=fill
+      col #n4 w=280 fill=light pad=3 gap=2 border
+        line #n6
+        col #n7 gap=2
+          row #n8 pad=2 fill=mid gap=2 align=center
+            shape #n9 circle w=24 h=24
+            col #n10 grow
+              text #n11 "Marcus Chen" bold size=s data
+              text #n12 "Can't login" shade=mid size=xs data
+            text #n13 "2m" shade=mid size=xs data
+          row #n14 pad=2 gap=2 align=center
+            shape #n15 circle w=24 h=24
+            col #n16 grow
+              text #n17 "Sarah Williams" bold size=s data
+              text #n18 "Billing question" shade=mid size=xs data
+            text #n19 "1h" shade=mid size=xs data
+          row #n20 pad=2 gap=2 align=center
+            shape #n21 circle w=24 h=24
+            col #n22 grow
+              text #n23 "James Rodriguez" bold size=s data
+              text #n24 "Feature request" shade=mid size=xs data
+            text #n25 "5h" shade=mid size=xs data
+      col #n26 grow pad=3 gap=3
+        col #n27 gap=2 border pad=3 fill=light
+          text #n28 "Marcus Chen" bold
+          text #n29 "Account security verified" shade=mid size=xs
+          text #n30 "Email: marcus.chen@company.com" shade=mid size=xs
+          text #n31 "Member since Jan 2023" shade=mid size=xs
+          line #n32
+          text #n33 "Last issue: Password reset" shade=mid size=xs
+        col #n34 grow gap=2
+          row #n35 gap=2
+            shape #n36 circle w=32 h=32
+            col #n37 grow
+              text #n38 "Marcus Chen" bold size=s data
+              text #n39 "I keep getting an error when I try to log in. Password reset didn't help." data
+              text #n40 "2m" shade=mid size=xs
+          row #n41 gap=2 justify=end
+            col #n42 grow align=end
+              text #n43 "Did you check if caps lock is on?" data
+              text #n44 "Just now" shade=mid size=xs
+          row #n45 gap=2
+            shape #n46 circle w=32 h=32
+            col #n47 grow
+              text #n48 "Marcus Chen" bold size=s data
+              text #n49 "Oh wow. Yes that was it. Thanks so much!" data
+              text #n50 "1m" shade=mid size=xs
+        row #n51 gap=2 pad=3 border
+          input #n52 "Type a reply..." grow
+  screen #n56 "Settings"
+    col #n96 gap=2 pad=3 fill=light border
+      text #n97 "Your account is in good standing" bold size=s
+      text #n98 "All security checks passed. No action needed." shade=mid size=xs
+    button #n95 "Sign out" ghost
+    col #n57 pad=3 gap=3
+      text #n58 "Settings" bold size=l
+      line #n59
+      col #n60 gap=3
+        col #n61 gap=2
+          text #n62 "Account" bold size=s
+          row #n63 pad=2 gap=2 align=center justify=between
+            text #n64 "Email" data
+            text #n65 "marcus.chen@company.com" shade=mid size=xs
+          row #n66 pad=2 gap=2 align=center justify=between
+            text #n67 "Name" data
+            text #n68 "Marcus Chen" shade=mid size=xs
+          row #n69 pad=2 gap=2 align=center justify=between
+            text #n70 "Member since" data
+            text #n71 "Jan 2023" shade=mid size=xs
+        line #n72
+        col #n73 gap=2
+          text #n74 "Notifications" bold size=s
+          row #n75 pad=2 gap=2 align=center justify=between
+            text #n76 "Email alerts" data
+            shape #n77 circle w=12 h=12 fill=dark
+          row #n78 pad=2 gap=2 align=center justify=between
+            text #n79 "Chat notifications" data
+            shape #n80 circle w=12 h=12 fill=dark
+          row #n81 pad=2 gap=2 align=center justify=between
+            text #n82 "Digest emails" data
+            shape #n83 circle w=12 h=12 fill=mid
+        line #n84
+        col #n85 gap=2
+          text #n86 "Preferences" bold size=s
+          row #n87 pad=2 gap=2 align=center justify=between
+            text #n88 "Dark mode" data
+            shape #n89 circle w=12 h=12 fill=mid
+          row #n90 pad=2 gap=2 align=center justify=between
+            text #n91 "Language" data
+            text #n92 "English" shade=mid size=xs
+        line #n93
+        row #n94 pad=2 gap=2

@@ -1,0 +1,12 @@
+{
+  "orchestration": "create an app for an agent orchestration platform",
+  "rent": "a phone app for splitting rent and bills with roommates",
+  "kanban": "a kanban board for a small design studio",
+  "support": "a chat app for a support team, with the customer's details beside the conversation",
+  "rideshare": "a phone app for rideshare drivers",
+  "daw": "a music production tool with a timeline of tracks",
+  "email": "an email client",
+  "extension": "a browser extension side panel that summarizes the page you are on",
+  "crm": "a CRM for a real estate agent tracking buyers through their pipeline",
+  "recipes": "a phone app for recipes and meal planning"
+}

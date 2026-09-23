@@ -1,0 +1,82 @@
+app #n1 "Driver" phone
+  screen #n2 "Active"
+    row #n3 pad=3 gap=2 align=center
+      text #n4 "Ready" bold size=l
+      shape #n5 circle w=12 h=12 fill=dark
+    row #n6 h=fill pad=3 gap=3
+      col #n7 grow
+        row #n8 gap=2 align=center
+          shape #n9 circle w=60 h=60
+          col #n10 grow
+            text #n11 "Marcus Chen" bold
+            text #n12 "4.8 ★" size=s shade=mid
+        row #n13 gap=3 pad=3 fill=light
+          col #n14 grow
+            text #n15 "Pickup" size=s shade=mid
+            text #n16 "Oak & 3rd" bold
+          col #n17 grow
+            text #n18 "Dropoff" size=s shade=mid
+            text #n19 "Union Station" bold
+        text #n20 "4 min away  •  $12.40" size=s shade=mid
+        row #n21 gap=2 pad=3 border
+          button #n22 "Accept" primary
+          button #n23 "Decline" ghost
+    row #n24 pad=3 gap=2 justify=between
+      col #n25 align=center
+        text #n26 "Today" size=s shade=mid
+        text #n27 "$186" bold size=l
+      col #n28 align=center
+        text #n29 "Trips" size=s shade=mid
+        text #n30 "7" bold size=l
+      col #n31 align=center
+        text #n32 "Rating" size=s shade=mid
+        text #n33 "4.9" bold size=l
+  screen #n34 "Trip"
+    col #n35 h=fill gap=2
+      row #n36 pad=3 gap=2 align=center
+        text #n37 "En route" bold size=l
+        shape #n38 circle w=12 h=12 fill=dark
+      shape #n39 w=fill h=280
+      col #n40 pad=3 gap=3 grow
+        row #n41 gap=2
+          col #n42 grow
+            text #n43 "Marcus Chen" bold
+            text #n44 "2 min" size=s shade=mid
+          shape #n45 circle w=40 h=40
+        text #n46 "Oak & 3rd" bold size=m
+        text #n47 "Heading to pickup" size=s shade=mid
+        progress #n48 "ETA" value=45
+        row #n49 gap=2 pad=3 fill=light border
+          button #n50 "Call" ghost w=fill
+          button #n51 "Message" ghost w=fill
+      row #n52 gap=2 pad=3 justify=between
+        button #n53 "Cancel" ghost
+        button #n54 "Arrived" primary
+  screen #n55 "History"
+    col #n56 pad=3 gap=4
+      text #n57 "This week" bold size=l
+      col #n58 gap=3
+        col #n59 border pad=3 gap=2
+          row #n60 justify=between
+            text #n61 "Sarah Johnson" bold
+            text #n62 "4.9" size=s
+          row #n63 gap=2 justify=between
+            text #n64 "8:45 AM" size=s shade=mid
+            text #n65 "$8.60" bold
+          text #n66 "Downtown → Airport" size=s shade=mid
+        col #n67 border pad=3 gap=2
+          row #n68 justify=between
+            text #n69 "Alex Rivera" bold
+            text #n70 "5.0" size=s
+          row #n71 gap=2 justify=between
+            text #n72 "2:30 PM" size=s shade=mid
+            text #n73 "$24.80" bold
+          text #n74 "Station → Midtown" size=s shade=mid
+        col #n75 border pad=3 gap=2
+          row #n76 justify=between
+            text #n77 "Jordan Lee" bold
+            text #n78 "4.7" size=s
+          row #n79 gap=2 justify=between
+            text #n80 "6:15 PM" size=s shade=mid
+            text #n81 "$31.50" bold
+          text #n82 "Midtown → Harbor" size=s shade=mid

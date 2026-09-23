@@ -1,0 +1,124 @@
+app #n1 "Splitwise" phone
+  screen #n2 "Home"
+    text #n4 "Splitwise" bold size=l
+    row #n103 pad=3 gap=2 align=center
+      input #n104 "Search expenses" search w=fill
+    row #n3 h=80 pad=3 align=center justify=between fill=dark
+      shape #n5 circle w=32 h=32
+    col #n6 grow gap=3 pad=3
+      row #n7 justify=between align=center
+        col #n8
+          text #n9 "You are owed" shade=mid size=s
+          text #n10 "$847" bold size=xl
+        shape #n11 circle w=40 h=40 fill=light
+      row #n12 justify=between align=center
+        col #n13
+          text #n14 "You owe" shade=mid size=s
+          text #n15 "$312" bold size=xl
+        shape #n16 circle w=40 h=40 fill=mid
+      line #n17
+      col #n18 gap=2
+        text #n19 "Recent" bold size=m
+        col #n20 gap=2
+          table #n131
+            tr #n132 "Expense | Amount"
+            tr #n133 "Grocery run" data
+            text #n134 "You paid $94.50" shade=mid size=s
+            text #n135 "$32" bold data
+            tr #n136 "Electric bill" data
+            text #n137 "You owe $156" shade=mid size=s
+            text #n138 "$156" bold data
+            tr #n139 "Dinner out" data
+            text #n140 "Alex paid $85" shade=mid size=s
+            text #n141 "$21" bold data
+    row #n36 h=60 pad=2 justify=between align=center border fill=light
+      col #n37 align=center gap=1
+        shape #n38 circle w=24 h=24
+        text #n39 "Add" size=xs
+      col #n40 align=center gap=1
+        shape #n41 circle w=24 h=24
+        text #n42 "Friends" size=xs
+      col #n43 align=center gap=1
+        shape #n44 circle w=24 h=24
+        text #n45 "Groups" size=xs
+      col #n46 align=center gap=1
+        shape #n47 circle w=24 h=24
+        text #n48 "Settle" size=xs
+  screen #n49 "Add Expense"
+    row #n50 h=60 pad=3 align=center justify=between fill=dark
+      text #n51 "← Back" shade=light
+      text #n52 "Add Expense" bold size=m
+      text #n53 "" w=40
+    col #n54 grow gap=3 pad=3
+      input #n55 "Description" value=Groceries
+      input #n56 "Amount" value="94.50"
+      col #n57 gap=2
+        text #n58 "Paid by" shade=mid size=s
+        row #n59 pad=2 border align=center gap=2
+          shape #n60 circle w=32 h=32
+          col #n61 grow
+            text #n62 "You" bold
+      col #n63 gap=2
+        text #n64 "Split among" shade=mid size=s
+        col #n65 gap=2 border pad=2
+          row #n66 justify=between
+            row #n67 align=center gap=2
+              shape #n68 circle w=28 h=28
+              text #n69 "You"
+            input #n70 value="31.50" w=60
+          row #n71 justify=between
+            row #n72 align=center gap=2
+              shape #n73 circle w=28 h=28
+              text #n74 "Alex"
+            input #n75 value="31.50" w=60
+          row #n76 justify=between
+            row #n77 align=center gap=2
+              shape #n78 circle w=28 h=28
+              text #n79 "Jordan"
+            input #n80 value="31.50" w=60
+    button #n81 "Add" primary w=fill h=50 pad=3 size=l
+  screen #n82 "Settlement"
+    row #n83 h=60 pad=3 align=center fill=dark
+      text #n84 "Settle up" bold size=m
+    col #n85 grow gap=2 pad=3
+      text #n86 "Simplest way to settle" shade=mid size=s
+      col #n87 gap=3
+        row #n88 justify=between pad=2 border
+          row #n89 align=center gap=2
+            text #n90 "You" bold
+            shape #n91 circle w=8 h=8 fill=dark
+            text #n92 "Alex" bold
+          text #n93 "Pay $156" bold
+        row #n94 justify=between pad=2 border
+          row #n95 align=center gap=2
+            text #n96 "Jordan" bold
+            shape #n97 circle w=8 h=8 fill=dark
+            text #n98 "You" bold
+          text #n99 "Pay $32" bold
+    col #n100 gap=2 pad=3
+      button #n101 "Record cash payment" ghost w=fill
+  screen #n105 "Settings"
+    row #n106 h=60 pad=3 align=center fill=dark
+      text #n107 "Settings" bold size=m
+    col #n108 grow gap=0 pad=0
+      row #n109 justify=between align=center pad=3 border
+        text #n110 "Profile" bold
+        shape #n111 circle w=24 h=24
+      row #n112 justify-between align=center pad=3 border
+        text #n113 "Payment methods" bold
+        shape #n114 circle w=24 h=24
+      row #n115 justify-between align=center pad=3 border
+        text #n116 "Notifications" bold
+        shape #n117 circle w=24 h=24
+      row #n118 justify-between align=center pad=3 border
+        text #n119 "Privacy & Security" bold
+        shape #n120 circle w=24 h=24
+      row #n121 justify-between align=center pad=3 border
+        text #n122 "Help & Support" bold
+        shape #n123 circle w=24 h=24
+      line #n124
+      row #n125 justify-between align=center pad=3
+        text #n126 "Version 5.2.1" shade=mid size=xs
+      row #n127 justify-between align=center pad=3 border
+        text #n128 "Log out" shade=mid
+        shape #n129 circle w=24 h=24

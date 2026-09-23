@@ -1,0 +1,55 @@
+app #n1 "Design Studio" web
+  screen #n2 "Board"
+    row #n3 h=fill
+      col #n4 w=200 fill=light pad=3 gap=2
+        text #n5 "Backlog" bold
+        text #n6 "Active" bold
+        text #n7 "Review" bold
+        text #n8 "Done" bold
+        line #n9
+        text #n10 "Team" shade=mid size=xs
+        text #n11 "Alice" size=s
+        text #n12 "Marcus" size=s
+        text #n13 "Yuki" size=s
+      col #n14 grow pad=3 gap=3
+        row #n15 gap=3 h=fill
+          col #n16 w=280 gap=2
+            text #n17 "Backlog" bold shade=mid size=s
+            col #n18 border pad=3 gap=2 fill=light
+              text #n19 "Homepage redesign" bold size=s
+              text #n20 "Alice" shade=mid size=xs
+              shape #n21 circle w=6 h=6 fill=mid
+            col #n22 border pad=3 gap=2 fill=light
+              text #n23 "Mobile app flows" bold size=s
+              text #n24 "Unassigned" shade=mid size=xs
+              shape #n25 circle w=6 h=6 fill=light
+            col #n26 border pad=3 gap=2 fill=light
+              text #n27 "Brand guidelines" bold size=s
+              text #n28 "Marcus" shade=mid size=xs
+              shape #n29 circle w=6 h=6 fill=mid
+          col #n30 w=280 gap=2
+            text #n31 "Active" bold shade=mid size=s
+            col #n32 border pad=3 gap=2
+              text #n33 "Logo concepts" bold size=s
+              text #n34 "Yuki" shade=mid size=xs
+              text #n35 "Due tomorrow" shade=mid size=xs
+              shape #n36 circle w=6 h=6 fill=dark
+            col #n37 border pad=3 gap=2
+              text #n38 "Pitch deck design" bold size=s
+              text #n39 "Alice" shade=mid size=xs
+              text #n40 "3 days left" shade=mid size=xs
+              shape #n41 circle w=6 h=6 fill=dark
+          col #n42 w=280 gap=2
+            text #n43 "Review" bold shade=mid size=s
+            col #n44 border pad=3 gap=2 fill=light
+              text #n45 "Website prototype" bold size=s
+              text #n46 "Marcus" shade=mid size=xs
+              text #n47 "Waiting on client" shade=mid size=xs
+              shape #n48 circle w=6 h=6 fill=mid
+          col #n49 w=280 gap=2
+            text #n50 "Done" bold shade=mid size=s
+            col #n51 border pad=3 gap=2 fill=light
+              text #n52 "Social media kit" bold size=s
+              text #n53 "Yuki" shade=mid size=xs
+              text #n54 "Completed Dec 12" shade=mid size=xs
+              shape #n55 circle w=6 h=6 fill=light

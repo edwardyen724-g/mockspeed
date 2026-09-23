@@ -1,0 +1,116 @@
+app #n1 "Agent Orchestration" web
+  screen #n2 "Runs"
+    row #n3 h=fill
+      col #n4 w=200 fill=light pad=3 gap=2
+        text #n5 "Runs" bold
+        text #n6 "Agents" shade=mid
+        text #n7 "Workflows" shade=mid
+        text #n8 "Settings" shade=mid
+      col #n9 grow pad=4 gap=3
+        row #n10 justify=between align=center
+          text #n11 "Recent Runs" size=l bold
+          button #n12 "New Run" primary
+        col #n13 gap=2
+          row #n14 border pad=3 gap=3 align=center
+            shape #n15 circle w=8 h=8 fill=dark
+            col #n16 grow gap=1
+              text #n17 "data_pipeline_sync" bold data
+              text #n18 "3 agents • 2m 14s" size=s shade=mid data
+            text #n19 "Completed" size=s shade=dark data
+          row #n20 border pad=3 gap=3 align=center
+            shape #n21 circle w=8 h=8 fill=dark
+            col #n22 grow gap=1
+              text #n23 "customer_support_batch" bold data
+              text #n24 "5 agents • Running" size=s shade=mid data
+            text #n25 "4m 32s" size=s shade=dark data
+          row #n26 border pad=3 gap=3 align=center
+            shape #n27 circle w=8 h=8 fill=mid
+            col #n28 grow gap=1
+              text #n29 "report_generation" bold data
+              text #n30 "2 agents • Waiting" size=s shade=mid data
+            text #n31 "Queued" size=s shade=dark data
+          row #n32 border pad=3 gap=3 align=center
+            shape #n33 circle w=8 h=8 fill=light
+            col #n34 grow gap=1
+              text #n35 "email_dispatch" bold data
+              text #n36 "4 agents • Failed at step 2" size=s shade=mid data
+            text #n37 "1h ago" size=s shade=mid data
+  screen #n38 "Run Detail"
+    row #n39 h=fill
+      col #n40 w=200 fill=light pad=3 gap=2
+        text #n41 "Runs" shade=mid
+        text #n42 "Agents" shade=mid
+        text #n43 "Workflows" shade=mid
+        text #n44 "Settings" shade=mid
+      col #n45 grow pad=4 gap=3
+        row #n46 justify=between align=center
+          col #n47 gap=1
+            text #n48 "data_pipeline_sync" size=l bold data
+            text #n49 "Started 14:23 • 2m 14s" size=s shade=mid data
+          text #n50 "Completed" size=s shade=dark data
+        graph #n51 dir=right h=200
+          node #fetch "Fetch Data" sub=api_reader
+          node #validate "Validate" sub=schema_check
+          node #transform "Transform" sub=etl_agent
+          node #store "Store" sub=db_writer
+          edge #n52 fetch -> validate "rows: 2,847"
+          edge #n53 validate -> transform "valid"
+          edge #n54 transform -> store "batches: 8"
+        col #n55 gap=2
+          col #n56 border pad=3 gap=2
+            row #n57 justify=between align=center
+              text #n58 "api_reader" bold mono size=s
+              text #n59 "✓ Done" size=s shade=dark data
+            text #n60 "Connected to prod_db | Retrieved 2,847 rows" size=xs shade=mid data
+          col #n61 border pad=3 gap=2
+            row #n62 justify=between align=center
+              text #n63 "schema_check" bold mono size=s
+              text #n64 "✓ Done" size=s shade=dark data
+            text #n65 "Validated all records against schema v4" size=xs shade=mid data
+          col #n66 border pad=3 gap=2
+            row #n67 justify=between align=center
+              text #n68 "etl_agent" bold mono size=s
+              text #n69 "✓ Done" size=s shade=dark data
+            text #n70 "Transformed 2,847 rows in 8 batches" size=xs shade=mid data
+          col #n71 border pad=3 gap=2
+            row #n72 justify=between align=center
+              text #n73 "db_writer" bold mono size=s
+              text #n74 "✓ Done" size=s shade=dark data
+            text #n75 "Wrote all records to warehouse • 14:25" size=xs shade=mid data
+  screen #n76 "Workflows"
+    row #n77 h=fill
+      col #n78 w=200 fill=light pad=3 gap=2
+        text #n79 "Runs" shade=mid
+        text #n80 "Agents" bold
+        text #n81 "Workflows" shade=mid
+        text #n82 "Settings" shade=mid
+      col #n83 grow pad=4 gap=3
+        row #n84 justify=between align=center
+          text #n85 "Agents" size=l bold
+          button #n86 "Add Agent" primary
+        col #n87 gap=2
+          col #n88 border pad=3 gap=2
+            row #n89 justify=between align=center
+              text #n90 "api_reader" bold mono
+              text #n91 "Ready" size=xs shade=dark data
+            text #n92 "Fetches data from REST APIs • Last used 8m ago" size=xs shade=mid data
+          col #n93 border pad=3 gap=2
+            row #n94 justify=between align=center
+              text #n95 "schema_check" bold mono
+              text #n96 "Ready" size=xs shade=dark data
+            text #n97 "Validates JSON against schema • 847 runs" size=xs shade=mid data
+          col #n98 border pad=3 gap=2
+            row #n99 justify=between align=center
+              text #n100 "etl_agent" bold mono
+              text #n101 "Ready" size=xs shade=dark data
+            text #n102 "Transforms and enriches data • Last used 2m ago" size=xs shade=mid data
+          col #n103 border pad=3 gap=2
+            row #n104 justify=between align=center
+              text #n105 "db_writer" bold mono
+              text #n106 "Ready" size=xs shade=dark data
+            text #n107 "Writes to PostgreSQL and BigQuery • 1,243 runs" size=xs shade=mid data
+          col #n108 border pad=3 gap=2
+            row #n109 justify=between align=center
+              text #n110 "email_dispatcher" bold mono
+              text #n111 "Error" size=xs shade=mid data
+            text #n112 "Connection lost • Reconnecting..." size=xs shade=mid data

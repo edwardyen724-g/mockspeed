@@ -1,0 +1,92 @@
+app #n1 "Studio" web
+  screen #n2 "Mixer"
+    button #n14 "Export" primary size=l
+    row #n80 pad=3 gap=2 align=center
+      input #n81 "Search tracks" search
+    row #n3 h=fill gap=4
+      col #n4 w=200 fill=light pad=3 gap=2
+        text #n5 "Tracks" bold shade=dark
+        text #n6 "Drums" bold
+        text #n7 "Bass" shade=mid
+        text #n8 "Guitar" shade=mid
+        text #n9 "Vocals" shade=mid
+        text #n10 "Synth" shade=mid
+      col #n11 grow pad=4 gap=3
+        row #n12 justify=between align=center
+          text #n13 "Studio Session" size=l bold
+        row #n15 gap=2 align=center
+          text #n16 "120 BPM" mono shade=mid
+          text #n17 "4:32" mono shade=mid
+        col #n19 grow border pad=3 gap=1
+          table #n118
+            tr #n119 "Track | Clips | Level"
+            tr #n120 "Drums | 8 | -12dB" data
+            tr #n121 "Bass | 6 | -8dB" data
+            tr #n122 "Guitar | 12 | -5dB" data
+            tr #n123 "Vocals | 4 | -3dB" data
+            tr #n124 "Synth | 5 | -10dB" data
+  screen #n50 "Timeline"
+    row #n51 h=fill gap=4
+      col #n52 w=200 fill=light pad=3 gap=2
+        text #n53 "Tracks" bold shade=dark
+        text #n54 "Drums" bold
+        text #n55 "Bass" shade=mid
+        text #n56 "Guitar" shade=mid
+        text #n57 "Vocals" shade=mid
+        text #n58 "Synth" shade=mid
+      col #n59 grow pad=4 gap=3
+        row #n60 gap=2 align=center
+          text #n61 "0:00" mono size=s shade=mid
+          text #n62 "1:00" mono size=s shade=mid
+          text #n63 "2:00" mono size=s shade=mid
+          text #n64 "3:00" mono size=s shade=mid
+          text #n65 "4:00" mono size=s shade=mid
+        col #n66 grow gap=1
+          row #n67 h=60 align=center gap=1 fill=light pad=1
+            shape #n68 pill w=120 h=40 shade=mid data
+            shape #n69 pill w=140 h=40 shade=mid data
+          row #n70 h=60 align=center gap=1 fill=light pad=1
+            shape #n71 pill w=200 h=40 shade=mid data
+          row #n72 h=60 align=center gap=1 fill=light pad=1
+            shape #n73 pill w=180 h=40 shade=mid data
+            shape #n74 pill w=160 h=40 shade=mid data
+          row #n75 h=60 align=center gap=1 fill=light pad=1
+            shape #n76 pill w=240 h=40 shade=mid data
+          row #n77 h=60 align=center gap=1 fill=light pad=1
+            shape #n78 pill w=130 h=40 shade=mid data
+            shape #n79 pill w=150 h=40 shade=mid data
+  screen #n82 "Settings"
+    row #n83 pad=3 gap=2 align=center
+      text #n84 "Settings" size=l bold
+    row #n85 h=fill gap=4
+      col #n86 w=200 fill=light pad=3 gap=2
+        text #n87 "Settings" bold shade=dark
+        text #n88 "Audio" bold
+        text #n89 "Project" shade=mid
+        text #n90 "Interface" shade=mid
+      col #n91 grow pad=4 gap=3
+        col #n92 gap=3
+          col #n93 gap=1
+            text #n94 "Sample Rate" bold
+            row #n95 gap=2 align=center
+              input #n96 "Sample Rate" select value="48 kHz"
+          col #n97 gap=1
+            text #n98 "Buffer Size" bold
+            row #n99 gap=2 align=center
+              input #n100 "Buffer Size" select value="256 samples"
+          col #n101 gap=1
+            text #n102 "Master Volume" bold
+            row #n103 gap=2 align=center
+              progress #n104 "Master" value=75 grow
+              text #n105 "75%" mono size=s shade=mid
+          line #n106
+          col #n107 gap=1
+            text #n108 "Auto-save" bold
+            row #n109 gap=2 align=center
+              input #n110 "Auto-save" toggle on
+              text #n111 "Enabled" shade=mid size=s
+          col #n112 gap=1
+            text #n113 "Metronome" bold
+            row #n114 gap=2 align=center
+              input #n115 "Metronome" toggle
+              text #n116 "Disabled" shade=mid size=s

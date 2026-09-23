@@ -1,0 +1,118 @@
+app #n1 "Pipeline" web
+  screen #n2 "Deals"
+    row #n3 h=fill
+      col #n4 w=200 fill=light pad=3 gap=2
+        text #n5 "Pipeline" bold
+        text #n6 "Active" bold shade=dark
+        text #n7 "Closed" shade=mid
+        text #n8 "Lost" shade=mid
+      col #n9 grow pad=3 gap=3
+        row #n10 justify=between align=center
+          text #n11 "12 active" size=m bold
+          button #n12 "New Deal" primary
+        col #n13 gap=2
+          col #n14 border pad=3 gap=2
+            row #n15 justify=between
+              text #n16 "Sarah Chen" bold
+              text #n17 "5 days" shade=mid size=s
+            text #n18 "2847 Oakmont Drive" shade=mid
+            row #n19 gap=2
+              shape #n20 circle w=16 h=16 fill=mid
+              text #n21 "Offer pending" size=s
+          col #n22 border pad=3 gap=2
+            row #n23 justify=between
+              text #n24 "Marcus Rodriguez" bold
+              text #n25 "12 days" shade=mid size=s
+            text #n26 "415 Pine Valley Lane" shade=mid
+            row #n27 gap=2
+              shape #n28 circle w=16 h=16 fill=dark
+              text #n29 "Under inspection" size=s
+          col #n30 border pad=3 gap=2
+            row #n31 justify=between
+              text #n32 "Jennifer Liu" bold
+              text #n33 "28 days" shade=mid size=s
+            text #n34 "892 Riverside Court" shade=mid
+            row #n35 gap=2
+              shape #n36 circle w=16 h=16 fill=light
+              text #n37 "Initial viewing" size=s
+          col #n38 border pad=3 gap=2
+            row #n39 justify=between
+              text #n40 "David Walsh" bold
+              text #n41 "3 days" shade=mid size=s
+            text #n42 "1123 Maple Heights" shade=mid
+            row #n43 gap=2
+              shape #n44 circle w=16 h=16 fill=dark
+              text #n45 "Closed" size=s
+  screen #n46 "Deal Detail"
+    row #n47 h=fill
+      col #n48 w=200 fill=light pad=3 gap=2
+        text #n49 "Sarah Chen" bold
+        text #n50 "Activity" bold shade=dark
+        text #n51 "Documents" shade=mid
+        text #n52 "Notes" shade=mid
+      col #n53 grow pad=3 gap=3
+        col #n54 gap=2
+          row #n55 justify=between align=center
+            col #n56 gap=1
+              text #n57 "2847 Oakmont Drive" bold size=l
+              text #n58 "$485,000 asking • Built 1998" shade=mid
+            button #n59 "..." ghost
+          row #n60 gap=4
+            col #n61 gap=1
+              text #n62 "Status" shade=mid size=s
+              text #n63 "Offer pending" bold
+            col #n64 gap=1
+              text #n65 "Listed" shade=mid size=s
+              text #n66 "Mar 15" bold
+            col #n67 gap=1
+              text #n68 "First shown" shade=mid size=s
+              text #n69 "Mar 18" bold
+        line #n70
+        col #n71 gap=2
+          text #n72 "Timeline" bold size=m
+          col #n73 gap=2
+            row #n74 gap=2
+              shape #n75 circle w=8 h=8 fill=dark
+              col #n76 gap=1 grow
+                text #n77 "Offer submitted" bold size=s
+                text #n78 "Mar 22, 2:14 PM" shade=mid size=xs
+            row #n79 gap=2
+              shape #n80 circle w=8 h=8 fill=dark
+              col #n81 gap=1 grow
+                text #n82 "Home inspection scheduled" bold size=s
+                text #n83 "Mar 25, 10:00 AM" shade=mid size=xs
+            row #n84 gap=2
+              shape #n85 circle w=8 h=8 fill=mid
+              col #n86 gap=1 grow
+                text #n87 "Appraisal pending" bold size=s
+                text #n88 "Expected Mar 28" shade=mid size=xs
+  screen #n89 "Contacts"
+    row #n90 h=fill
+      col #n91 w=200 fill=light pad=3 gap=2
+        text #n92 "Pipeline" bold
+        text #n93 "Buyers" bold shade=dark
+        text #n94 "Sellers" shade=mid
+        text #n95 "Agents" shade=mid
+      col #n96 grow pad=3 gap=3
+        input #n97 "Search" search
+        col #n98 gap=2
+          col #n99 border pad=3 gap=1
+            text #n100 "Sarah Chen" bold
+            text #n101 "sarah.chen@email.com" shade=mid size=s
+            text #n102 "555-0147" shade=mid size=s
+            text #n103 "Pre-approved • $500k budget" shade=mid size=xs
+          col #n104 border pad=3 gap=1
+            text #n105 "Marcus Rodriguez" bold
+            text #n106 "m.rodriguez@email.com" shade=mid size=s
+            text #n107 "555-0268" shade=mid size=s
+            text #n108 "First-time buyer • Flexible timeline" shade=mid size=xs
+          col #n109 border pad=3 gap=1
+            text #n110 "Jennifer Liu" bold
+            text #n111 "jen.liu@email.com" shade=mid size=s
+            text #n112 "555-0391" shade=mid size=s
+            text #n113 "Relocating • $750k-$1.2M range" shade=mid size=xs
+          col #n114 border pad=3 gap=1
+            text #n115 "David Walsh" bold
+            text #n116 "d.walsh@email.com" shade=mid size=s
+            text #n117 "555-0524" shade=mid size=s
+            text #n118 "Investor • 3 properties in pipeline" shade=mid size=xs
