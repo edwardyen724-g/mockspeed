@@ -131,7 +131,7 @@ function stepsTable(i) {
   const judged = i.steps.some((st) => st.verdict);
   const rows = i.steps.map((st, n) => {
     const route = routeOf(st), right = route === expected(st.kind);
-    const jev = st.jev.map((j) => `<div><b>${j.kind}</b>${j.said && j.said !== st.sentence ? ` <span class="muted">(${esc(j.said)})</span>` : ""}${j.kind === "where" ? `: ${esc(j.text)}` : ""}<div class="muted">${esc(j.detail.replace(/^jev · /, ""))}</div></div>`).join("") || `<span class="muted">—</span>`;
+    const jev = st.jev.map((j) => `<div><b>${j.kind}</b>${j.said && j.said !== st.sentence ? ` <span class="muted">(${esc(j.said)})</span>` : ""}${j.kind === "where" || j.kind === "which" ? `: ${esc(j.text)}` : ""}<div class="muted">${esc(j.detail.replace(/^jev · /, ""))}</div></div>`).join("") || `<span class="muted">—</span>`;
     const you = [...st.asked.map((a) => `<div>asked: <b>${esc(a.question)}</b><div class="muted">${a.options.map(esc).join(" · ")}</div></div>`), ...st.human.map((h) => `<div>answered: <b>${esc(h)}</b></div>`)].join("") || `<span class="muted">—</span>`;
     const bad = /not built|asked you|error/.test(st.outcome) || !right;
     const v = st.verdict ? `<span class="out${/wrong|needless|missed/.test(st.verdict.call) ? " bad" : ""}">${esc(st.verdict.call.replace(/_/g, " "))}</span><div class="muted">${esc(st.verdict.why)}</div>` : `<span class="muted">—</span>`;

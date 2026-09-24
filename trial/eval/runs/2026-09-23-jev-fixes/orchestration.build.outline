@@ -1,0 +1,96 @@
+app #n1 "Agents" web
+  screen #n2 "Agents"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Agents" bold
+        text #n6 "Runs" shade=mid
+        text #n7 "Logs" shade=mid
+      col #n8 grow pad=4 gap=4
+        row #n9 justify=between align=center
+          text #n10 "Active Agents" size=l bold
+          button #n11 "New Agent" primary
+        grid #n12 cols=3 gap=3
+          col #n13 border pad=3 gap=2
+            text #n14 "Email Parser" bold
+            text #n15 "Processing" size=s shade=mid
+            row #n16 gap=2 align=center
+              shape #n17 circle w=8 h=8 fill=dark
+              text #n18 "3 runs active" size=s
+            progress #n19 value=65
+          col #n20 border pad=3 gap=2
+            text #n21 "Data Validator" bold
+            text #n22 "Idle" size=s shade=mid
+            row #n23 gap=2 align=center
+              shape #n24 circle w=8 h=8 fill=mid
+              text #n25 "Last run 2h ago" size=s
+            progress #n26 value=100
+          col #n27 border pad=3 gap=2
+            text #n28 "Report Generator" bold
+            text #n29 "Processing" size=s shade=mid
+            row #n30 gap=2 align=center
+              shape #n31 circle w=8 h=8 fill=dark
+              text #n32 "1 run active" size=s
+            progress #n33 value=42
+        text #n34 "Agent Network" size=m bold pad=3
+        graph #n35 dir=right h=300
+          node #email "Email Parser" sub="processes incoming"
+          node #validate "Data Validator" sub="validates format"
+          node #report "Report Generator" sub="generates output"
+          node #archive "Archive" sub="stores results"
+          edge #n36 email -> validate "data"
+          edge #n37 validate -> report "validated"
+          edge #n38 report -> archive "final"
+  screen #n39 "Runs"
+    row #n40 h=fill
+      col #n41 share=nav w=200 fill=light pad=3 gap=2
+        text #n42 "Agents" shade=mid
+        text #n43 "Runs" bold
+        text #n44 "Logs" shade=mid
+      col #n45 grow pad=4 gap=4
+        row #n46 justify=between align=center
+          text #n47 "Recent Runs" size=l bold
+          button #n48 "Filter" ghost
+        col #n49 gap=2
+          table #n50
+            tr #n51 "Agent | Status | Started | Duration"
+            tr #n52 "Email Parser | Completed" data
+            text #n53 "2 min ago" shade=mid
+            text #n54 "1m 23s" shade=mid
+            tr #n55 "Data Validator | Completed" data
+            text #n56 "4 min ago" shade=mid
+            text #n57 "45s" shade=mid
+            tr #n58 "Report Generator | Running" data
+            text #n59 "1 min ago" shade=mid
+            text #n60 "—" shade=mid
+            tr #n61 "Email Parser | Failed" data
+            text #n62 "12 min ago" shade=mid
+            text #n63 "2m 15s" shade=mid
+            tr #n64 "Data Validator | Completed" data
+            text #n65 "28 min ago" shade=mid
+            text #n66 "52s" shade=mid
+        text #n67 "Run Pipeline" size=m bold pad=3
+        graph #n68 dir=down h=250
+          node #run1 "Email Parser" sub="2m 15s"
+          node #run2 "Data Validator" sub=52s
+          node #run3 "Report Generator" sub=pending
+          edge #n69 run1 -> run2 "pass"
+          edge #n70 run2 -> run3 "pass"
+  screen #n71 "Logs"
+    row #n72 h=fill
+      col #n73 share=nav w=200 fill=light pad=3 gap=2
+        text #n74 "Agents" shade=mid
+        text #n75 "Runs" shade=mid
+        text #n76 "Logs" bold
+      col #n77 grow pad=4 gap=3
+        row #n78 justify=between align=center
+          text #n79 "System Logs" size=l bold
+          input #n80 "Search" search
+        col #n81 fill=light border pad=3 gap=2 h=fill
+          text #n82 "14:32:18 Report Generator started run #8427" size=s mono
+          text #n83 "14:32:19 Email Parser handoff: 156 items queued" size=s mono
+          text #n84 "14:32:25 Data Validator processing batch 3 of 8" size=s mono
+          text #n85 "14:32:41 Data Validator validation passed 152/156" size=s mono
+          text #n86 "14:32:43 Report Generator received 152 records" size=s mono
+          text #n87 "14:33:01 Report Generator PDF generated 2.3 MB" size=s mono
+          text #n88 "14:33:02 Archive stored run #8427 successfully" size=s mono
+          text #n89 "14:33:03 Email Parser started run #8428" size=s mono

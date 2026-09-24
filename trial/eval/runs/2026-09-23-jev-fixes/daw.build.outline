@@ -1,0 +1,116 @@
+app #n1 "Studio" web
+  screen #n2 "Timeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Studio" bold
+        text #n6 "Timeline" bold shade=dark
+        text #n7 "Mixer" shade=mid
+        text #n8 "Library" shade=mid
+      col #n9 grow pad=3 gap=3
+        row #n10 align=center gap=3
+          text #n11 "Project: Midnight Echo" bold size=l
+          button #n12 "Play" primary
+          button #n13 "Export"
+        row #n14 h=fill gap=2
+          col #n15 w=120 gap=2 pad=2 border
+            text #n16 "Tracks" bold size=s shade=dark
+            row #n17 gap=2
+              shape #n18 circle w=8 h=8 fill=dark
+              text #n19 "Drums" size=s data
+            row #n20 gap=2
+              shape #n21 circle w=8 h=8 fill=dark
+              text #n22 "Bass" size=s data
+            row #n23 gap=2
+              shape #n24 circle w=8 h=8 fill=dark
+              text #n25 "Keys" size=s data
+            row #n26 gap=2
+              shape #n27 circle w=8 h=8 fill=dark
+              text #n28 "Vocals" size=s data
+            line #n29
+            button #n30 "Add Track" ghost size=s
+          col #n31 grow pad=3 border fill=light
+            text #n32 "0:00" shade=mid size=xs
+            row #n33 h=200 gap=1
+              col #n34 grow h=fill fill=mid shade=light
+              col #n35 grow h=fill fill=mid
+              col #n36 grow h=fill fill=mid shade=light
+              col #n37 grow h=fill fill=mid
+              col #n38 grow h=fill fill=mid shade=light
+            row #n39 h=200 gap=1
+              col #n40 grow h=fill fill=mid
+              col #n41 grow h=fill fill=mid shade=light
+              col #n42 grow h=fill fill=mid
+              col #n43 grow h=fill fill=mid shade=light
+              col #n44 grow h=fill fill=mid
+            row #n45 h=200 gap=1
+              col #n46 grow h=fill fill=mid shade=light
+              col #n47 grow h=fill fill=mid
+              col #n48 grow h=fill fill=mid shade=light
+              col #n49 grow h=fill fill=mid
+              col #n50 grow h=fill fill=mid shade=light
+            row #n51 h=200 gap=1
+              col #n52 grow h=fill fill=mid
+              col #n53 grow h=fill fill=mid shade=light
+              col #n54 grow h=fill fill=mid
+              col #n55 grow h=fill fill=mid shade=light
+              col #n56 grow h=fill fill=mid
+  screen #n57 "Mixer"
+    row #n58 h=fill
+      col #n59 share=nav w=200 fill=light pad=3 gap=2
+        text #n60 "Studio" bold
+        text #n61 "Timeline" shade=mid
+        text #n62 "Mixer" bold shade=dark
+        text #n63 "Library" shade=mid
+      col #n64 grow pad=3 gap=3
+        text #n65 "Mixer" bold size=l
+        row #n66 gap=4 pad=2 border align=stretch
+          col #n67 gap=2 align=center
+            text #n68 "Drums" bold size=s
+            shape #n69 circle w=40 h=40 fill=mid
+            progress #n70 "Vol" value=75 w=80
+            text #n71 "−12 dB" size=xs shade=mid mono data
+          col #n72 gap=2 align=center
+            text #n73 "Bass" bold size=s
+            shape #n74 circle w=40 h=40 fill=mid
+            progress #n75 "Vol" value=60 w=80
+            text #n76 "−18 dB" size=xs shade=mid mono data
+          col #n77 gap=2 align=center
+            text #n78 "Keys" bold size=s
+            shape #n79 circle w=40 h=40 fill=mid
+            progress #n80 "Vol" value=70 w=80
+            text #n81 "−14 dB" size=xs shade=mid mono data
+          col #n82 gap=2 align=center
+            text #n83 "Vocals" bold size=s
+            shape #n84 circle w=40 h=40 fill=mid
+            progress #n85 "Vol" value=85 w=80
+            text #n86 "−8 dB" size=xs shade=mid mono data
+        col #n87 grow pad=3 border
+          text #n88 "Master" bold size=s
+          progress #n89 "Level" value=92 w=full
+          text #n90 "−2 dB" size=xs shade=mid mono data
+  screen #n91 "Library"
+    row #n92 h=fill
+      col #n93 share=nav w=200 fill=light pad=3 gap=2
+        text #n94 "Studio" bold
+        text #n95 "Timeline" shade=mid
+        text #n96 "Mixer" shade=mid
+        text #n97 "Library" bold shade=dark
+      col #n98 grow pad=3 gap=3
+        text #n99 "Sound Library" bold size=l
+        input #n100 "Search" search w=300
+        col #n101 gap=2
+          col #n102 border pad=2 gap=1
+            text #n103 "Loops" bold size=s
+            text #n104 "Trap Drums 140 BPM" size=s data
+            text #n105 "Deep House Bass" size=s data
+            text #n106 "Ambient Pad Wash" size=s data
+          col #n107 border pad=2 gap=1
+            text #n108 "Instruments" bold size=s
+            text #n109 "Vintage Synthesizer" size=s data
+            text #n110 "Acoustic Piano" size=s data
+            text #n111 "Electric Guitar" size=s data
+          col #n112 border pad=2 gap=1
+            text #n113 "Effects" bold size=s
+            text #n114 "Reverb Hall Large" size=s data
+            text #n115 "Delay Vintage Echo" size=s data
+            text #n116 "Compression Vocal" size=s data

@@ -1,0 +1,122 @@
+app #n1 "Mail" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Mail" bold size=l
+        text #n6 "Inbox" bold
+        text #n7 "Sent" shade=mid
+        text #n8 "Drafts" shade=mid
+        text #n9 "Spam" shade=mid
+        text #n10 "Trash" shade=mid
+        line #n11
+        text #n12 "Labels" shade=mid size=s
+        text #n13 "Work" shade=mid
+        text #n14 "Personal" shade=mid
+        text #n15 "Follow up" shade=mid
+      col #n16 grow pad=4 gap=3
+        row #n17 justify=between align=center
+          text #n18 "Inbox" bold size=l
+          row #n19 gap=2
+            button #n20 "Search" ghost
+            button #n21 "Filter" ghost
+        col #n22 gap=2 grow
+          row #n23 border pad=3 gap=3 align=center
+            input #n24 "Search messages" search w=fill
+          col #n25 gap=1 grow
+            row #n26 pad=2 gap=3 align=center border
+              text #n27 "From: Sarah Chen" bold
+              text #n28 "Project kickoff" bold
+              text #n29 "2m ago" shade=mid size=s
+            row #n30 pad=2 gap=3 align=center border
+              text #n31 "From: Marcus Lee" bold
+              text #n32 "Budget review attached" bold
+              text #n33 "1h ago" shade=mid size=s
+            row #n34 pad=2 gap=3 align=center border
+              text #n35 "From: Lisa Wong" bold
+              text #n36 "RE: Q4 planning" bold
+              text #n37 "3h ago" shade=mid size=s
+            row #n38 pad=2 gap=3 align=center border
+              text #n39 "From: Dev Team" bold
+              text #n40 "Deployment complete" bold
+              text #n41 "Today" shade=mid size=s
+            row #n42 pad=2 gap=3 align=center border
+              text #n43 "From: Jenny Park" bold
+              text #n44 "Coffee this week?" bold
+              text #n45 "Yesterday" shade=mid size=s
+  screen #n46 "Message"
+    row #n47 h=fill
+      col #n48 share=nav w=200 fill=light pad=3 gap=2
+        text #n49 "Mail" bold size=l
+        text #n50 "Inbox" shade=mid
+        text #n51 "Sent" shade=mid
+        text #n52 "Drafts" shade=mid
+        text #n53 "Spam" shade=mid
+        text #n54 "Trash" shade=mid
+        line #n55
+        text #n56 "Labels" shade=mid size=s
+        text #n57 "Work" shade=mid
+        text #n58 "Personal" shade=mid
+        text #n59 "Follow up" shade=mid
+      col #n60 grow pad=4 gap=3
+        row #n61 justify=between align=center
+          text #n62 "← Back" bold
+          row #n63 gap=2
+            button #n64 "Archive" ghost
+            button #n65 "Delete" ghost
+            button #n66 "More" ghost
+        col #n67 gap=3 grow border pad=3
+          col #n68 gap=1
+            text #n69 "Project kickoff meeting" bold size=l
+            text #n70 "From: Sarah Chen <sarah@company.com>" shade=mid size=s
+            text #n71 "To: you@company.com" shade=mid size=s
+            text #n72 "Wed, 10:30 AM" shade=mid size=s
+          line #n73
+          col #n74 gap=2 grow
+            text #n75 "Hi team,"
+            text #n76 "I wanted to kick off the new initiative next week. I've attached the proposal document with timeline and budget breakdown."
+            text #n77 "Key dates:"
+            text #n78 "• Discovery phase: Jan 8–19" data
+            text #n79 "• Review: Jan 22" data
+            text #n80 "• Approval: Jan 29" data
+            text #n81 "Looking forward to your thoughts."
+            text #n82 "Best,"
+            text #n83 "Sarah"
+          line #n84
+          col #n85 gap=1
+            text #n86 "1 attachment" shade=mid size=s
+            row #n87 border pad=2 gap=2 align=center
+              shape #n88 "📄"
+              text #n89 "proposal_2024.pdf"
+              text #n90 "2.4 MB" shade=mid size=s
+          line #n91
+          row #n92 gap=2 pad=2
+            button #n93 "Reply" primary
+            button #n94 "Reply all" ghost
+            button #n95 "Forward" ghost
+  screen #n96 "Compose"
+    row #n97 h=fill
+      col #n98 share=nav w=200 fill=light pad=3 gap=2
+        text #n99 "Mail" bold size=l
+        text #n100 "Inbox" shade=mid
+        text #n101 "Sent" shade=mid
+        text #n102 "Drafts" bold
+        text #n103 "Spam" shade=mid
+        text #n104 "Trash" shade=mid
+        line #n105
+        text #n106 "Labels" shade=mid size=s
+        text #n107 "Work" shade=mid
+        text #n108 "Personal" shade=mid
+        text #n109 "Follow up" shade=mid
+      col #n110 grow pad=4 gap=2
+        row #n111 justify=between align=center
+          text #n112 "New message" bold size=l
+          button #n113 "×" ghost
+        col #n114 gap=2 grow border pad=3
+          input #n115 "To:" value=alice@company.com
+          input #n116 "Cc:"
+          input #n117 "Subject:" value="RE: Q4 planning"
+          col #n118 grow
+            text #n119 "Thanks for the update. I've reviewed the numbers and have a few questions:" area h=200
+          row #n120 gap=2 pad=2 justify=end
+            button #n121 "Save draft" ghost
+            button #n122 "Send" primary

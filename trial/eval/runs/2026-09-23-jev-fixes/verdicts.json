@@ -1,0 +1,1248 @@
+{
+  "orchestration": {
+    "app": "orchestration",
+    "substance": 2,
+    "substanceWhy": "The core objects are there: an Agents screen with three agent cards (status dot, run count, progress) above an 'Agent Network' graph with labelled edges, a Runs screen with a runs table and a top-down run-pipeline graph, and a Logs screen of mono log lines. It falls short of 3 because the Runs table is broken. The writer gave each tr only 'Agent | Status' and indented the Started and Duration values as text under the row. They render as stray stacked lines ('2 min ago', '1m 23s') under each row, and the Started and Duration columns stay empty. Both graphs are plain 3\u20134-node linear chains floating in a mostly empty 300 px band, and no product name appears anywhere (the app is called 'Agents', the same as a screen and a nav item).",
+    "composedWell": [
+      "The shared nav (share=nav) is on all three screens, with the current item bold and the others shade=mid.",
+      "The agent cards are a grid cols=3 of bordered cols. Each has a status row made of a small circle shape (fill=dark for active, mid for idle) beside the run text, plus a progress bar.",
+      "The agent network is a graph dir=right with sub lines and labelled edges (data / validated / final). The run pipeline is a graph dir=down with per-step times and 'pending'.",
+      "Logs are size=s mono text lines inside a fill=light bordered col h=fill, with a search input in the justify=between header row.",
+      "The Settings screen added in step 8 has setting rows (label + description col, right-aligned input or toggle) grouped under bordered sections."
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "On Runs, each tr has only two of the four header cells, and the other two values are written as text nodes indented under the tr. That produced 20 parser warnings. The texts draw as full-width stacked lines under each row, and the Started and Duration columns are empty.",
+        "evidence": "build outline lines 55\u201370 (tr #n52 \"Email Parser | Completed\" data, then text #n53 \"2 min ago\"\u2026). The build render shows the stray lines under each row. The step-1 log says 'text is indented under tr \u2026 which holds nothing'.",
+        "composable": "Write each tr with all four cells: tr \"Email Parser | Completed | 2 min ago | 1m 23s\" data."
+      },
+      {
+        "category": "writer",
+        "what": "In step 6, 'add a search field at the top', the writer wrapped the search input in a row with a second button \"New Agent\" primary size=l. This duplicates the existing New Agent button one line below, so the Agents screen now shows two identical primary buttons stacked.",
+        "evidence": "final outline lines 10\u201315 (#n92 and #n11 are both \"New Agent\" primary size=l). The step-6 log says '3 lines from haiku'. The final render shows two black New Agent buttons.",
+        "composable": "The piece should be just `input \"Search agents...\" search`, or a row holding only the input."
+      },
+      {
+        "category": "jev",
+        "what": "In step 11, Jev moved the Filter button out of the search row it had just been placed in and set it alone on its own line above that row (spot confidence 0.52). It was already in the topmost row, so the move only separated it from the search field.",
+        "evidence": "step-11 log: place 'at the top of col \u00b7 grow \u2026 above row \"Search agents... \u00b7 Filter \u00b7 New Agent\"'. Final outline line 9, button #n148, sits before row #n90. In the final render 'Filter' floats alone at the top left.",
+        "composable": "When the target is already in the first row of the part, reply that it is already at the top, or place it at the start or end of that row."
+      },
+      {
+        "category": "jev",
+        "what": "In step 5, 'remove the last button', Jev ranked New Agent first at 0.20 even though Filter (Runs) is the last of the only two buttons in the mock. The ordinal was not used, and the question followed.",
+        "evidence": "step-5 log: target 'button \"New Agent\"' conf 0.2 'of 2', then choice.",
+        "composable": "Resolve ordinals ('last', 'first') over the candidates of the named kind in document order before scoring."
+      },
+      {
+        "category": "jev",
+        "what": "In step 9, the 'which one?' for 'the main list' offered the Runs col, which already holds a table. The Logs list, the one real list elsewhere, was not offered. On the viewed Agents screen the agent-card grid was the clear referent and Jev's top guess (0.53).",
+        "evidence": "step-9 choices: option 2 is 'col \u00b7 \"Agent | Status | Started | Duration \u2026\" \u00b7 holds table \u00b7 Runs'.",
+        "composable": "Drop candidates that are already the target form (a table) from a 'turn X into a table' question, and prefer the viewed screen."
+      },
+      {
+        "category": "jev",
+        "what": "In steps 2 and 10, the 'which title?' options included the nav item \"Agents\", which is not a title, and left out \"System Logs\", the Logs screen's title.",
+        "evidence": "step-2 choices: '2 \u00b7 text \"Agents\" \u00b7 bold \u00b7 Agents, Runs, Logs'. No option is \"System Logs\".",
+        "composable": "Take title candidates from each screen's heading text (size l or larger, first in the content part), not from shared nav items."
+      },
+      {
+        "category": "edit",
+        "what": "In step 8, the new Settings screen's nav copy got a fourth item, \"Settings\", but the nav copies on Agents, Runs and Logs did not, so Settings is unreachable from the other screens.",
+        "evidence": "final outline: col #n95 has 4 texts, while #n4, #n41 and #n73 still have 3.",
+        "composable": "When a screen is added, append its name to every copy of the shared nav."
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "fair_ask",
+        "why": "Every screen has its own l bold heading ('Active Agents', 'Recent Runs', 'System Logs'), so 'the title' is ambiguous. The options, though, wrongly included the nav item 'Agents' and left out 'System Logs'."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "The shared nav col #n4 went from fill=light to mid, and the change reached its copies on Runs and Logs."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked 'New Agent' button #n11 went from size m to l."
+      },
+      {
+        "step": 5,
+        "verdict": "needless_ask",
+        "why": "The mock had only two buttons, and in reading order the last is 'Filter' at the top of Runs. Jev still asked 'which one?' and even ranked 'New Agent' first at 0.20, ignoring 'last'. Viewing Agents, where 'New Agent' is the only button, makes this borderline."
+      },
+      {
+        "step": 6,
+        "verdict": "partly",
+        "why": "The search input landed in a sensible spot, the top of the main col #n8 on Agents. But the writer wrapped it in a row with a duplicate primary 'New Agent' button (#n92), so two identical New Agent buttons now sit stacked."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "A question about the layout was routed to none (0.75), and nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A Settings screen was added after Logs, with the shared nav (Settings current) and General, Notifications and Integrations sections. The minor flaw: the navs on the other three screens did not get a Settings item."
+      },
+      {
+        "step": 9,
+        "verdict": "needless_ask",
+        "why": "On the viewed Agents screen, the grid of three agent cards (#n12) is plainly the main list and was Jev's top guess at 0.53. The question also offered the Runs col, which is already a table."
+      },
+      {
+        "step": 10,
+        "verdict": "right",
+        "why": "The sentence was split correctly. 'Add a filter' put a ghost 'Filter' button (#n148) next to the search input, a sensible spot, and 'make the title bigger' raised the same fair 'which one?' as step 2 (one title per screen)."
+      },
+      {
+        "step": 11,
+        "verdict": "partly",
+        "why": "The right Filter was picked: #n148 on the viewed Agents screen, not the one on Runs. But it was already in the top row beside the search field, and the move left it alone on a new line above that row, detached from the search it filters."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "A bordered fill=light tip note (#n149) was added on the Settings screen, directly under its 'Settings' heading."
+      },
+      {
+        "step": 13,
+        "verdict": "correctly_nothing",
+        "why": "The marked nav text 'Agents' (#n5) was already bold and already first in the nav, so both parts were declined with a clear reply."
+      }
+    ]
+  },
+  "kanban": {
+    "app": "kanban",
+    "substance": 2,
+    "substanceWhy": "The core object is shown: four board columns (Backlog, In Progress, Review, Done), each a stack of bordered cards with a title, detail and assignee, and In Progress cards shaded to set them apart. It is shallow for a design studio's board. Cards are three grey text lines with no avatar, tag pill, due date or '+ add card'. There is no board toolbar and not a single button. The nav just repeats the four column names. The four w=280 columns overflow the 1000 px content area, so the Done column hangs off the right edge of the artboard in the render.",
+    "composedWell": [
+      "The board is a row of four cols, each with a bold column header over a col of bordered card cols with pad=2 gap=1.",
+      "In Progress cards use fill=light to separate them from the others, and their extra 'Started Mon/Wed' line is well chosen.",
+      "The nav col uses line dividers to separate the brand, the column links and a small 'Team' section.",
+      "The Settings screen added in step 8 has team rows with justify=between (name left, role right), a check and toggles for notifications, and line dividers between sections."
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "Four columns at w=280 plus gap=4 need about 1168 px, but the content area is about 968 px (1200 \u2212 200 nav \u2212 padding). The Done column runs past the artboard's right border.",
+        "evidence": "build outline lines 18, 33, 46 and 54 (col w=280 \u00d74). The build render shows the Done cards extending beyond the frame edge at about x=1240\u20131432.",
+        "composable": "Give each board column `grow` (or w=220) so four columns fit the row."
+      },
+      {
+        "category": "writer",
+        "what": "The nav lists the four board columns as destinations, with 'Backlog' bold as if it were a page. After step 8, neither nav copy has a Settings item, so the Settings screen is unreachable and neither copy marks it as current.",
+        "evidence": "final outline: #n4 and #n67 both list Backlog / In Progress / Review / Done. #n67 has no Settings item and no bold current item.",
+        "composable": "Nav items should be pages (Board, Settings); append 'Settings' to every nav copy when that screen is added."
+      },
+      {
+        "category": "writer",
+        "what": "The board has no toolbar, no '+ Add card' and no buttons at all, and the cards have no avatar shape or tag pill. This makes the kanban read as a generic list of text boxes and leaves nothing for step 5's 'the last button'.",
+        "evidence": "build outline: no button or shape anywhere. The cards are only text nodes.",
+        "composable": "Add a header row (title, search input, 'New task' primary button), a small circle shape for each assignee, and a text pill for tags."
+      },
+      {
+        "category": "jev",
+        "what": "'Add a search field at the top' (step 6) and 'add a filter' (step 10) were both put back to the person as 'where should it go?'. Jev's part confidence for the main board area was only 0.34 and 0.08, even though the top of the board area is the obvious host, and the same sentences on orchestration were placed without asking (0.83 / 0.91).",
+        "evidence": "step-6 log: place 'col \u00b7 grow \u2026' conf 0.34, then choice. Step-10 log: place conf 0.08, then 'belongs next to text \"Studio Board\"' 0.31, then choice.",
+        "composable": "When the main part has no toolbar row, prefer a new top row in the widest part for search, filter and actions instead of asking."
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "right",
+        "why": "The only title on the single Board screen, 'Studio Board' (#n5), was picked at 0.99 and went from size l to xl."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "The nav col #n4 went from fill=light to mid."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked 'Studio Board' went from size xl to xxl. At that size it wraps to two lines in the 200 px nav, which is what 'bigger' meant here."
+      },
+      {
+        "step": 5,
+        "verdict": "correctly_nothing",
+        "why": "The board has no buttons, and Jev replied 'there is no button on the mockup' without changing anything."
+      },
+      {
+        "step": 6,
+        "verdict": "needless_ask",
+        "why": "A search field 'at the top' of a kanban board naturally goes at the top of the board area (col #n16). Jev asked 'where should it go?', offering that or the nav, after scoring the main part only 0.34."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "The question was routed to none (0.78), and nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A Settings screen was added after Board, with the shared nav, workspace, team members with roles, notifications, theme and Save/Cancel. The flaw: no nav copy got a Settings item."
+      },
+      {
+        "step": 9,
+        "verdict": "fair_ask",
+        "why": "A kanban board is four lists, not one, and the only true list is the Team members on Settings, so 'the main list' has no single clear referent. The options did include the whole board col #n16."
+      },
+      {
+        "step": 10,
+        "verdict": "needless_ask",
+        "why": "'Add a filter' was asked back as 'where should it go?' (main part scored 0.08), though a board filter belongs at the top of the board area. 'Make the title bigger' was correctly declined because 'Studio Board' was already xxl, so nothing changed."
+      },
+      {
+        "step": 11,
+        "verdict": "right",
+        "why": "The one 'Save changes' button (#n112) was moved from the bottom Save/Cancel row to the top of the Settings content col, above the 'Settings' heading, as asked. Cancel stays at the bottom."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "A 'Note' block (#n114) was added on the Settings screen, directly under its 'Settings' heading."
+      },
+      {
+        "step": 13,
+        "verdict": "correctly_nothing",
+        "why": "The marked 'Studio Board' (#n5) was already bold and already first in the nav, so both parts were declined with a clear reply."
+      }
+    ]
+  },
+  "rent": {
+    "app": "rent",
+    "substance": 2,
+    "substanceWhy": "The objects of a bill-splitting app are all there. Home shows balance cards (You are owed $340.50 / You owe $127.25) and a Recent activity list. Add expense has Description, Amount, Paid by and a Split between list of roommates. Friends has a balance per roommate with a Settle button. But the split itself is only three unlabelled checkboxes: no share per person, no split method, no per-person amounts. Nothing is specific to rent (no recurring bill or due date). And the main action, Save expense, renders as a giant black slab.",
+    "composedWell": [
+      "Home: two bordered balance cards with a small mid-grey label, an xl bold amount and an xs caption, a clear hierarchy made only with size and shade",
+      "Recent activity rows: name on the left with grow, the amount as mid-grey s data on the right",
+      "Add expense form: small bold field labels over inputs, a select for Paid by, and a check list of the three roommates for Split between",
+      "Friends: each roommate row pairs a name and balance column (grow) with a ghost Settle button, using justify=between",
+      "Bottom tab bar shared with share=tabs, where the current item is bold on each screen (Home / Add / Friends)",
+      "Consistent dark 56px header strip on every screen"
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "Save expense has `grow` inside a col, so it takes all the remaining height: a black slab about 160x240 instead of a 48px full-width button",
+        "evidence": "build outline line 65 `button #n65 \"Save expense\" primary grow h=48`; render style `flex:1 1 48px;align-self:flex-start`; both shots show a tall black block on Add expense",
+        "composable": "yes: `button \"Save expense\" primary w=fill h=48`"
+      },
+      {
+        "category": "writer",
+        "what": "The core splitting step is shallow. Split between is bare checkboxes with no share per person, no split method and no total, and nothing is specific to rent (recurring, due date)",
+        "evidence": "build outline lines 53-64: three `input check` + name rows only",
+        "composable": "yes: a row per roommate with check, name (grow) and `text \"$400\" data`, plus a row of `text pill` for Equal / Exact / %"
+      },
+      {
+        "category": "writer",
+        "what": "The app is named after a real product (\"Splitwise\") instead of a name for the idea",
+        "evidence": "`app #n1 \"Splitwise\" phone`, and the Home header title reads Splitwise",
+        "composable": "yes: any invented name"
+      },
+      {
+        "category": "writer",
+        "what": "The shared tab bar has a Settings tab, but no Settings screen exists",
+        "evidence": "text \"Settings\" in n37/n76/n109; screens are only Home, Add expense, Friends",
+        "composable": "yes: drop the tab or add the screen"
+      },
+      {
+        "category": "render",
+        "what": "The header avatar (shape circle, default fill=light) sits on a fill=dark bar, where --soft becomes #111 on #222, so it draws nearly invisible",
+        "evidence": "`.fill-dark{--soft:#111}` and `.shp.f-light{background:var(--soft)}`; the shots show a black disc on the black header",
+        "composable": "n/a: a render theming rule; light shapes on dark bars should stay light"
+      },
+      {
+        "category": "jev",
+        "what": "Step 8: asked where a Settings screen goes although Jev's own top pick (at the end, 0.41) matches the tab bar's order",
+        "evidence": "place 'a new screen after the \"Friends\" screen (at the end)' conf 0.41, then choice 'where should it go?'",
+        "composable": "n/a: should have placed it at the end"
+      },
+      {
+        "category": "jev",
+        "what": "Step 12: the part pick was right (the Friends content column, 0.44), but the next placement drifted to 'next to text \"Roommates\"' in the header (0.20). The ask that followed offered the header and tab-bar strips as places for a note",
+        "evidence": "place 'next to text \"Roommates\" \u00b7 bold l' conf 0.2, then choice with options 1-3 (content / header strip / tab bar)",
+        "composable": "n/a: a note belongs at the end of the content column"
+      },
+      {
+        "category": "jev",
+        "what": "Step 13: 'move it to the top' on a title that is already at the top-left of the header chose 'just below the header' (0.35) and asked, instead of saying it is already there (rideshare step 13 handled the same case as a no-op)",
+        "evidence": "place spot 0.35 'just below row \u00b7 h=56 fill=dark \u00b7 \"Splitwise\"'; option 2 in the choice reads '..., where it is now'",
+        "composable": "n/a: should have refused as already at the top"
+      },
+      {
+        "category": "writer",
+        "what": "Added pieces wrap themselves in an extra `pad=3` col inside the already padded content column, so the search field and the table sit 12px further in than the cards",
+        "evidence": "final outline `col #n112 gap=2 pad=3` around the search input; `col #n17 gap=2 pad=3` around the table; the final shot shows both inset",
+        "composable": "yes: append the input and table without a padded wrapper"
+      },
+      {
+        "category": "edit",
+        "what": "The step 5 confirmation does not say which of three identical Settle buttons it will remove (Sam Rivera's, on Friends, while the person views Home)",
+        "evidence": "asked 'remove button \"Settle\" \u00b7 ghost s?'; target n98",
+        "composable": "n/a: the question should name the row or screen"
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "right",
+        "why": "Enlarged text \"Splitwise\" (n4) l to xl. It is the header title of the viewed Home screen and the app name, the most title-like text."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "Darkened the bottom tab bar row n27 (share=tabs), fill none to light, on all three screens. On this phone app the tab bar is the navigation."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "Marked button \"Save expense\" (n65) went from size m to l."
+      },
+      {
+        "step": 5,
+        "verdict": "right",
+        "why": "After a yes/no confirmation, removed the last button in app order: Sam Rivera's \"Settle\" (n98) on Friends. Home has no buttons, so this is the reasonable reading, though the confirmation did not say which Settle."
+      },
+      {
+        "step": 6,
+        "verdict": "right",
+        "why": "Put the \"Search expenses\" search input just below the dark header, at the top of Home's content column. The writer's extra padded wrapper insets it slightly."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "Routed as not a request (none 0.70); nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "needless_ask",
+        "why": "Asked where the Settings screen goes, though Jev's top pick (after Friends, at the end, 0.41) is obvious because the tab bar already lists Settings last. Nothing was added."
+      },
+      {
+        "step": 9,
+        "verdict": "right",
+        "why": "Rewrote the Recent activity list col n17 into a table with an Expense | Amount header and the same three rows (Rent, Internet, Groceries)."
+      },
+      {
+        "step": 10,
+        "verdict": "right",
+        "why": "Split into two parts. It added a Filter chip row (All / You owe / You are owed) directly under the \"Search expenses\" field, and enlarged \"Splitwise\" xl to xxl."
+      },
+      {
+        "step": 11,
+        "verdict": "right",
+        "why": "Moved button \"All\" (n123) to the top of Home's content column, just below the header. That is the literal top of the screen's content, though it leaves its filter chip row."
+      },
+      {
+        "step": 12,
+        "verdict": "needless_ask",
+        "why": "The Friends content column (Jev's own part pick, 0.44) is the obvious place for a note. The spot drifted to next to the header title \"Roommates\" (0.20), then the app asked with the header and tab bar as options, and nothing was added."
+      },
+      {
+        "step": 13,
+        "verdict": "needless_ask",
+        "why": "Marked \"Splitwise\" is already bold (correctly refused) and already at the top-left of the header. Instead of saying so, the app asked where to move it, listing 'where it is now' as option 2."
+      }
+    ]
+  },
+  "rideshare": {
+    "app": "rideshare",
+    "substance": 1,
+    "substanceWhy": "This is recognisably a driver app: Ready to drive?, Trip requests, Today's earnings, Next pickup, plus an Earnings chart and a Ratings page. But the core object is missing. There is no map, no incoming ride request with pickup, dropoff, fare and Accept/Decline, and no online toggle. The Accept button sits on a count (\"8 nearby\"). Earnings and Ratings are generic stat pages. A desktop-style 200px side nav in a 375px phone frame squeezes the content so hard that text wraps one letter per line.",
+    "composedWell": [
+      "Earnings: headline \"This week\" over an xl \"$847.25\", a line chart card, and a Breakdown card whose Fares/Tips rows use justify=between with bold data amounts",
+      "Ratings: a centered xxl \"4.87\" with a \"Based on 284 trips\" caption, a star-distribution row, and Recent feedback cards with the stars right-aligned",
+      "The side nav is shared with share=nav, and the current screen's item is bold on each screen",
+      "Home: Today's earnings card with the Trips count aligned right in its own column (align=end); Next pickup card with address and ETA in shade steps"
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "A desktop pattern on a phone: a 200px side nav inside the 375px frame leaves about 127px for content, so card text breaks one letter per line",
+        "evidence": "build outline `col #n4 share=nav w=200` beside `col #n9 grow pad=4`; the build shot shows \"Tri/p/re/qu/es/ts\" and \"8/n/e/ar/b/y\" beside Accept, and \"star/s\" on Ratings",
+        "composable": "yes: no side nav on phone; use the bottom tab row, with the content full width"
+      },
+      {
+        "category": "writer",
+        "what": "The core object is missing: no map, no ride-request card (pickup to dropoff, fare, distance, countdown, Accept/Decline) and no online/offline toggle. \"Accept\" is attached to a count, \"8 nearby\"",
+        "evidence": "build outline lines 10-17: \"Ready to drive?\" with a 12px dot, and row \"Trip requests \u00b7 8 nearby\" + button \"Accept\"",
+        "composable": "yes: `shape \"Map\" h=300 fill=mid`, a bordered col with pickup/dropoff texts and a fare in data, a row of Decline / Accept primary buttons, `input \"Online\" toggle on`"
+      },
+      {
+        "category": "writer",
+        "what": "Two competing navigations. The bottom tab bar (Active / History / Wallet) maps to no screen: the Earnings screen marks \"History\" current and Ratings marks nothing. The side nav's Settings item also has no screen",
+        "evidence": "n29/n58/n96 share=tabs with n60 \"History\" bold on Earnings; n8/n39/n68 \"Settings\"; screens are only Home, Earnings, Ratings",
+        "composable": "yes: one tab row whose items are the screens"
+      },
+      {
+        "category": "render",
+        "what": "Text in narrow columns breaks mid-word instead of keeping words whole, which makes the squeeze unreadable",
+        "evidence": "`.t{overflow-wrap:anywhere}` with `.row>*{min-width:0}`; \"Tri p re qu es ts\" and \"F i l t e r\" in the shots",
+        "composable": "n/a: a renderer wrapping rule"
+      },
+      {
+        "category": "jev",
+        "what": "Build: \"a phone app for rideshare drivers\" was classified kind none 0.56 rather than new_app, so the person was asked 'what kind of change is it?' with five options",
+        "evidence": "route source 'jev \u00b7 write 0.64 \u00b7 request 0.94 \u00b7 none 0.56', then choice 'what kind of change is it?'",
+        "composable": "n/a: should be new_app, like the rent build (new_app 0.86)"
+      },
+      {
+        "category": "jev",
+        "what": "\"the title\": the top candidate was text \"4.87\" (the rating on another screen, 0.67 and 0.51). The options offered the nav item \"Home\" and the number \"$847.25\" but not \"This week\"",
+        "evidence": "steps 2 and 10: target 'text \"4.87\" \u00b7 xxl bold'; options 'text \"Home\"', 'text \"Ready to drive?\"', 'text \"$847.25\"'",
+        "composable": "n/a: \"Ready to drive?\" on the viewed Home screen is the natural pick"
+      },
+      {
+        "category": "jev",
+        "what": "\"the main list\": the options were the whole content column, the side nav and the full-height row. The real lists (Recent feedback n85, the Breakdown rows) were not offered",
+        "evidence": "step 9 choice options 1-3",
+        "composable": "n/a: offer list-shaped candidates"
+      },
+      {
+        "category": "edit",
+        "what": "The filter was inserted 'right after input' inside the search field's own `row pad=3`, so it lands to the right of the search box in the 127px column. The search box shrinks to about 20px, \"Filter\" wraps per letter, \"Scheduled\" truncates and \"Urgent\" is clipped",
+        "evidence": "final outline `row #n100` holds `input #n101 ... w=fill` and `row #n102` (Filter / Scheduled / Urgent); final shot shows the crushed strip",
+        "composable": "yes: put the filter row after n100 (below it); the step 6 writer should have used a col or no wrapper"
+      },
+      {
+        "category": "jev",
+        "what": "Step 8: asked where a Settings screen goes, although the side nav already lists Settings after Ratings and Jev's top pick was 'at the end' (0.45)",
+        "evidence": "place conf 0.45 then choice 'where should it go?'",
+        "composable": "n/a: should place at the end"
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "fair_ask",
+        "why": "Each screen has its own heading (\"Ready to drive?\", \"This week\", \"4.87\") and there is no app title, so asking is fair. But Jev's top guess was \"4.87\", and the options offered the nav item \"Home\" and \"$847.25\" instead of \"This week\"."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "Darkened the shared side nav col n4 (share=nav), fill light to mid, on all three screens. It is the screen-level navigation."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "Marked button \"Accept\" (n17) went from size m to l."
+      },
+      {
+        "step": 5,
+        "verdict": "right",
+        "why": "After a yes/no confirmation, removed the app's only button, \"Accept\" (n17)."
+      },
+      {
+        "step": 6,
+        "verdict": "right",
+        "why": "Added a \"Search trips\" search input at the top of Home's content column, above \"Ready to drive?\" (spot 0.98). It is wrapped in a padded row, which causes trouble in step 10."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "Routed as not a request (none 0.63); nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "needless_ask",
+        "why": "Asked where the Settings screen goes, though the side nav already lists Settings after Ratings and Jev's top pick was 'at the end' (0.45). Nothing was added."
+      },
+      {
+        "step": 9,
+        "verdict": "fair_ask",
+        "why": "The viewed Home screen has no list, only a stack of cards, so \"the main list\" is ambiguous. But the options (whole content column, side nav, full-height row) left out the real lists: Recent feedback and Breakdown."
+      },
+      {
+        "step": 10,
+        "verdict": "partly",
+        "why": "The filter chips (Filter / All trips / Scheduled / Urgent) went into the search field's row, beside it in a 127px column, crushing the search box and wrapping \"Filter\" per letter. The title half asked \"which one?\" again (top guess \"4.87\"), so nothing was enlarged."
+      },
+      {
+        "step": 11,
+        "verdict": "right",
+        "why": "Moved button \"All trips\" (n104) to the top of Home's content column, above the search row, which is the top of the screen's content."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "Added a light Note card (\"Maintain a 4.6+ rating to stay active on the platform\") at the end of the Ratings content column, below Recent feedback."
+      },
+      {
+        "step": 13,
+        "verdict": "correctly_nothing",
+        "why": "Marked nav item \"Home\" (n5) is already bold and already first in the side nav. Both parts were refused with 'already bold' and 'already at the top \u2014 nothing moved'."
+      }
+    ]
+  },
+  "support": {
+    "app": "support",
+    "substance": 2,
+    "substanceWhy": "The conversation is there: a conversation queue on the left, the thread with avatars, names, times and realistic copy, and a composer. But the 'customer's details beside the conversation', which the prompt asked for, is only a 120px column of three fields (Status, Plan, MRR) inside the header row next to the customer's name. It is not a panel beside the thread. Agent and customer messages are also drawn identically, so the chat does not read as a conversation between two sides.",
+    "composedWell": [
+      "The left queue is grouped by status: small mid 'Active' and 'Waiting' labels with a divider between them. The open conversation 'Marcus Chen' is bold and the others are mid shade, each with its subject underneath in small mid text.",
+      "The header row pairs the customer name with the subline 'Customer since Jan 2023 \u2022 2 previous chats'.",
+      "Customer facts are key/value pairs: small mid labels over bold values, separated by lines (Status Active / Plan Professional / MRR $299).",
+      "The thread has plausible support content (402 payment error, Visa ending 4829), with circle avatars and name-plus-time stacks.",
+      "The composer is a bordered row with a multi-line area input and a primary Send button. The thread col is grow, so the composer sits at the bottom of the screen.",
+      "The step-8 Settings screen fits a support agent: Notifications, Availability (status select, auto-reply toggle and message) and Preferences sections, laid out as label-left, control-right rows with dividers."
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "The customer details are not beside the conversation. They are a narrow three-field column in the header row, level with the name, and nothing sits alongside the thread.",
+        "evidence": "row #n16 > col #n20 w=120 gap=1 holding Status/Plan/MRR; col #n29 (thread) spans the full width below it",
+        "composable": "row grow { col #thread grow ; col w=280 pad=3 gap=2 border { text \"Customer\" bold ; key/value rows for email, plan, MRR, open tickets } }"
+      },
+      {
+        "category": "writer",
+        "what": "The avatar/name row and the message body are loose siblings in one col. 'You' and customer messages look the same: same side, same shade, no bubble.",
+        "evidence": "col #n29: row #n36 (You, 2:16 PM) then text #n41 as siblings, laid out exactly like #n30/#n35 for Marcus Chen",
+        "composable": "per message: row gap=2 { shape circle ; col fill=light pad=2 { text name bold size=s ; text body } }, with agent messages in row justify=end"
+      },
+      {
+        "category": "prop",
+        "what": "The writer puts 'on' on non-toggle inputs, where it means nothing. The added search field is a plain input, not the search variant.",
+        "evidence": "input #n49 \"Type a message...\" grow area on; input #n53 \"Search messages...\" grow on (step 6)",
+        "composable": "input \"Search messages\" search grow"
+      },
+      {
+        "category": "jev",
+        "what": "Step 10's 'add a filter' ended up below the message composer. Jev's open-spot answer, next to the search field, came back at 0.34, under ACT_NEXT 0.4. Code then fell back to the end of the main column instead of the search row or asking.",
+        "evidence": "place 'next to input \"Search messages...\"' conf 0.34 \u2192 piece 'added at the end of col \u00b7 grow'; final: row #n118 Filter/select sits after row #n48 (composer)",
+        "composable": "after #n51 (or in #n51): input select value=\"All messages\""
+      },
+      {
+        "category": "jev",
+        "what": "Step 9's 'turn the main list into a table' asked which one, although Jev's top pick, the conversation queue (0.62), was the obvious list. Two of the three options are not lists: the whole main column and a Settings group.",
+        "evidence": "target col share=nav conf 0.62 \u2192 choice options: #n4 queue, #n15 whole main column, Notifications col on Settings",
+        "composable": "rewrite #n4's queue items as table { tr \"Customer | Issue | Status\" ; tr \u2026 data }"
+      },
+      {
+        "category": "jev",
+        "what": "Step 13's 'move it to the top' on the marked 'Support' (#n5) asked where it should go. #n5 is already the first child of the nav. The email run caught this same case ('already there').",
+        "evidence": "place part conf 0.48 on the nav col \u2192 choice 'where should it go?' with nav col / main col; #n5 is first in col #n4",
+        "composable": "no change; reply 'already at the top'"
+      },
+      {
+        "category": "writer",
+        "what": "The note added in step 12 says settings save automatically, on a screen that has Save Changes and Cancel buttons.",
+        "evidence": "text #n123 \"Changes to your settings are saved automatically.\" beside button #n116 \"Save Changes\" and button #n117 \"Cancel\"",
+        "composable": "text \"Changes apply after you press Save.\" size=s"
+      },
+      {
+        "category": "writer",
+        "what": "The shared 'nav' is the conversation queue, not app navigation. The Settings screen therefore shows the Marcus Chen conversation as selected, and no nav item leads to Settings.",
+        "evidence": "col #n56 share=nav on Settings: text #n59 \"Marcus Chen\" bold; no Settings entry in #n4/#n56",
+        "composable": "col share=nav { text \"Inbox\" ; text \"Settings\" \u2026 } separate from a col for the conversation queue"
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "right",
+        "why": "The canvas had one screen, and 'Support' (#n5, size l) was its title-like heading; Jev stepped it from l to xl without asking."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "The nav col #n4 (the conversation queue) went from fill light to mid."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked Send button #n50 went from size m to l."
+      },
+      {
+        "step": 5,
+        "verdict": "right",
+        "why": "Send (#n50) was the only button. The app asks yes/no before every removal by design, and after the yes it removed the Send button."
+      },
+      {
+        "step": 6,
+        "verdict": "right",
+        "why": "A bordered search row (#n51) went in at the top of the main column, above the customer header, which is a sensible 'top'. Minor: the row has a redundant 'Search' label, and the input is plain rather than the search variant."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "Jev routed the question to none (0.69) and nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A Settings screen was added after Conversation with the shared nav copied, and its sections suit a support agent."
+      },
+      {
+        "step": 9,
+        "verdict": "needless_ask",
+        "why": "The conversation queue in the nav (#n4) was the obvious list, and Jev's top pick. The app still asked which one, offering the whole main column #n15 and a Settings group as alternatives, and nothing was converted."
+      },
+      {
+        "step": 10,
+        "verdict": "partly",
+        "why": "The split worked. But the filter row (#n118) landed at the very bottom of the main column, below the message composer, because Jev's 'next to the search field' was 0.34, under threshold. The title half asked a fair 'which one?' between 'Support' and the Settings screen's 'Settings'."
+      },
+      {
+        "step": 11,
+        "verdict": "right",
+        "why": "Save Changes (#n116) moved to the top of the Settings content column. It now sits above the 'Settings' heading, which is literally the top of the screen, though beside the heading would look better."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "The note (#n121) went on the Settings screen directly under the 'Settings' heading, a sensible spot. Its copy contradicts the Save Changes button, a writer issue."
+      },
+      {
+        "step": 13,
+        "verdict": "needless_ask",
+        "why": "The bold half correctly reported 'already bold', but the move half asked 'where should it go?'. The marked 'Support' (#n5) is already first in the nav, so the answer was 'already there'."
+      }
+    ]
+  },
+  "email": {
+    "app": "email",
+    "substance": 3,
+    "substanceWhy": "Three connected screens cover the core email flows convincingly. Inbox has a folders/labels nav, search and message rows. Message has Back, Archive/Delete/More, subject with from/to/date, body, an attachment and Reply/Reply all/Forward. Compose has To/Cc/Subject, a body, and Save draft plus Send. The flaws are real but secondary: every inbox row is bold with a 'From:' prefix and no preview, there is no Compose button, the compose body is not an input, and the Search button duplicates the search field.",
+    "composedWell": [
+      "The shared nav has Mail, Inbox, Sent, Drafts, Spam and Trash, then a divider and a small 'Labels' group (Work/Personal/Follow up). The current folder is bold per screen: Inbox on Inbox, Drafts on Compose.",
+      "Message screen: a Back and Archive/Delete/More toolbar row with justify=between, then a bordered card. The subject heading sits over small mid From/To/date meta, a divider, a body with bullet key dates, the attachment with its file size, and Reply (primary) plus Reply all and Forward (ghost).",
+      "Compose: filled To and Subject values, an empty Cc, and Save draft (ghost) and Send (primary) pushed right with justify=end.",
+      "The step-9 rewrite produced a proper table (From | Subject | Date) and dropped the 'From:' prefix from the cells.",
+      "The step-8 Settings screen has bordered section cards: Account, Notifications toggles, Display selects, Storage with a progress bar at 1.2 of 15 GB, and Labels & filters. Rows put the label left and the value or control right."
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "The Inbox has a 'Search' ghost button in the header and a 'Search messages' field right under it, a duplicate. No Compose button exists anywhere, so the Compose screen cannot be reached.",
+        "evidence": "row #n19 { button #n20 \"Search\" ghost ; button #n21 \"Filter\" ghost } above row #n23 { input #n24 \"Search messages\" search }; no Compose button in #n4 or #n16",
+        "composable": "button \"Compose\" primary w=fill as the first child of the nav col; drop #n20"
+      },
+      {
+        "category": "writer",
+        "what": "Inbox rows are shallow. Every row is bold, so unread cannot be told from read. Each sender starts with 'From:', the time sits right after the subject, and there is no preview line.",
+        "evidence": "row #n26 { text \"From: Sarah Chen\" bold ; text \"Project kickoff\" bold ; text \"2m ago\" } repeated with bold on all five rows",
+        "composable": "row justify=between { col grow { row { text sender bold ; text subject } ; text preview shade=mid size=s } ; text time shade=mid size=s }, with bold only on unread rows"
+      },
+      {
+        "category": "prop",
+        "what": "The compose body is a text node with 'area'. The prop is ignored, so the body draws as a single plain line with no text box.",
+        "evidence": "text #n119 \"Thanks for the update. I've reviewed the numbers and have a few questions:\" area h=200",
+        "composable": "input area value=\"Thanks for the update\u2026\" h=200"
+      },
+      {
+        "category": "prop",
+        "what": "The attachment icon is an unsized shape holding an emoji, and it renders as a large grey block that dwarfs the file row.",
+        "evidence": "shape #n88 \"\ud83d\udcc4\" with no w/h; the render shows a ~130\u00d7100 grey box next to proposal_2024.pdf",
+        "composable": "shape w=32 h=40 fill=mid"
+      },
+      {
+        "category": "jev",
+        "what": "Step 2's 'make the title bigger', said while viewing Inbox, changed the email subject on the Message screen without asking. Every screen has its own heading.",
+        "evidence": "target text \"Project kickoff meeting\" (#n69, Message screen) conf 0.73 of 45 \u2192 size l\u2192xl; viewing: Inbox, whose heading is #n18 \"Inbox\"",
+        "composable": "bigger on #n18, or a 'which one?' listing Inbox, Project kickoff meeting, New message"
+      },
+      {
+        "category": "jev",
+        "what": "Step 6's 'add a search field at the top' added a second 'Search messages' field without noticing the existing one two rows below.",
+        "evidence": "new row #n123 { input #n124 \"Search messages\" search } at the top of #n16, while row #n23 { input #n24 \"Search messages\" search } remains",
+        "composable": "move row #n23 to the top of #n16, or add nothing and say one exists"
+      },
+      {
+        "category": "writer",
+        "what": "Step 10's 'add a filter' was placed next to the Search button, where a Filter button already sat. The writer added a second identical 'Filter' button, copying size=l from its neighbour, so the toolbar reads 'Search Filter Filter'.",
+        "evidence": "row #n19: button #n20 \"Search\" size=l ; button #n187 \"Filter\" ghost size=l ; button #n21 \"Filter\" ghost",
+        "composable": "row gap=2 { text \"Unread\" pill ; text \"Starred\" pill ; input select value=\"All mail\" } above the table"
+      },
+      {
+        "category": "jev",
+        "what": "Step 11's 'move the Search button to the top of the screen' asked where it should go. Jev's own first spot, the top of the main column (0.45 of 7), was the literal meaning, and the support run moved on the same sentence without asking.",
+        "evidence": "spot 'at the top of col \u00b7 grow \u2026 above row \u00b7 border \u00b7 \"Search messages\"' conf 0.45 \u2192 choice with 3 spots",
+        "composable": "move #n20 to the top of #n16 (or into row #n123 beside the search input)"
+      },
+      {
+        "category": "jev",
+        "what": "The step-10 title question offered the nav item 'Inbox' (#n6), which is not a title, and left out the 'New message' and 'Settings' headings.",
+        "evidence": "options: 'Project kickoff meeting' (Message), 'Inbox' bold l (Inbox), 'Inbox' bold (Inbox, Message, Compose, Settings)",
+        "composable": "offer each screen's heading: #n18, #n69, #n112, #n140"
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "wrong",
+        "why": "The person was viewing Inbox, and every screen has its own heading. Jev enlarged the Message screen's 'Project kickoff meeting' (#n69) instead of the Inbox heading (#n18), and did not ask."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "The shared nav col #n4 went from fill light to mid, mirrored on the other screens."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked Search button #n20 went from size m to l."
+      },
+      {
+        "step": 5,
+        "verdict": "fair_ask",
+        "why": "Each of the three screens ends in a different button (Send on Compose, Filter on Inbox, More on Message). The question offered all three, including the viewed Inbox's Filter, and nothing was removed."
+      },
+      {
+        "step": 6,
+        "verdict": "partly",
+        "why": "A search field (#n123) went in at the top of the Inbox main column as asked. An identical 'Search messages' field (#n24) was already just below the header, so Inbox now has two."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "Jev routed the question to none (0.78) and nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A Settings screen was added after Compose with the shared nav and sensible mail settings sections."
+      },
+      {
+        "step": 9,
+        "verdict": "right",
+        "why": "Jev picked the message list col #n25 at 0.94, and the writer turned it into a From | Subject | Date table (#n180) with the same five messages."
+      },
+      {
+        "step": 10,
+        "verdict": "partly",
+        "why": "The split worked, but the filter half put a second 'Filter' button (#n187) beside the existing Filter button (#n21) in the Inbox header. The title half asked a fair 'which one?', though one option was the nav item 'Inbox'."
+      },
+      {
+        "step": 11,
+        "verdict": "needless_ask",
+        "why": "The sentence named the place. The top of the Inbox main column, above the new search row, was Jev's own first spot, yet the app asked where it should go and the Search button did not move."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "The note (#n188) was added on the Settings screen directly under the 'Settings' heading, and its copy fits the screen."
+      },
+      {
+        "step": 13,
+        "verdict": "correctly_nothing",
+        "why": "The marked 'Mail' (#n5) was already bold and already first in the nav. Both halves reported that and nothing changed."
+      }
+    ]
+  },
+  "daw": {
+    "app": "daw",
+    "substance": 1,
+    "substanceWhy": "You can tell it is a music tool: a shared nav, a Play/Export header, a track list, a Mixer and a Sound Library. The timeline of tracks the prompt named is weak, though. It is four rows of five equal grey blocks filling every lane, with no clip lengths, gaps, ruler or playhead. The track names sit in a separate narrow column and do not line up with the 200px lanes. It reads as a tile grid, not tracks over time.",
+    "composedWell": [
+      "The side nav is a shared col (share=nav) on all three screens, with the current item bold. Step 3 darkened every copy at once.",
+      "Mixer channel strips are a row of cols: bold name, a circle shape for the knob, a level progress bar and a mono dB readout marked data.",
+      "The header row puts the project title next to a primary Play button and an outlined Export button.",
+      "Library: a search input over grouped lists (Loops, Instruments, Effects) in bordered cols.",
+      "The Settings screen added in step 8 uses label/value rows with justify=between, and toggles for the preferences."
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "The timeline lanes are rows of five equal `grow` cols filling each lane edge to edge. There are no clips of different lengths or positions, no gaps, no time ruler beyond one \"0:00\", and no playhead.",
+        "evidence": "daw.build.outline lines 33-56: row #n33 h=200 holding col #n34..#n38 grow h=fill fill=mid, repeated for 4 lanes. The build render shows 20 identical grey cells.",
+        "composable": "Yes. Each lane can be a row of shapes with different w and fill=mid/dark separated by fixed gaps, with a row of xs mono time labels above and a narrow dark shape as the playhead."
+      },
+      {
+        "category": "prop",
+        "what": "`shade=light` was put on alternating lane cols to vary the clip shading. On a container, shade only sets the text shade, so every cell renders the same colour.",
+        "evidence": "col #n34 grow h=fill fill=mid shade=light next to col #n35 grow h=fill fill=mid. The build render shows no difference between them.",
+        "composable": "Yes, with fill=light on alternating cols instead of shade."
+      },
+      {
+        "category": "writer",
+        "what": "The track names are in their own 120px column of small dot+text rows, while each lane is h=200. Drums/Bass/Keys/Vocals stack at the top and do not line up with their lanes, and Add Track sits far from the grid.",
+        "evidence": "col #n15 w=120 (rows #n17-#n26) is a sibling of col #n31 with rows #n33/#n39/#n45/#n51 at h=200. In the build render all names are in the top ~80px, next to lane 1.",
+        "composable": "Yes. Make one row per track: a col w=120 header (name, then mute/solo as text pills) followed by that track's lane row, all stacked in one col."
+      },
+      {
+        "category": "writer",
+        "what": "On the Mixer, the Master col has `grow`, so a three-line Master box stretches over ~600px of empty bordered space. The channel faders are horizontal progress bars, with no mute, solo or pan. `w=full` is not a valid value.",
+        "evidence": "col #n87 grow pad=3 border holds 3 leaves. progress #n89 has w=full. The Mixer render shows a large empty Master box.",
+        "composable": "Yes. Drop grow on #n87, use w=fill, and add text pills M/S under each channel."
+      },
+      {
+        "category": "writer",
+        "what": "For step 6 (\"add a search field at the top\"), Haiku wrapped the search input in a copy of the whole header row. The Timeline now has two \"Project: Midnight Echo\" titles and two Play/Export pairs.",
+        "evidence": "daw.final.outline: row #n117 = input #n118 \"Search project\" + text #n119 \"Project: Midnight Echo\" xl + button #n120 \"Play\" + #n121 \"Export\", sitting above the original row #n10. Log: 5 lines from haiku.",
+        "composable": "Yes. The piece needed only the input line, or the input placed inside row #n10."
+      },
+      {
+        "category": "jev",
+        "what": "This is a knock-on from step 6. In step 10, \"make the title bigger\" found two identical \"Project: Midnight Echo\" texts, so Jev's confidence dropped (0.79 in step 2, 0.66 here) and it asked \"which one?\". Two of the options could not be told apart.",
+        "evidence": "Step 10 choices: '1 \u00b7 text \"Project: Midnight Echo\" \u00b7 bold xl \u00b7 Timeline', '2 \u00b7 text \"Project: Midnight Echo\" \u00b7 bold xl \u00b7 Timeline', '3 \u00b7 text \"Timeline\"'.",
+        "composable": "Yes. It goes away once the duplicate header is fixed, or if identical copies are treated as one target."
+      },
+      {
+        "category": "jev",
+        "what": "\"turn the main list into a table\" picked the Tracks list with only 0.27 confidence and asked. The Tracks list is the only content list on Timeline, and the other two candidates (the nav, the whole main column) are not plausible readings.",
+        "evidence": "Step 9 log: 'element 0.27 of 62 (group 0.97)'. The choices list col #n15, nav col share=nav and col grow.",
+        "composable": "n/a (a Jev decision)"
+      },
+      {
+        "category": "jev",
+        "what": "In step 13, \"move it to the top\" on the marked \"Studio\" asked \"where should it go?\". \"Studio\" is already the first item of the nav at the top of the screen, and already bold, so both parts should have ended as nothing to do.",
+        "evidence": "Step 13: the bold part was refused ('text \"Studio\" is already bold'). The move part logged 'part 0.47 of 2' and then a choice between the nav col and col grow. #n5 is the first child of #n4.",
+        "composable": "n/a (a Jev decision)"
+      },
+      {
+        "category": "edit",
+        "what": "Adding the Settings screen gave only its own nav copy a Settings item. The shared nav on Timeline, Mixer and Library still lists four items, so Settings cannot be reached from the other screens.",
+        "evidence": "daw.final.outline: col #n124 (Settings) has text #n129 \"Settings\". Cols #n4, #n59 and #n93 end at \"Library\".",
+        "composable": "Yes. Add the item to every copy of share=nav when a screen is added."
+      },
+      {
+        "category": "writer",
+        "what": "The step-10 filter options are ghost buttons, which render as bare words. \"All Tracks / Active / Muted / Solo\" look like labels, not chips.",
+        "evidence": "row #n169: button #n172 \"Active\" ghost size=s, etc. In the final render they show as plain text in a bordered row.",
+        "composable": "Yes, as text pill (with bold or darker shade for the selected one)."
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "right",
+        "why": "Jev made the Timeline screen's title \"Project: Midnight Echo\" (#n11) bigger, l to xl. That is the screen being viewed, not the Mixer or Sound Library titles."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "The shared nav col #n4 went from fill light to mid, and the other two copies changed with it."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked Play button (#n12) went from size m to l, and the render shows it larger."
+      },
+      {
+        "step": 5,
+        "verdict": "right",
+        "why": "\"Add Track\" (#n30) is the last button on Timeline in reading order (after Play and Export). The only question was the app's standard remove confirmation."
+      },
+      {
+        "step": 6,
+        "verdict": "partly",
+        "why": "The search input landed at the top of main col #n9, but the writer wrapped it in a copy of the header row (#n117 with a second \"Project: Midnight Echo\", Play and Export), so the header now shows twice."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "The question was routed to none (0.71) and nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A full Settings screen (Audio, Project and Preferences rows, Save/Reset) was added after Library. However, the nav copies on Timeline, Mixer and Library did not gain a Settings item."
+      },
+      {
+        "step": 9,
+        "verdict": "needless_ask",
+        "why": "On Timeline the only content list is the Tracks list (#n15), which was also Jev's top pick. The other options (the nav, the whole main column) are not a \"main list\", so the rewrite was left undone for no good reason."
+      },
+      {
+        "step": 10,
+        "verdict": "partly",
+        "why": "The filter row (#n169: Filter:, All Tracks, Active, Muted, Solo) was added at the top of the main column. The title half asked \"which one?\" between two identical \"Project: Midnight Echo\" copies left by step 6, so it was not done."
+      },
+      {
+        "step": 11,
+        "verdict": "right",
+        "why": "\"All Tracks\" (#n171) moved to the top of main col #n9, the topmost spot in the content. It was already in the top filter row, so this is the only move that changes anything, though it now floats alone above the filter row."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "A note box (#n175) was placed on the Settings screen directly under the \"Settings\" heading (#n131), in the main column."
+      },
+      {
+        "step": 13,
+        "verdict": "needless_ask",
+        "why": "The marked \"Studio\" (#n5) was already bold (correctly refused) and already first in the nav at the top of the screen. There was nothing to move, yet the app asked \"where should it go?\" between the nav and the main column."
+      }
+    ]
+  },
+  "extension": {
+    "app": "extension",
+    "substance": 2,
+    "substanceWhy": "Jev chose the panel frame, so the result is a 360px side panel beside a placeholder host page. The panel shows the core object, a summary of the current page: page title, source domain, summary paragraph and key points, with Save/Share. It is thin, though: one screen, 24 nodes, no controls for the summarising itself (regenerate, length, copy), and \"Key Points\" holds one real point plus two metadata lines.",
+    "composedWell": [
+      "The `panel` app type draws a narrow panel next to the host page, the right form factor for a browser extension.",
+      "Labelled sections (Page, Source, Summary, Key Points) are separated by `line` dividers. The source domain is in mono shade=mid.",
+      "The action row has a primary Save and a ghost Share.",
+      "The step-8 Settings screen uses label-grow + toggle/select rows grouped under Display, Preferences and Data, and ends with a primary Done.",
+      "The step-10 filter piece puts an \"All sources\" select and a \"Sort by\" select right under the search input, in the same block."
+    ],
+    "issues": [
+      {
+        "category": "writer",
+        "what": "\"Key Points\" has one real point. The other two bullets are metadata (read time, number of sources), and the bullet characters are typed into the text.",
+        "evidence": "build outline #n19 \"\u2022 Infinite scroll mimics slot machine psychology\", #n20 \"\u2022 Read time: 8 minutes\", #n21 \"\u2022 47 cited sources\".",
+        "composable": "Yes. Write 3-4 real key points, and put read time and sources as xs shade=mid meta text next to the source."
+      },
+      {
+        "category": "writer",
+        "what": "Nothing on the panel is about producing the summary. There is no summarize/regenerate button, no length or detail control, no copy, and no loading state. Only Save/Share, on a single screen.",
+        "evidence": "extension.build.outline: 24 nodes; the only buttons are #n24 Save and #n25 Share.",
+        "composable": "Yes. Add a row of text pills (Short / Detailed) and a ghost \"Regenerate\" button under the header."
+      },
+      {
+        "category": "writer",
+        "what": "The step-9 table forces the key point into a \"Metric | Value\" pair and invents the value \"Psychology\" for it.",
+        "evidence": "extension.final.outline: tr #n61 \"Metric | Value\", tr #n62 \"Infinite scroll mimics slot machine psychology | Psychology\".",
+        "composable": "Yes. A \"Point | Detail\" table, or a single-column table of points with read time and sources as rows."
+      },
+      {
+        "category": "jev",
+        "what": "In step 11, \"move the Save button to the top of the screen\" asked \"where should it go?\". The panel is one column, so \"top of the screen\" can only mean the top of col #n3, which was Jev's own first option at 0.49.",
+        "evidence": "Step 11 log: 'spot 0.49 of 18 on Summary'. Choice 1 is 'at the top of col \u2026 above col \"Search pages\u2026\"'.",
+        "composable": "n/a (a Jev decision)"
+      },
+      {
+        "category": "jev",
+        "what": "In step 3, Jev correctly said there is no navigation on the panel, but then offered the Save/Share row, the Page col and the Summary col as things to darken. None of them is navigation-like.",
+        "evidence": "Step 3: 'element 0.66 of 5 (group 1.00) \u00b7 exists 0.22'. Choices: row \"Save \u00b7 Share\", col \"Page \u00b7 \u2026\", col \"Summary \u00b7 \u2026\".",
+        "composable": "n/a (a Jev decision)"
+      },
+      {
+        "category": "writer",
+        "what": "The added \"Search pages\" field and the \"All sources\" / \"Sort by\" filters imply a list of saved pages that the panel does not have. On the Summary screen they filter nothing.",
+        "evidence": "extension.final.outline: col #n26 (input #n27 \"Search pages\", selects #n68 and #n71) sits above one page's summary.",
+        "composable": "Yes. Word them for this screen (\"Search this summary\"), or add a saved-pages list for them to act on."
+      },
+      {
+        "category": "writer",
+        "what": "The Settings screen added in step 8 has no way in: there is no settings icon or link on the Summary panel.",
+        "evidence": "extension.final.outline: screen Summary has no element that points to Settings.",
+        "composable": "Yes, with a row justify=between holding the header text and a small ghost button or circle shape as the gear."
+      },
+      {
+        "category": "prop",
+        "what": "The step-12 note text is size=s shade=light and renders in faint #aaa, hard to read for a note that is meant to be noticed.",
+        "evidence": "text #n75 \"Your settings are synced\u2026\" size=s shade=light. The final render shows it very faint.",
+        "composable": "Yes, with shade=mid, or the note in a fill=light box."
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "right",
+        "why": "Jev made the page title \"The Hidden Psychology of Social Media\" (#n8) bigger, m to l. That is the title of the summarized page. The \"PageSummary\" heading was the only other candidate and is the less natural reading."
+      },
+      {
+        "step": 3,
+        "verdict": "fair_ask",
+        "why": "The panel has no navigation, so saying \"I don't see that\" and checking was reasonable. The candidates offered (Save/Share row, Page col, Summary col) were weak."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked Save button (#n24) went from size m to l, and the render shows it larger."
+      },
+      {
+        "step": 5,
+        "verdict": "right",
+        "why": "Share (#n25) is the last button, in the Save/Share row. It was removed after the app's standard confirmation."
+      },
+      {
+        "step": 6,
+        "verdict": "right",
+        "why": "A full-width \"Search pages\" input (#n27) went in at the very top of panel col #n3, as the sentence said. It sits above the \"PageSummary\" heading."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "The question was routed to none (0.73) and nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A Settings screen (Display, Preferences, Data, Done) was added after Summary, the only gap. Nothing on Summary links to it."
+      },
+      {
+        "step": 9,
+        "verdict": "right",
+        "why": "Jev picked the Key Points col #n17 (0.95) and it became table #n60. The writer's \"Metric | Value\" header with the invented value \"Psychology\" is a poor fit."
+      },
+      {
+        "step": 10,
+        "verdict": "right",
+        "why": "Split correctly: the filter selects (col #n65: All sources, Sort by/Date added) went right after the search input, and the page title #n8 went from l to xl."
+      },
+      {
+        "step": 11,
+        "verdict": "needless_ask",
+        "why": "In a one-column panel, \"the top of the screen\" is the top of col #n3, which was Jev's own first option. Asking \"where should it go?\" left Save at the bottom."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "A Note block (#n73) was added on the Settings screen right under the \"Settings\" heading."
+      },
+      {
+        "step": 13,
+        "verdict": "right",
+        "why": "The marked \"Filter\" label (#n67) was made bold and moved to the top of panel col #n3, above the search block. That is the only \"top\" in a one-column panel, though it leaves the \"All sources\" select without a label."
+      }
+    ]
+  },
+  "crm": {
+    "app": "crm",
+    "substance": 3,
+    "substanceWhy": "The Pipeline screen is a real-estate deal board. It has stage columns Showing / Offer / Inspection / Closing, and each deal card carries a buyer, a price and a status line ('$580k offer \u00b7 Seller reviewing', 'Report due Friday'). Around it are a Leads list of buyers and their needs and a Contact Detail with budget, timeline, location and an activity timeline. Together they show buyers moving through a pipeline convincingly. The defects are layout and labelling, not missing substance.",
+    "composedWell": [
+      "Pipeline board built as a row of stage cols, each a small bold stage heading over bordered fill=light deal cards (name bold, price s mid, status xs mid)",
+      "Side nav as one shared col (share=nav) with the current item bold per screen, which let step 3 darken every copy in one edit",
+      "Lead rows: 40px circle avatar + grow col (name bold, need s mid) + right-hand 'days ago', bordered and padded",
+      "Contact Detail: 60px avatar beside an xl name and 'Buyer \u00b7 Active' subline; label/value rows with justify=between and mono phone/email; activity timeline of 6px dark dot shapes + text + xs time",
+      "Step 9's rewrite turned the list into a Name | Details | Last Contact table and kept all four leads' data"
+    ],
+    "issues": [
+      {
+        "category": "prop",
+        "what": "On the Pipeline screen the four stage columns have fixed widths that don't fit. The Closing column spills past the artboard's right edge in both renders.",
+        "evidence": "col #n48/#n59/#n66/#n73 each w=280 gap=3 (about 1156px) inside col #n45 grow pad=4 next to a 200px nav in a 1200px frame (about 936px free); the screenshot shows the 'Elena Rodriguez' Closing card crossing the frame edge",
+        "composable": "Give each stage col grow instead of w=280, or have the renderer clip or scroll an overflowing row"
+      },
+      {
+        "category": "writer",
+        "what": "The nav items don't match the screens, and the nav has no app name. The Pipeline screen marks 'Active' as current. Contact Detail marks nothing. There is no item for Pipeline or Contact.",
+        "evidence": "col share=nav holds text 'Leads' / 'Active' / 'Closed' / 'Lost', but the screens are 'Leads', 'Pipeline', 'Contact Detail'; text #n42 'Active' bold on the Pipeline screen",
+        "composable": "Name the nav items after the screens (Leads, Pipeline, \u2026) and put a bold app-name text at the top of the shared nav"
+      },
+      {
+        "category": "writer",
+        "what": "Lead rows don't show which pipeline stage each buyer is at, which is the core of the prompt. '55 leads' heads a list of four.",
+        "evidence": "row #n14..#n32 hold only the avatar, name, need and 'N days ago'; nothing like 'Offer' or 'Showing' appears in them",
+        "composable": "Add a text pill with the stage (text \"Offer\" pill size=xs) in each row"
+      },
+      {
+        "category": "jev",
+        "what": "In step 10's 'make the title bigger', Jev took the nav item 'Leads' as the title (0.86) and acted without asking. The shared nav then grew 'Leads' to size l on all four screens. Step 2 had asked 'which one?' for the same sentence.",
+        "evidence": "target text \"Leads\" \u00b7 bold conf 0.86 \u2192 'text \"Leads\" size m \u2192 l \u00b7 and on 3 other screens'; final text #n5 'Leads' bold size=l, #n41/#n83/#n133 'Leads' shade=mid size=l",
+        "composable": "Keep items of a share=nav element out of the 'title' candidates. Prefer the size=l+ heading on the viewed screen ('55 leads'), or ask as step 2 did"
+      },
+      {
+        "category": "jev",
+        "what": "The candidate list for step 2's 'which one?' led with a nav item. It left out the Pipeline screen's own heading.",
+        "evidence": "options: 1 \u00b7 text \"Leads\" \u00b7 bold (nav item, all screens), 2 \u00b7 '55 leads', 3 \u00b7 'Sarah Chen'; 'Active deals' (size=l bold, Pipeline) was not offered",
+        "composable": "Rank per-screen headings (size l/xl bold, first in the content col) above nav labels"
+      },
+      {
+        "category": "jev",
+        "what": "In step 11, Jev pulled the Status button out of the filter row, which was already the topmost row. It became a lone button above 'Filter:', and the label now introduces only Budget, Timeline and Clear all.",
+        "evidence": "final: button #n185 \"Status\" ghost size=s as the first child of col #n9, then row #n183 text \"Filter:\" \u00b7 Budget \u00b7 Timeline \u00b7 Clear all",
+        "composable": "When the element's row is already at the named top, reply 'already at the top', as step 13 did"
+      },
+      {
+        "category": "writer",
+        "what": "The Settings screen from step 8 uses buyer lead Sarah Chen's name and email as the agent's own account. No Settings item was added to the shared nav.",
+        "evidence": "row #n142 Email 'sarah.chen@email.com', row #n145 Name 'Sarah Chen', row #n148 Role 'Agent'; nav #n132 still Leads/Active/Closed/Lost",
+        "composable": "Give the writer the app's cast so the agent's account is a new person, and append text \"Settings\" to the shared nav"
+      },
+      {
+        "category": "writer",
+        "what": "In step 12 the writer turned 'add a note' into a large notes-entry field at the top of Settings, not a note.",
+        "evidence": "col #n189: text 'Notes' + input #n191 \"Add a note...\" area grow h=120, above the Account section",
+        "composable": "A small text note (text \"\u2026\" size=s shade=mid, optionally in a bordered col), as the recipes run produced"
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "fair_ask",
+        "why": "Each screen has its own heading ('55 leads', 'Active deals', 'Sarah Chen'), so 'which one?' is fair. But the options led with the nav item 'Leads' and left out 'Active deals'."
+      },
+      {
+        "step": 3,
+        "verdict": "right",
+        "why": "The shared side nav (col share=nav) went from fill light to mid on all three screens, which is exactly the navigation."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked 'Add Lead' primary button went from size m to l."
+      },
+      {
+        "step": 5,
+        "verdict": "right",
+        "why": "'Add Lead' was the only button in the app (element 1.00 of 1). It was removed after the app's standing removal confirmation, which the script answered."
+      },
+      {
+        "step": 6,
+        "verdict": "right",
+        "why": "A 'Search leads...' search input row went to the top of the Leads main column, above the '55 leads' header row."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "Jev routed the question to 'none' and the canvas was untouched."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A Settings screen was added after Contact Detail, with a copy of the shared nav and settings sections. Its Account section wrongly reuses buyer Sarah Chen's name and email, and the nav got no Settings item."
+      },
+      {
+        "step": 9,
+        "verdict": "right",
+        "why": "Jev picked the leads list col #n13 (0.92), and the writer replaced its four rows with a Name | Details | Last Contact table that keeps all four leads."
+      },
+      {
+        "step": 10,
+        "verdict": "partly",
+        "why": "The filter row landed sensibly at the top of the Leads main column above the search. But 'make the title bigger' grew the nav item 'Leads' (not a title) on all four screens without asking, though step 2 had asked for the same sentence."
+      },
+      {
+        "step": 11,
+        "verdict": "partly",
+        "why": "The element was right (the Status ghost button), but it already sat in the topmost row. Moving it left a lone 'Status' above 'Filter: Budget Timeline Clear all' and split it from its filter group."
+      },
+      {
+        "step": 12,
+        "verdict": "partly",
+        "why": "The quoted Settings screen was resolved, and the piece went sensibly below the 'Settings' heading. But the writer made 'a note' into a 120px 'Add a note...' textarea headed 'Notes', which is a data-entry field, not a note on a settings page."
+      },
+      {
+        "step": 13,
+        "verdict": "correctly_nothing",
+        "why": "The marked nav item 'Leads' was already bold and already first in the nav. Both parts reported that, and nothing changed."
+      }
+    ]
+  },
+  "recipes": {
+    "app": "recipes",
+    "substance": 2,
+    "substanceWhy": "The app shows both core objects. Recipe Detail has a hero image, ingredients and a numbered method, with Save/Cook. Meal Plan lists Mon\u2013Fri, each with a dish and its key ingredients, plus a Shopping list button. Home joins them with a 'This week' strip and saved recipes. But meal planning is only a static list: no week navigation, no way to put a recipe on a day, no shopping list content. Ingredients have no quantities, and every header title renders at body size because of a malformed prop.",
+    "composedWell": [
+      "Phone frames with a dark header bar and a shared bottom tab bar (share=tabs) whose current tab is bold per screen",
+      "Recipe Detail: hero shape w=fill h=180, meta lines, bold Ingredients and Method sections with numbered steps, and a bottom action bar of Save (primary, grow) and Cook (ghost, grow) that stands in for the tab bar on a pushed screen",
+      "Meal Plan as bordered day cards (day bold, dish, key ingredients xs mid) with a full-width ghost Shopping list button",
+      "Home layers search, a 'This week' strip of image-placeholder cards with dish and ingredient count, and saved-recipe rows with 60px thumbnails and cuisine \u00b7 time",
+      "The Settings screen from step 8 is domain-specific (dietary restrictions, servings, cooking level, meal reminders) and reuses the header and shared tab bar"
+    ],
+    "issues": [
+      {
+        "category": "prop",
+        "what": "The writer wrote the header titles' size as a bare flag 'xl' instead of size=xl. The parser keeps it as an unknown flag, so every header title renders at body size m.",
+        "evidence": "text #n4 \"Recipes\" xl bold renders as class=\"t sz-m b\"; the same for #n45 'Carbonara', #n68 'This Week', #n98 'Settings' and #n44 '\u2190'",
+        "composable": "size=xl, or have the parser accept a bare size word as size=<word>"
+      },
+      {
+        "category": "jev",
+        "what": "In step 6 Jev added a second, identical search field right above the one Home already had. The add route never checks whether the thing already exists.",
+        "evidence": "final col #n5 starts with input #n95 \"Search\" search on, then input #n6 \"Search\" search on; the log shows route write/add 0.99 and place with no 'exists' check",
+        "composable": "Run the same exists check the edit route uses before an add, and reply 'Home already has a search field at the top'"
+      },
+      {
+        "category": "jev",
+        "what": "In step 3 Jev did not settle on the only navigation, the shared tab bar. The alternatives it offered were content cards.",
+        "evidence": "target row h=56 share=tabs 'Home \u00b7 Plan \u00b7 Saved' conf 0.64; options 2 and 3 were row 'Monday \u00b7 Pasta \u00b7 3 ingredients' and col w=80 'Tuesday \u00b7 Salmon'",
+        "composable": "Score a share=tabs or share=nav element as 'navigation' outright; day-card strips are not navigation"
+      },
+      {
+        "category": "jev",
+        "what": "In step 13 the marked header title was already at the top. Jev's only spot was 'where it is now' (0.36), but it asked 'where should it go?' instead of saying it is already there, as the CRM run did for the same sentence.",
+        "evidence": "place 'at the start (left end) of row h=64 fill=dark \"Recipes\" \u00b7 holds text, where it is now' conf 0.36 \u2192 choice 'where should it go?'",
+        "composable": "When the top spot is the element's current place, answer 'already at the top' whatever the confidence"
+      },
+      {
+        "category": "jev",
+        "what": "In step 10 the filter landed at the bottom of Home, below Saved recipes and just above the tab bar. Its best spot, next to Search, scored 0.34, and the fallback was the end of the column.",
+        "evidence": "place 'next to input \"Search\"' conf 0.34 \u2192 piece 'added at the end of col \u00b7 grow'; final row #n129 Filter / Cuisine / Time follows col #n22",
+        "composable": "Below threshold, fall back to the top of the part, or ask 'where should it go?', rather than the end of the column"
+      },
+      {
+        "category": "render",
+        "what": "In the filter row the two select inputs squeeze the 'Filter' label onto two lines.",
+        "evidence": "row #n129 gap=2 pad=1: text #n130 \"Filter\" size=s + input 'Cuisine' select + input 'Time' select; the render shows 'Filt / er'",
+        "composable": "Keep short text leaves from wrapping (white-space:nowrap / flex:none), or let the writer give the selects grow"
+      },
+      {
+        "category": "jev",
+        "what": "In step 9 Jev's top candidate for 'the main list' was the horizontal 'This week' card strip, not either vertical list.",
+        "evidence": "target row 'Monday \u00b7 Pasta \u00b7 3 ingredients' conf 0.57; Saved recipes col #n22 and Meal Plan col #n69 came second and third",
+        "composable": "Rank vertical lists of repeated rows (Saved recipes, Meal Plan days) above a 3-card strip for 'list'"
+      },
+      {
+        "category": "prop",
+        "what": "The tab bar labels sit at the top of the 56px bar instead of centred in it.",
+        "evidence": "row #n38 h=56 pad=2 fill=light border justify=between share=tabs has no align=center; the render shows Home/Plan/Saved near the bar's top edge",
+        "composable": "align=center on the tab row"
+      }
+    ],
+    "steps": [
+      {
+        "step": 2,
+        "verdict": "fair_ask",
+        "why": "Home, Recipe Detail and Meal Plan each have their own header title ('Recipes', 'Carbonara', 'This Week'), and the options were exactly those three."
+      },
+      {
+        "step": 3,
+        "verdict": "needless_ask",
+        "why": "The shared bottom tab bar (Home \u00b7 Plan \u00b7 Saved) is the only navigation on the canvas. The other options were a strip of day cards and a single day card."
+      },
+      {
+        "step": 4,
+        "verdict": "right",
+        "why": "The marked 'Save' primary button went from size m to l, as the final render shows."
+      },
+      {
+        "step": 5,
+        "verdict": "fair_ask",
+        "why": "There are three buttons on two screens and none on the viewed Home screen. 'Last' could be 'Shopping list' (last in the document, Jev's top pick) or 'Cook' (last in the Save/Cook bar). Offering 'Save' as well was noise."
+      },
+      {
+        "step": 6,
+        "verdict": "wrong",
+        "why": "Home already had a 'Search' input at the top of its content, and a second identical search input was stacked directly above it."
+      },
+      {
+        "step": 7,
+        "verdict": "correctly_nothing",
+        "why": "Jev routed the question to 'none' and nothing changed."
+      },
+      {
+        "step": 8,
+        "verdict": "right",
+        "why": "A Settings screen was added after Meal Plan with the dark header, food-specific preferences, notification checks, an Account section and a copy of the shared tab bar."
+      },
+      {
+        "step": 9,
+        "verdict": "fair_ask",
+        "why": "'The main list' could be Home's Saved recipes list or Meal Plan's day list, so asking was fair. Jev's top option was the horizontal 'This week' card strip, which is not really a list."
+      },
+      {
+        "step": 10,
+        "verdict": "partly",
+        "why": "The filter (Cuisine and Time selects) went to the bottom of Home's content, below Saved recipes and far from the search it belongs with, and its label wraps as 'Filt/er'. The title part asked, which is fair, but the options dropped 'This Week' for the 'Home' tab label."
+      },
+      {
+        "step": 11,
+        "verdict": "fair_ask",
+        "why": "The Save button was certain. On Recipe Detail, 'top of the screen' could mean the right end of the dark header bar (Jev's top pick, probably intended) or just below the header. The third option, between '\u2190' and the title, was noise."
+      },
+      {
+        "step": 12,
+        "verdict": "right",
+        "why": "The quoted Settings screen was resolved. A bordered 'Note' box with a short preferences hint went at the end of its content, below 'Sign out', a reasonable place for a footnote."
+      },
+      {
+        "step": 13,
+        "verdict": "needless_ask",
+        "why": "The marked 'Recipes' header title was already bold (correctly refused) and already in the top bar. Jev's own spot was 'where it is now', yet it asked 'where should it go?' instead of saying it was already at the top."
+      }
+    ]
+  }
+}

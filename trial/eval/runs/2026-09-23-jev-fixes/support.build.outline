@@ -1,0 +1,50 @@
+app #n1 "Support Chat" web
+  screen #n2 "Conversation"
+    row #n3 h=fill gap=0
+      col #n4 share=nav w=240 fill=light pad=3 gap=2
+        text #n5 "Support" bold size=l
+        text #n6 "Active" shade=mid size=s
+        text #n7 "Marcus Chen" bold data
+        text #n8 "Stripe payment issue" shade=mid size=s
+        line #n9
+        text #n10 "Waiting" shade=mid size=s
+        text #n11 "Elena Rodriguez" shade=mid data
+        text #n12 "Login not working" shade=mid size=s
+        text #n13 "Yuki Tanaka" shade=mid data
+        text #n14 "Feature request" shade=mid size=s
+      col #n15 grow pad=4 gap=3
+        row #n16 gap=2 align=center
+          col #n17 grow
+            text #n18 "Marcus Chen" bold size=m
+            text #n19 "Customer since Jan 2023 • 2 previous chats" shade=mid size=s
+          col #n20 w=120 gap=1
+            text #n21 "Status" shade=mid size=xs
+            text #n22 "Active" bold
+            line #n23
+            text #n24 "Plan" shade=mid size=xs
+            text #n25 "Professional" bold
+            line #n26
+            text #n27 "MRR" shade=mid size=xs
+            text #n28 "$299" bold
+        col #n29 grow gap=2
+          row #n30 gap=2
+            shape #n31 circle w=40 h=40
+            col #n32 grow
+              text #n33 "Marcus Chen" bold size=s
+              text #n34 "2:14 PM" shade=mid size=xs
+          text #n35 "Payment failed with error code 402. Retried twice, still failing. Need this resolved urgently." data
+          row #n36 gap=2
+            shape #n37 circle w=40 h=40
+            col #n38 grow
+              text #n39 "You" bold size=s
+              text #n40 "2:16 PM" shade=mid size=xs
+          text #n41 "I'll look into this right away. Can you share your last 4 digits and the payment method?" data
+          row #n42 gap=2
+            shape #n43 circle w=40 h=40
+            col #n44 grow
+              text #n45 "Marcus Chen" bold size=s
+              text #n46 "2:18 PM" shade=mid size=xs
+          text #n47 "Visa ending in 4829. Been working fine for 6 months." data
+        row #n48 gap=2 pad=3 border
+          input #n49 "Type a message..." grow area on
+          button #n50 "Send" primary

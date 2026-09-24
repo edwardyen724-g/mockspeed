@@ -1,0 +1,99 @@
+app #n1 "Driver" phone
+  screen #n2 "Home"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Home" bold
+        text #n6 "Earnings" shade=mid
+        text #n7 "Ratings" shade=mid
+        text #n8 "Settings" shade=mid
+      col #n9 grow pad=4 gap=4
+        row #n10 justify=between align=center
+          text #n11 "Ready to drive?" size=l bold
+          shape #n12 circle w=12 h=12 fill=dark
+        row #n13 gap=3 pad=3 border
+          col #n14 gap=1 grow
+            text #n15 "Trip requests" size=s shade=mid
+            text #n16 "8 nearby" bold size=m
+          button #n17 "Accept" primary
+        row #n18 gap=3 pad=3 border
+          col #n19 gap=1 grow
+            text #n20 "Today's earnings" size=s shade=mid
+            text #n21 "$127.50" bold size=l
+          col #n22 gap=1 align=end
+            text #n23 "Trips" size=s shade=mid
+            text #n24 "12" bold size=m
+        col #n25 gap=2 pad=3 border
+          text #n26 "Next pickup" size=s shade=mid
+          text #n27 "520 Market St" bold
+          text #n28 "4 min away" size=s shade=mid
+    row #n29 share=tabs justify=between pad=3 border
+      text #n30 "Active" bold size=s
+      text #n31 "History" shade=mid size=s
+      text #n32 "Wallet" shade=mid size=s
+  screen #n33 "Earnings"
+    row #n34 h=fill
+      col #n35 share=nav w=200 fill=light pad=3 gap=2
+        text #n36 "Home" shade=mid
+        text #n37 "Earnings" bold
+        text #n38 "Ratings" shade=mid
+        text #n39 "Settings" shade=mid
+      col #n40 grow pad=4 gap=4
+        col #n41 gap=1
+          text #n42 "This week" size=l bold
+          text #n43 "$847.25" size=xl bold
+        col #n44 gap=2 pad=3 border
+          chart #n45 "Earnings by day" line values=145,168,201,189,154,190 h=120
+        col #n46 gap=2 pad=3 border
+          text #n47 "Breakdown" size=s bold
+          row #n48 justify=between
+            text #n49 "Fares" shade=mid
+            text #n50 "$612.50" bold data
+          row #n51 justify=between
+            text #n52 "Tips" shade=mid
+            text #n53 "$234.75" bold data
+        col #n54 gap=2 pad=3 border
+          text #n55 "Best day" size=s shade=mid
+          text #n56 "Thursday" bold
+          text #n57 "$201 · 16 trips" size=s shade=mid
+    row #n58 share=tabs justify=between pad=3 border
+      text #n59 "Active" shade=mid size=s
+      text #n60 "History" bold size=s
+      text #n61 "Wallet" shade=mid size=s
+  screen #n62 "Ratings"
+    row #n63 h=fill
+      col #n64 share=nav w=200 fill=light pad=3 gap=2
+        text #n65 "Home" shade=mid
+        text #n66 "Earnings" shade=mid
+        text #n67 "Ratings" bold
+        text #n68 "Settings" shade=mid
+      col #n69 grow pad=4 gap=4
+        col #n70 gap=1 align=center
+          text #n71 "4.87" size=xxl bold
+          text #n72 "Based on 284 trips" size=s shade=mid
+        row #n73 gap=3 pad=3 border justify=between
+          col #n74 gap=1
+            text #n75 "5 stars" size=s shade=mid
+            text #n76 "267" bold data
+          col #n77 gap=1
+            text #n78 "4 stars" size=s shade=mid
+            text #n79 "14" bold data
+          col #n80 gap=1
+            text #n81 "3 stars" size=s shade=mid
+            text #n82 "3" bold data
+        col #n83 gap=2 pad=3 border
+          text #n84 "Recent feedback" size=s bold
+          col #n85 gap=2
+            col #n86 gap=1 pad=2 border
+              row #n87 justify=between
+                text #n88 "Great driver!" size=s
+                text #n89 "5★" bold
+              text #n90 "Super friendly, arrived early" size=s shade=mid data
+            col #n91 gap=1 pad=2 border
+              row #n92 justify=between
+                text #n93 "Good" size=s
+                text #n94 "4★" bold
+              text #n95 "Car was clean" size=s shade=mid data
+    row #n96 share=tabs justify=between pad=3 border
+      text #n97 "Active" shade=mid size=s
+      text #n98 "History" shade=mid size=s
+      text #n99 "Wallet" shade=mid size=s

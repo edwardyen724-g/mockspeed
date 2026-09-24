@@ -1,0 +1,122 @@
+app #n1 "Support Chat" web
+  screen #n2 "Conversation"
+    row #n3 h=fill gap=0
+      col #n4 share=nav w=240 fill=mid pad=3 gap=2
+        text #n5 "Support" bold size=xl
+        text #n6 "Active" shade=mid size=s
+        text #n7 "Marcus Chen" bold data
+        text #n8 "Stripe payment issue" shade=mid size=s
+        line #n9
+        text #n10 "Waiting" shade=mid size=s
+        text #n11 "Elena Rodriguez" shade=mid data
+        text #n12 "Login not working" shade=mid size=s
+        text #n13 "Yuki Tanaka" shade=mid data
+        text #n14 "Feature request" shade=mid size=s
+      col #n15 grow pad=4 gap=3
+        row #n51 gap=2 pad=2 border
+          text #n52 "Search" shade=mid size=s
+          input #n53 "Search messages..." grow on
+        row #n16 gap=2 align=center
+          col #n17 grow
+            text #n18 "Marcus Chen" bold size=m
+            text #n19 "Customer since Jan 2023 • 2 previous chats" shade=mid size=s
+          col #n20 w=120 gap=1
+            text #n21 "Status" shade=mid size=xs
+            text #n22 "Active" bold
+            line #n23
+            text #n24 "Plan" shade=mid size=xs
+            text #n25 "Professional" bold
+            line #n26
+            text #n27 "MRR" shade=mid size=xs
+            text #n28 "$299" bold
+        col #n29 grow gap=2
+          row #n30 gap=2
+            shape #n31 circle w=40 h=40
+            col #n32 grow
+              text #n33 "Marcus Chen" bold size=s
+              text #n34 "2:14 PM" shade=mid size=xs
+          text #n35 "Payment failed with error code 402. Retried twice, still failing. Need this resolved urgently." data
+          row #n36 gap=2
+            shape #n37 circle w=40 h=40
+            col #n38 grow
+              text #n39 "You" bold size=s
+              text #n40 "2:16 PM" shade=mid size=xs
+          text #n41 "I'll look into this right away. Can you share your last 4 digits and the payment method?" data
+          row #n42 gap=2
+            shape #n43 circle w=40 h=40
+            col #n44 grow
+              text #n45 "Marcus Chen" bold size=s
+              text #n46 "2:18 PM" shade=mid size=xs
+          text #n47 "Visa ending in 4829. Been working fine for 6 months." data
+        row #n48 gap=2 pad=3 border
+          input #n49 "Type a message..." grow area on
+        row #n118 gap=2 pad=2 border
+          text #n119 "Filter" shade=mid size=s
+          input #n120 select value="All messages"
+  screen #n54 "Settings"
+    row #n55 h=fill gap=0
+      col #n56 share=nav w=240 fill=mid pad=3 gap=2
+        text #n57 "Support" bold size=xl
+        text #n58 "Active" shade=mid size=s
+        text #n59 "Marcus Chen" bold data
+        text #n60 "Stripe payment issue" shade=mid size=s
+        line #n61
+        text #n62 "Waiting" shade=mid size=s
+        text #n63 "Elena Rodriguez" shade=mid data
+        text #n64 "Login not working" shade=mid size=s
+        text #n65 "Yuki Tanaka" shade=mid data
+        text #n66 "Feature request" shade=mid size=s
+      col #n67 grow pad=4 gap=4
+        button #n116 "Save Changes" primary
+        text #n68 "Settings" bold size=xl
+        col #n121 gap=2 pad=3 fill=light border
+          text #n122 "Note" bold size=s shade=dark
+          text #n123 "Changes to your settings are saved automatically." size=s shade=dark
+        col #n69 gap=3
+          col #n70 gap=2
+            text #n71 "Notifications" bold size=m
+            row #n72 gap=2 align=center
+              col #n73 grow
+                text #n74 "New message alerts" size=s
+              input #n75 toggle on
+            row #n76 gap=2 align=center
+              col #n77 grow
+                text #n78 "Email digest" size=s
+              input #n79 toggle
+            row #n80 gap=2 align=center
+              col #n81 grow
+                text #n82 "Sound on notifications" size=s
+              input #n83 toggle on
+          line #n84
+          col #n85 gap=2
+            text #n86 "Availability" bold size=m
+            row #n87 gap=2 align=center
+              col #n88 grow
+                text #n89 "Status" size=s
+              input #n90 select value=Online
+            row #n91 gap=2 align=center
+              col #n92 grow
+                text #n93 "Auto-reply when away" size=s
+              input #n94 toggle
+            row #n95 gap=2 align=center
+              col #n96 grow
+                text #n97 "Auto-reply message" size=s
+              input #n98 "Set a custom away message..." grow area
+          line #n99
+          col #n100 gap=2
+            text #n101 "Preferences" bold size=m
+            row #n102 gap=2 align=center
+              col #n103 grow
+                text #n104 "Dark mode" size=s
+              input #n105 toggle
+            row #n106 gap=2 align=center
+              col #n107 grow
+                text #n108 "Default chat view" size=s
+              input #n109 select value="Unread first"
+            row #n110 gap=2 align=center
+              col #n111 grow
+                text #n112 "Message text size" size=s
+              input #n113 select value=Medium
+          line #n114
+          row #n115 gap=2
+            button #n117 "Cancel" ghost

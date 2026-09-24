@@ -1,0 +1,127 @@
+app #n1 "Pipeline" web
+  screen #n2 "Leads"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Leads" bold
+        text #n6 "Active" shade=mid
+        text #n7 "Closed" shade=mid
+        text #n8 "Lost" shade=mid
+      col #n9 grow pad=4 gap=3
+        row #n10 justify=between align=center
+          text #n11 "55 leads" size=l bold
+          button #n12 "Add Lead" primary
+        col #n13 gap=2
+          row #n14 pad=3 border gap=3 align=center
+            shape #n15 circle w=40 h=40
+            col #n16 grow gap=1
+              text #n17 "Sarah Chen" bold
+              text #n18 "House hunting, budget $650k" size=s shade=mid
+            text #n19 "2 days ago" size=s shade=mid
+          row #n20 pad=3 border gap=3 align=center
+            shape #n21 circle w=40 h=40
+            col #n22 grow gap=1
+              text #n23 "Marcus Johnson" bold
+              text #n24 "First-time buyer, pre-approved" size=s shade=mid
+            text #n25 "5 days ago" size=s shade=mid
+          row #n26 pad=3 border gap=3 align=center
+            shape #n27 circle w=40 h=40
+            col #n28 grow gap=1
+              text #n29 "Elena Rodriguez" bold
+              text #n30 "Relocating, needs school district" size=s shade=mid
+            text #n31 "1 week ago" size=s shade=mid
+          row #n32 pad=3 border gap=3 align=center
+            shape #n33 circle w=40 h=40
+            col #n34 grow gap=1
+              text #n35 "David Park" bold
+              text #n36 "Investment property, 2-4 units" size=s shade=mid
+            text #n37 "10 days ago" size=s shade=mid
+  screen #n38 "Pipeline"
+    row #n39 h=fill
+      col #n40 share=nav w=200 fill=light pad=3 gap=2
+        text #n41 "Leads" shade=mid
+        text #n42 "Active" bold
+        text #n43 "Closed" shade=mid
+        text #n44 "Lost" shade=mid
+      col #n45 grow pad=4 gap=3
+        text #n46 "Active deals" size=l bold
+        row #n47 gap=3 align=start
+          col #n48 w=280 gap=2
+            text #n49 "Showing" size=s bold shade=dark
+            col #n50 gap=2
+              col #n51 pad=3 border gap=1 fill=light
+                text #n52 "Sarah Chen" bold
+                text #n53 "$650k" size=s shade=mid
+                text #n54 "Viewed 3 homes" size=xs shade=mid
+              col #n55 pad=3 border gap=1 fill=light
+                text #n56 "James Wilson" bold
+                text #n57 "$425k" size=s shade=mid
+                text #n58 "Waiting for open houses" size=xs shade=mid
+          col #n59 w=280 gap=2
+            text #n60 "Offer" size=s bold shade=dark
+            col #n61 gap=2
+              col #n62 pad=3 border gap=1 fill=light
+                text #n63 "Marcus Johnson" bold
+                text #n64 "$580k offer" size=s shade=mid
+                text #n65 "Seller reviewing" size=xs shade=mid
+          col #n66 w=280 gap=2
+            text #n67 "Inspection" size=s bold shade=dark
+            col #n68 gap=2
+              col #n69 pad=3 border gap=1 fill=light
+                text #n70 "Lisa Tang" bold
+                text #n71 "$720k" size=s shade=mid
+                text #n72 "Report due Friday" size=xs shade=mid
+          col #n73 w=280 gap=2
+            text #n74 "Closing" size=s bold shade=dark
+            col #n75 gap=2
+              col #n76 pad=3 border gap=1 fill=light
+                text #n77 "Elena Rodriguez" bold
+                text #n78 "$895k" size=s shade=mid
+                text #n79 "Closing in 4 days" size=xs shade=mid
+  screen #n80 "Contact Detail"
+    row #n81 h=fill
+      col #n82 share=nav w=200 fill=light pad=3 gap=2
+        text #n83 "Leads" shade=mid
+        text #n84 "Active" shade=mid
+        text #n85 "Closed" shade=mid
+        text #n86 "Lost" shade=mid
+      col #n87 grow pad=4 gap=4
+        row #n88 align=center gap=3
+          shape #n89 circle w=60 h=60
+          col #n90 gap=1
+            text #n91 "Sarah Chen" size=xl bold
+            text #n92 "Buyer · Active" size=s shade=mid
+        col #n93 gap=3
+          col #n94 gap=1
+            text #n95 "Contact" size=s bold shade=dark
+            row #n96 justify=between
+              text #n97 "Phone"
+              text #n98 "(415) 555-0821" mono
+            row #n99 justify=between
+              text #n100 "Email"
+              text #n101 "sarah.chen@email.com" mono
+          col #n102 gap=1
+            text #n103 "Details" size=s bold shade=dark
+            row #n104 justify=between
+              text #n105 "Budget"
+              text #n106 "$600k–$700k"
+            row #n107 justify=between
+              text #n108 "Timeline"
+              text #n109 "6–8 weeks"
+            row #n110 justify=between
+              text #n111 "Location"
+              text #n112 "Marina District, SF"
+          col #n113 gap=1
+            text #n114 "Activity" size=s bold shade=dark
+            col #n115 gap=2
+              row #n116 align=center gap=2
+                shape #n117 circle w=6 h=6 fill=dark
+                text #n118 "Showed 3 homes" size=s
+                text #n119 "3 days ago" size=xs shade=mid
+              row #n120 align=center gap=2
+                shape #n121 circle w=6 h=6 fill=dark
+                text #n122 "Scheduled showing" size=s
+                text #n123 "1 week ago" size=xs shade=mid
+              row #n124 align=center gap=2
+                shape #n125 circle w=6 h=6 fill=dark
+                text #n126 "First contact" size=s
+                text #n127 "2 weeks ago" size=xs shade=mid

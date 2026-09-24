@@ -3,7 +3,7 @@
 // request the page's text box sends, so Jev routes and decides everything it would for a person.
 //
 //   node trial/server.mjs --env <env file>          (in another terminal, or via .claude/launch.json)
-//   node trial/eval/run.mjs <out-dir> [--port 8772]
+//   node trial/eval/run.mjs <out-dir> [--port 8772] [--only rent,crm]
 //
 // For each request in prompts.json: build the app, then twelve follow-ups that put Jev to work —
 // find an element nobody marked, act on a marked one, remove, place a new piece, a whole screen,
@@ -29,6 +29,9 @@ const OUT = resolve(outArg);
 const BASE = `http://localhost:${flag("--port", 8772)}`;
 mkdirSync(OUT, { recursive: true });
 const prompts = JSON.parse(readFileSync(join(HERE, "prompts.json"), "utf8"));
+// --only rent,crm: a smoke test on some of the apps before a full run.
+const only = flag("--only", null)?.split(",");
+if (only) for (const k of Object.keys(prompts)) if (!only.includes(k)) delete prompts[k];
 
 const post = (p, b) => fetch(BASE + p, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }).then((r) => r.json());
 const state = () => fetch(BASE + "/state").then((r) => r.json());
@@ -63,7 +66,8 @@ for (const key of Object.keys(prompts)) {
     const all = (await state()).log;
     const at = all.map((e) => e.op === "ask" && e.note === sentence).lastIndexOf(true);
     const log = at >= 0 ? all.slice(at) : [];
-    const jev = log.filter((e) => e.op === "route" && /^jev/.test(e.source ?? "")).length + log.filter((e) => e.op === "place").length;
+    // Jev's decisions in the step: routes (and whether a split part waits), elements, places.
+    const jev = log.filter((e) => ["route", "target", "place"].includes(e.op) && /^jev/.test(e.source ?? "")).length;
     steps.push({ kind, sentence, marked, reply: r.note, changed: Boolean(r.changed), asked, human, jev, ms, log });
     return r;
   }

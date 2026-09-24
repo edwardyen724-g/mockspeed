@@ -33,11 +33,13 @@ chart "caption"                bar | line  values=3,5,2,8  h=
 table, then tr "a | b | c"     the first tr is the header row
 graph dir=right|down h=        children: node #id "Label" sub="second line", and edge a -> b "label"
 Layout, on containers (w, h and grow on anything): w=<px>|fill  h=<px>|fill  grow  gap=0..6  pad=0..6  fill=light|mid|dark  border  divider  align=start|center|end|stretch  justify=start|center|end|between
+share=<name>                   on something drawn on several screens — the side nav, a top bar, a bottom bar: every copy carries the same share=<name>, and a change to one is made to all
 
 COMPOSE — there are no ready-made widgets, and you never need one:
-- side nav: row h=fill, then col w=200 fill=light pad=3 gap=2 holding texts, the current one bold, the rest shade=mid; then col grow for the main area
+- side nav: row h=fill, then col share=nav w=200 fill=light pad=3 gap=2 holding texts, the current one bold, the rest shade=mid; then col grow for the main area
 - tabs: row gap=4 of texts, the current one bold under, the rest shade=mid
-- bottom bar on a phone: the screen's last child, a row justify=between pad=3 border of small texts
+- bottom bar on a phone: the screen's last child, a row share=tabs justify=between pad=3 border of small texts
+- what every screen shows — the side nav, a top bar with the app's name, a bottom bar — is one element drawn on each: write it the same on every screen, with the same share=<name>; only which item is current differs
 - cards: col border pad=3 gap=1; a kanban board is a row of cols of cards
 - chat: col gap=2 of rows, each a circle shape w=28 h=28 and a col of texts
 - anything connected — a pipeline, workflow, agents handing work to each other, a state machine, an org chart — is a graph

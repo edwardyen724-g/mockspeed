@@ -1,0 +1,135 @@
+app #n1 "Recipes" phone
+  screen #n2 "Home"
+    row #n3 h=64 pad=3 fill=dark align=center
+      text #n4 "Recipes" xl bold
+    col #n5 grow gap=3 pad=3
+      input #n95 "Search" search on
+      input #n6 "Search" search on
+      text #n7 "This week" bold
+      row #n8 gap=2 justify=between
+        col #n9 w=80 gap=1
+          shape #n10 "Monday" w=fill h=100 border
+          text #n11 "Pasta" size=s
+          text #n12 "3 ingredients" size=xs shade=mid data
+        col #n13 w=80 gap=1
+          shape #n14 "Tuesday" w=fill h=100 border
+          text #n15 "Salmon" size=s
+          text #n16 "5 ingredients" size=xs shade=mid data
+        col #n17 w=80 gap=1
+          shape #n18 "Wednesday" w=fill h=100 border
+          text #n19 "Tacos" size=s
+          text #n20 "4 ingredients" size=xs shade=mid data
+      text #n21 "Saved recipes" bold
+      col #n22 gap=2
+        row #n23 border pad=2 gap=2 align=center
+          shape #n24 "Carbonara" w=60 h=60
+          col #n25 grow
+            text #n26 "Carbonara" bold
+            text #n27 "Italian · 25 min" size=xs shade=mid data
+        row #n28 border pad=2 gap=2 align=center
+          shape #n29 "Pad Thai" w=60 h=60
+          col #n30 grow
+            text #n31 "Pad Thai" bold
+            text #n32 "Thai · 20 min" size=xs shade=mid data
+        row #n33 border pad=2 gap=2 align=center
+          shape #n34 "Risotto" w=60 h=60
+          col #n35 grow
+            text #n36 "Risotto" bold
+            text #n37 "Italian · 35 min" size=xs shade=mid data
+      row #n129 gap=2 pad=1
+        text #n130 "Filter" size=s shade=mid
+        input #n131 "Cuisine" select on
+        input #n132 "Time" select on
+    row #n38 h=56 pad=2 fill=light border justify=between share=tabs
+      text #n39 "Home" bold
+      text #n40 "Plan" shade=mid
+      text #n41 "Saved" shade=mid
+  screen #n42 "Recipe Detail"
+    row #n43 h=64 pad=3 fill=dark align=center justify=start gap=2
+      text #n44 "←" xl
+      text #n45 "Carbonara" xl bold
+    col #n46 grow gap=3 pad=3 overflow
+      shape #n47 "Carbonara" w=fill h=180
+      col #n48 gap=1
+        text #n49 "Italian" size=s shade=mid data
+        text #n50 "Prep 10 min · Cook 15 min" size=s shade=mid data
+      text #n51 "Ingredients" bold
+      col #n52 gap=1
+        text #n53 "Spaghetti" size=s data
+        text #n54 "Eggs" size=s data
+        text #n55 "Pancetta" size=s data
+        text #n56 "Pecorino" size=s data
+      text #n57 "Method" bold
+      col #n58 gap=1
+        text #n59 "1. Cook pasta until al dente" size=s data
+        text #n60 "2. Fry pancetta until crispy" size=s data
+        text #n61 "3. Mix eggs and cheese" size=s data
+        text #n62 "4. Combine all ingredients" size=s data
+    row #n63 h=56 pad=3 gap=2
+      button #n64 "Save" primary grow size=l
+      button #n65 "Cook" ghost grow
+  screen #n66 "Meal Plan"
+    row #n67 h=64 pad=3 fill=dark align=center
+      text #n68 "This Week" xl bold
+    col #n69 grow gap=2 pad=3
+      col #n70 border pad=2 gap=1
+        text #n71 "Monday" bold shade=dark
+        text #n72 "Pasta" data
+        text #n73 "Tomato sauce, basil" size=xs shade=mid data
+      col #n74 border pad=2 gap=1
+        text #n75 "Tuesday" bold shade=dark
+        text #n76 "Salmon" data
+        text #n77 "Lemon, asparagus" size=xs shade=mid data
+      col #n78 border pad=2 gap=1
+        text #n79 "Wednesday" bold shade=dark
+        text #n80 "Tacos" data
+        text #n81 "Ground beef, cilantro" size=xs shade=mid data
+      col #n82 border pad=2 gap=1
+        text #n83 "Thursday" bold shade=dark
+        text #n84 "Risotto" data
+        text #n85 "Arborio rice, mushroom" size=xs shade=mid data
+      col #n86 border pad=2 gap=1
+        text #n87 "Friday" bold shade=dark
+        text #n88 "Pad Thai" data
+        text #n89 "Noodles, peanut sauce" size=xs shade=mid data
+      button #n90 "Shopping list" ghost w=fill
+    row #n91 h=56 pad=2 fill=light border justify=between share=tabs
+      text #n92 "Home" shade=mid
+      text #n93 "Plan" bold
+      text #n94 "Saved" shade=mid
+  screen #n96 "Settings"
+    row #n97 h=64 pad=3 fill=dark align=center
+      text #n98 "Settings" xl bold
+    col #n99 grow gap=3 pad=3
+      text #n100 "Preferences" bold
+      col #n101 gap=2
+        row #n102 border pad=2 justify=between align=center
+          text #n103 "Dietary restrictions" size=s
+          text #n104 "None" size=s shade=mid
+        row #n105 border pad=2 justify=between align=center
+          text #n106 "Servings" size=s
+          text #n107 "2" size=s shade=mid
+        row #n108 border pad=2 justify=between align=center
+          text #n109 "Cooking level" size=s
+          text #n110 "Intermediate" size=s shade=mid
+      text #n111 "Notifications" bold
+      col #n112 gap=2
+        row #n113 border pad=2 justify=between align=center
+          text #n114 "Meal reminders" size=s
+          input #n115 check on
+        row #n116 border pad=2 justify=between align=center
+          text #n117 "New recipes" size=s
+          input #n118 check on
+      text #n119 "Account" bold
+      col #n120 gap=2
+        row #n121 border pad=2 justify=between align=center
+          text #n122 "Email" size=s
+          text #n123 "elena@example.com" size=s shade=mid
+        button #n124 "Sign out" ghost w=fill
+      col #n133 border pad=2 gap=1
+        text #n134 "Note" size=xs shade=mid
+        text #n135 "Customize your recipe preferences to get personalized recommendations" size=xs shade=mid
+    row #n125 h=56 pad=2 fill=light border justify=between share=tabs
+      text #n126 "Home" shade=mid
+      text #n127 "Plan" shade=mid
+      text #n128 "Saved" shade=mid

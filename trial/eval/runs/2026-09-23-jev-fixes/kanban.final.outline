@@ -1,0 +1,116 @@
+app #n1 "Studio Board" web
+  screen #n2 "Board"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Studio Board" bold size=xxl
+        line #n6
+        text #n7 "Backlog" bold
+        text #n8 "In Progress" shade=mid
+        text #n9 "Review" shade=mid
+        text #n10 "Done" shade=mid
+        line #n11
+        text #n12 "Team" size=s bold shade=dark
+        text #n13 "Maya" size=s data
+        text #n14 "Kai" size=s data
+        text #n15 "Jordan" size=s data
+      col #n16 grow pad=4 gap=4
+        row #n17 gap=4 grow h=fill
+          col #n18 w=280 gap=2
+            text #n19 "Backlog" bold size=m
+            col #n20 gap=2
+              col #n21 border pad=2 gap=1
+                text #n22 "Website redesign" bold size=s
+                text #n23 "High fidelity mocks" size=xs shade=mid data
+                text #n24 "Maya" size=xs shade=mid data
+              col #n25 border pad=2 gap=1
+                text #n26 "Logo concepts" bold size=s
+                text #n27 "3 variations" size=xs shade=mid data
+                text #n28 "Kai" size=xs shade=mid data
+              col #n29 border pad=2 gap=1
+                text #n30 "Brand guidelines" bold size=s
+                text #n31 "Color + typography" size=xs shade=mid data
+                text #n32 "Unassigned" size=xs shade=mid data
+          col #n33 w=280 gap=2
+            text #n34 "In Progress" bold size=m
+            col #n35 gap=2
+              col #n36 border pad=2 gap=1 fill=light
+                text #n37 "Mobile app UI kit" bold size=s
+                text #n38 "Components library" size=xs shade=mid data
+                text #n39 "Jordan" size=xs shade=mid data
+                text #n40 "Started Mon" size=xs shade=mid data
+              col #n41 border pad=2 gap=1 fill=light
+                text #n42 "Packaging design" bold size=s
+                text #n43 "Label iteration 2" size=xs shade=mid data
+                text #n44 "Maya" size=xs shade=mid data
+                text #n45 "Started Wed" size=xs shade=mid data
+          col #n46 w=280 gap=2
+            text #n47 "Review" bold size=m
+            col #n48 gap=2
+              col #n49 border pad=2 gap=1
+                text #n50 "Social media kit" bold size=s
+                text #n51 "12 templates" size=xs shade=mid data
+                text #n52 "Kai" size=xs shade=mid data
+                text #n53 "Pending feedback" size=xs shade=mid data
+          col #n54 w=280 gap=2
+            text #n55 "Done" bold size=m
+            col #n56 gap=2
+              col #n57 border pad=2 gap=1
+                text #n58 "Q4 campaign visuals" bold size=s
+                text #n59 "8 assets" size=xs shade=mid data
+                text #n60 "Jordan" size=xs shade=mid data
+              col #n61 border pad=2 gap=1
+                text #n62 "Event poster series" bold size=s
+                text #n63 "5 variations" size=xs shade=mid data
+                text #n64 "Maya" size=xs shade=mid data
+  screen #n65 "Settings"
+    row #n66 h=fill
+      col #n67 share=nav w=200 fill=mid pad=3 gap=2
+        text #n68 "Studio Board" bold size=xxl
+        line #n69
+        text #n70 "Backlog" shade=mid
+        text #n71 "In Progress" shade=mid
+        text #n72 "Review" shade=mid
+        text #n73 "Done" shade=mid
+        line #n74
+        text #n75 "Team" size=s bold shade=dark
+        text #n76 "Maya" size=s data
+        text #n77 "Kai" size=s data
+        text #n78 "Jordan" size=s data
+      col #n79 grow pad=4 gap=4
+        button #n112 "Save changes" primary
+        text #n80 "Settings" bold size=l
+        col #n114 gap=1
+          text #n115 "Note" bold size=m
+          text #n116 "You are the workspace admin. Manage team members and settings here." size=s shade=mid data
+        col #n81 gap=3 w=400
+          col #n82 gap=1
+            text #n83 "Workspace" bold size=m
+            text #n84 "Studio Board" size=s data
+          line #n85
+          col #n86 gap=1
+            text #n87 "Team members" bold size=m
+            col #n88 gap=2
+              row #n89 justify=between align=center
+                text #n90 "Maya" size=s data
+                text #n91 "Admin" size=xs shade=mid data
+              row #n92 justify=between align=center
+                text #n93 "Kai" size=s data
+                text #n94 "Member" size=xs shade=mid data
+              row #n95 justify=between align=center
+                text #n96 "Jordan" size=s data
+                text #n97 "Member" size=xs shade=mid data
+          line #n98
+          col #n99 gap=1
+            text #n100 "Notifications" bold size=m
+            row #n101 gap=2
+              input #n102 "Email on task updates" check
+            row #n103 gap=2
+              input #n104 "Digest weekly" toggle on
+          line #n105
+          col #n106 gap=1
+            text #n107 "Theme" bold size=m
+            row #n108 gap=2
+              input #n109 "Dark mode" toggle
+          line #n110
+          row #n111 gap=2
+            button #n113 "Cancel" ghost

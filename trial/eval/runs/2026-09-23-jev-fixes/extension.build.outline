@@ -1,0 +1,25 @@
+app #n1 "PageSummary" panel
+  screen #n2 "Summary"
+    col #n3 pad=4 gap=3
+      text #n4 "PageSummary" size=l bold
+      line #n5
+      col #n6 gap=2
+        text #n7 "Page" size=s shade=mid
+        text #n8 "The Hidden Psychology of Social Media" bold size=m
+      col #n9 gap=2
+        text #n10 "Source" size=s shade=mid
+        text #n11 "psychologytoday.com" mono shade=mid size=s
+      line #n12
+      col #n13 gap=2
+        text #n14 "Summary" size=s shade=mid bold
+        text #n15 "Article explores how platform algorithms exploit cognitive biases to maximize engagement. Discusses variable reward schedules, FOMO mechanics, and dopamine feedback loops that keep users scrolling. Includes interviews with former product designers discussing addiction-by-design strategies." size=s
+      line #n16
+      col #n17 gap=2
+        text #n18 "Key Points" size=s shade=mid bold
+        text #n19 "• Infinite scroll mimics slot machine psychology" size=s
+        text #n20 "• Read time: 8 minutes" size=s shade=mid
+        text #n21 "• 47 cited sources" size=s shade=mid
+      line #n22
+      row #n23 gap=2
+        button #n24 "Save" primary
+        button #n25 "Share" ghost

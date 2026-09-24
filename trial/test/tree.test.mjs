@@ -10,7 +10,8 @@
 import { describe as group, test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  TYPES, parse, Stream, nextId, serialize, index, find, describe, applyPatch, apply, gaps, screenGaps, placeAt, shapeOf,
+  TYPES, parse, Stream, nextId, serialize, index, find, describe, applyPatch, apply, gaps, screenGaps, placeAt, shapeOf, positionOf,
+  padded, sectionsOf, partsOf, spotsIn, edgesOf, neighboursIn, shares, copiesOf, firstCopy, sharedView, mirrorsOf,
 } from "../tree.mjs";
 
 // ---- fixtures ----------------------------------------------------------------------------
@@ -1561,5 +1562,219 @@ group("shapeOf — what a container is made of, for Jev to read", () => {
     assert.equal(at("wide"), "a list of 5 texts");
     assert.equal(shapeOf(find(root, "n5").node), "holds text");
     assert.equal(shapeOf({ type: "text", text: "x", props: {}, children: [] }), "");
+  });
+});
+
+group("positionOf — where a node sits, for Jev to read", () => {
+  test("an item of a list, a side of a row with its width, the top and bottom of a screen; nothing else", () => {
+    const { root } = parse(RELAY);
+    const nav = find(root, "nav").node;
+    const content = find(root, "n8").node;
+    assert.equal(content.props.grow, true);
+    assert.equal(positionOf(root, nav.children[1].id), "item 2 of a list of 4 texts");
+    assert.equal(positionOf(root, "nav"), "at the left, narrow");
+    assert.equal(positionOf(root, content.id), "at the right, wide");
+    // A row's only child, a col's children that are not a list, and the root say nothing.
+    assert.equal(positionOf(root, "n3"), "");
+    assert.equal(positionOf(root, content.children[1].id), "");
+    assert.equal(positionOf(root, root.id), "");
+    assert.equal(positionOf(root, "nope"), "");
+    const { root: phone } = parse(`app phone
+  screen "Home"
+    row #bar fill=dark
+      text "Home"
+    col #body grow
+      text "x"
+    row #tabs border
+      text "a"
+      text "b"`);
+    assert.equal(positionOf(phone, "bar"), "at the top of the screen");
+    assert.equal(positionOf(phone, "body"), "");
+    assert.equal(positionOf(phone, "tabs"), "at the bottom of the screen");
+  });
+});
+
+group("top-down placement — parts of a screen, then spots in a part, only inside the padding", () => {
+  const PHONE = `app phone
+  screen "Home"
+    row #bar h=80 pad=3 fill=dark
+      text #title "Home" bold
+      shape #avatar circle w=32 h=32
+    col #body grow pad=3 gap=2
+      row #search gap=2
+        input #q "Search" search
+      col #list gap=1
+        text "a"
+        text "b"
+        text "c"
+    row #tabs h=60 pad=2 border
+      text "One"
+      text "Two"
+  screen "Bare"
+    text #lone "nothing padded"`;
+  const WEB = RELAY;
+
+  test("padded: a container or one around it below the screen has pad", () => {
+    const { root } = parse(PHONE);
+    assert.equal(padded(root, "bar"), true);
+    assert.equal(padded(root, "list"), true);
+    assert.equal(padded(root, "search"), true);
+    assert.equal(padded(root, find(root, "bar").parent.id), false);
+    const { root: web } = parse(WEB);
+    assert.equal(padded(web, "n3"), false);
+    assert.equal(padded(web, "nav"), true);
+  });
+
+  test("sectionsOf looks through a plain wrapper that is alone on the screen", () => {
+    const { root: web } = parse(WEB);
+    assert.deepEqual(sectionsOf(web, "n2").map((n) => n.id), ["nav", "n8"]);
+    const { root } = parse(PHONE);
+    assert.deepEqual(sectionsOf(root, "n2").map((n) => n.id), ["bar", "body", "tabs"]);
+    assert.deepEqual(sectionsOf(root, "nope"), []);
+    // A padded lone wrapper of columns is looked through too, and a row that fills the screen under
+    // a top bar is split into its columns; a tab bar of columns is not.
+    const { root: padRow } = parse(`app
+  screen "S"
+    row #wrap h=fill pad=3 gap=3
+      col #side w=280
+        text "a"
+      col #main grow
+        text "b"`);
+    assert.deepEqual(sectionsOf(padRow, "n2").map((n) => n.id), ["side", "main"]);
+    const { root: barred } = parse(`app
+  screen "S"
+    row #top h=60 pad=3 fill=dark
+      text "App"
+    row #split h=fill
+      col #side w=200 pad=3
+        text "a"
+      col #main grow pad=3
+        text "b"
+    row #tabs h=60
+      col
+        text "One"
+      col
+        text "Two"`);
+    assert.deepEqual(sectionsOf(barred, "n2").map((n) => n.id), ["top", "side", "main", "tabs"]);
+    const parts = partsOf(barred, "n2");
+    assert.match(parts.find((p) => p.into === "side").text, /the left side of the screen, a narrow column 200 px wide$/);
+    assert.match(parts.find((p) => p.into === "top").text, /the top part of the screen, a strip 60 px tall$/);
+  });
+
+  test("partsOf names each part by what it holds, where it is and how big", () => {
+    const { root } = parse(PHONE);
+    const parts = partsOf(root, "n2");
+    assert.deepEqual(parts.map((p) => p.into), ["bar", "body", "tabs"]);
+    assert.match(parts[0].text, /the top part of the screen, a strip 80 px tall$/);
+    assert.match(parts[1].text, /the middle of the screen, the largest part, filling the rest of the height$/);
+    assert.match(parts[2].text, /the bottom part of the screen, a strip 60 px tall$/);
+    const { root: web } = parse(WEB);
+    const cols = partsOf(web, "n2");
+    assert.match(cols[0].text, /the left side of the screen, a narrow column 200 px wide$/);
+    assert.match(cols[1].text, /the right side of the screen, the widest part, filling the rest of the width$/);
+    // An element being moved is not a place to move it to; a screen with nothing padded has no parts.
+    assert.deepEqual(partsOf(root, "n2", new Set(["tabs"])).map((p) => p.into), ["bar", "body"]);
+    assert.deepEqual(partsOf(root, find(root, "lone").parent.id), []);
+  });
+
+  test("spotsIn offers a part's own gaps, named by their neighbours, and the way into each container in it", () => {
+    const { root } = parse(PHONE);
+    const spots = spotsIn(root, "body");
+    const gapsOnly = spots.filter((s) => s.anchor);
+    assert.deepEqual(gapsOnly.map((g) => `${g.position} ${g.anchor}`), ["inside_start body", "after search", "inside_end body"]);
+    assert.match(gapsOnly[0].text, /^at the top of col #body · grow .*, above row #search · "Search"$/);
+    assert.match(gapsOnly[2].text, /below col #list · "a · b · c"$/);
+    assert.deepEqual(spots.filter((s) => s.into).map((s) => s.into), ["search", "list"]);
+    assert.match(spots.find((s) => s.into === "list").text, /^somewhere inside col .* a list of 3 texts/);
+    // The element being moved leaves the gaps around it, and is no way in.
+    const without = spotsIn(root, "body", new Set(["search"]));
+    assert.deepEqual(without.filter((s) => s.anchor).map((g) => `${g.position} ${g.anchor}`), ["inside_start body", "inside_end body"]);
+    assert.deepEqual(without.filter((s) => s.into).map((s) => s.into), ["list"]);
+    // A plain wrapper's own gaps sit outside the padding: only the ways into its padded columns.
+    const { root: web } = parse(WEB);
+    assert.deepEqual(spotsIn(web, "n3").map((s) => s.into ?? s.anchor), ["nav", "n8"]);
+  });
+
+  test("the gap a moved element sits in now says so", () => {
+    const { root } = parse(PHONE);
+    const first = spotsIn(root, "body", new Set(["search"])).filter((s) => s.anchor);
+    assert.match(first[0].text, /, where it is now$/);
+    assert.equal(first.filter((g) => /where it is now/.test(g.text)).length, 1);
+    const last = spotsIn(root, "body", new Set(["list"])).filter((s) => s.anchor);
+    assert.deepEqual(last.filter((g) => /where it is now/.test(g.text)).map((g) => `${g.position} ${g.anchor}`), ["inside_end body"]);
+    const mid = spotsIn(root, "list", new Set(["n4"])).filter((s) => s.anchor);
+    assert.deepEqual(mid.filter((g) => /where it is now/.test(g.text)).map((g) => `${g.position} ${g.anchor}`), ["after n3"]);
+    assert.equal(spotsIn(root, "body").some((g) => /where it is now/.test(g.text)), false);
+  });
+
+  test("edgesOf: just below or above a stacked part, landing in the padded part next to it", () => {
+    const { root } = parse(PHONE);
+    const e = edgesOf(root, "n2", "bar");
+    assert.deepEqual(e.map((g) => `${g.position} ${g.anchor}`), ["inside_start body"]);
+    assert.match(e[0].text, /^just below row #bar · h=80 fill=dark · "Home", at the top of col #body/);
+    assert.deepEqual(edgesOf(root, "n2", "tabs").map((g) => `${g.position} ${g.anchor}`), ["inside_end body"]);
+    // Side by side there is no below or above.
+    const { root: web } = parse(WEB);
+    assert.deepEqual(edgesOf(web, "n2", "nav"), []);
+  });
+
+  test("neighboursIn lists what a piece can follow inside the padding, with where each sits", () => {
+    const { root } = parse(PHONE);
+    const ids = neighboursIn(root, "body").map((e) => e.id);
+    assert.deepEqual(ids, ["search", "q", "list", "n3", "n4", "n5"]);
+    assert.match(neighboursIn(root, "body").find((e) => e.id === "n4").text, /item 2 of a list of 3 texts$/);
+    assert.deepEqual(neighboursIn(root, "body", new Set(["search"])).map((e) => e.id), ["list", "n3", "n4", "n5"]);
+  });
+});
+
+group("shared elements — one element drawn on several screens", () => {
+  const APP = `app "Relay" web
+  screen "Runs"
+    row h=fill
+      col #nav1 share=nav w=200 fill=light pad=3
+        text #brand1 "Relay" bold
+        text #runs1 "Runs" bold
+        text #agents1 "Agents" shade=mid
+      col #main1 grow pad=3
+        text "Runs" size=l
+  screen "Agents"
+    row h=fill
+      col #nav2 share=nav w=200 fill=light pad=3
+        text #brand2 "Relay" bold
+        text #runs2 "Runs" shade=mid
+        text #agents2 "Agents" bold
+        text #extra2 "Settings" shade=mid
+      col #main2 grow pad=3
+        text "Agents" size=l`;
+
+  test("shares lists each name's copies in order; copiesOf maps a node to the same place in the others", () => {
+    const { root } = parse(APP);
+    assert.deepEqual([...shares(root).entries()].map(([k, v]) => [k, v.map((n) => n.id)]), [["nav", ["nav1", "nav2"]]]);
+    assert.deepEqual(copiesOf(root, "nav1"), [{ id: "nav2", copy: "nav2" }]);
+    assert.deepEqual(copiesOf(root, "runs2"), [{ id: "runs1", copy: "nav1" }]);
+    // An item one copy has and the other has not, and anything outside a shared element: no copies.
+    assert.deepEqual(copiesOf(root, "extra2"), []);
+    assert.deepEqual(copiesOf(root, "main1"), []);
+    assert.equal(firstCopy(root, "agents2"), "agents1");
+    assert.equal(firstCopy(root, "main2"), "main2");
+  });
+
+  test("sharedView shows each shared element once, on all its screens", () => {
+    const { root } = parse(APP);
+    const v = sharedView(root);
+    assert.deepEqual([...v.hidden].sort(), ["agents2", "brand2", "extra2", "nav2", "runs2"]);
+    assert.deepEqual(v.screens.get("brand1"), ["Runs", "Agents"]);
+    assert.equal(v.screens.has("main1"), false);
+  });
+
+  test("mirrorsOf: a place in a shared element, or the element replaced, has a twin in each copy; a place beside it has none", () => {
+    const { root } = parse(APP);
+    assert.deepEqual(mirrorsOf(root, "nav1", "inside_end"), ["nav2"]);
+    assert.deepEqual(mirrorsOf(root, "brand1", "after"), ["brand2"]);
+    assert.deepEqual(mirrorsOf(root, "nav1", "replace"), ["nav2"]);
+    assert.deepEqual(mirrorsOf(root, "nav1", "after"), []);
+    assert.deepEqual(mirrorsOf(root, "main1", "inside_start"), []);
+    // share is an ordinary prop to the parser and the serializer.
+    assert.match(serialize(root), /col #nav1 share=nav w=200/);
   });
 });

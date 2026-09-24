@@ -1,0 +1,114 @@
+app #n1 "Splitwise" phone
+  screen #n2 "Home"
+    row #n3 h=56 pad=2 align=center justify=between fill=dark
+      text #n4 "Splitwise" bold size=xxl
+      shape #n5 circle w=40 h=40
+    col #n6 grow gap=3 pad=3
+      button #n123 "All" primary size=s
+      col #n112 gap=2 pad=3
+        input #n113 "Search expenses" search
+        col #n120 gap=2
+          row #n121 gap=2 align=center
+            text #n122 "Filter" shade=mid size=s bold
+            button #n124 "You owe" ghost size=s
+            button #n125 "You are owed" ghost size=s
+      col #n7 border pad=3 gap=2
+        text #n8 "You are owed" shade=mid size=s
+        text #n9 "$340.50" bold size=xl
+        text #n10 "From 3 people" shade=mid size=xs
+      col #n11 border pad=3 gap=2
+        text #n12 "You owe" shade=mid size=s
+        text #n13 "$127.25" bold size=xl
+        text #n14 "To 2 people" shade=mid size=xs
+      line #n15
+      text #n16 "Recent activity" shade=mid size=s bold
+      col #n17 gap=2 pad=3
+        table #n115
+          tr #n116 "Expense | Amount"
+          tr #n117 "Rent | You paid $1200" data
+          tr #n118 "Internet | You owe $45" data
+          tr #n119 "Groceries | You are owed $78.50" data
+    row #n27 h=56 pad=2 gap=2 border justify=between share=tabs fill=light
+      col #n28 align=center gap=1 grow
+        text #n29 "💰" size=l
+        text #n30 "Home" size=xs bold
+      col #n31 align=center gap=1 grow
+        text #n32 "➕" size=l
+        text #n33 "Add" size=xs shade=mid
+      col #n34 align=center gap=1 grow
+        text #n35 "👥" size=l
+        text #n36 "Friends" size=xs shade=mid
+      col #n37 align=center gap=1 grow
+        text #n38 "⚙️" size=l
+        text #n39 "Settings" size=xs shade=mid
+  screen #n40 "Add expense"
+    row #n41 h=56 pad=2 align=center fill=dark
+      text #n42 "New expense" bold size=l
+    col #n43 grow gap=4 pad=3
+      col #n44 gap=2
+        text #n45 "Description" shade=mid size=s bold
+        input #n46 value="Enter description"
+      col #n47 gap=2
+        text #n48 "Amount" shade=mid size=s bold
+        input #n49 value=$0.00
+      col #n50 gap=2
+        text #n51 "Paid by" shade=mid size=s bold
+        input #n52 "Select person" select
+      col #n53 gap=2
+        text #n54 "Split between" shade=mid size=s bold
+        col #n55 gap=2
+          row #n56 gap=2 align=center
+            input #n57 check
+            text #n58 "Alex"
+          row #n59 gap=2 align=center
+            input #n60 check
+            text #n61 "Jordan"
+          row #n62 gap=2 align=center
+            input #n63 check
+            text #n64 "Sam"
+      button #n65 "Save expense" primary grow h=48 size=l
+    row #n66 h=56 pad=2 gap=2 border justify=between share=tabs fill=light
+      col #n67 align=center gap=1 grow
+        text #n68 "💰" size=l
+        text #n69 "Home" size=xs shade=mid
+      col #n70 align=center gap=1 grow
+        text #n71 "➕" size=l
+        text #n72 "Add" size=xs bold
+      col #n73 align=center gap=1 grow
+        text #n74 "👥" size=l
+        text #n75 "Friends" size=xs shade=mid
+      col #n76 align=center gap=1 grow
+        text #n77 "⚙️" size=l
+        text #n78 "Settings" size=xs shade=mid
+  screen #n79 "Friends"
+    row #n80 h=56 pad=2 align=center fill=dark
+      text #n81 "Roommates" bold size=l
+    col #n82 grow gap=2 pad=3
+      col #n83 gap=3
+        row #n84 gap=2 align=center justify=between
+          col #n85 gap=1 grow
+            text #n86 "Alex Chen" bold size=m
+            text #n87 "You are owed $156.75" shade=mid size=s data
+          button #n88 "Settle" ghost size=s
+        row #n89 gap=2 align=center justify=between
+          col #n90 gap=1 grow
+            text #n91 "Jordan Kim" bold size=m
+            text #n92 "You owe $92.50" shade=mid size=s data
+          button #n93 "Settle" ghost size=s
+        row #n94 gap=2 align=center justify=between
+          col #n95 gap=1 grow
+            text #n96 "Sam Rivera" bold size=m
+            text #n97 "You are owed $183.75" shade=mid size=s data
+    row #n99 h=56 pad=2 gap=2 border justify=between share=tabs fill=light
+      col #n100 align=center gap=1 grow
+        text #n101 "💰" size=l
+        text #n102 "Home" size=xs shade=mid
+      col #n103 align=center gap=1 grow
+        text #n104 "➕" size=l
+        text #n105 "Add" size=xs shade=mid
+      col #n106 align=center gap=1 grow
+        text #n107 "👥" size=l
+        text #n108 "Friends" size=xs bold
+      col #n109 align=center gap=1 grow
+        text #n110 "⚙️" size=l
+        text #n111 "Settings" size=xs shade=mid

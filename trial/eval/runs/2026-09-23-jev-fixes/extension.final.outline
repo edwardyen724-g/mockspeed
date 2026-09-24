@@ -1,0 +1,69 @@
+app #n1 "PageSummary" panel
+  screen #n2 "Summary"
+    col #n3 pad=4 gap=3
+      text #n67 "Filter" size=s shade=mid bold
+      col #n26 gap=2
+        input #n27 "Search pages" search w=fill
+        col #n65 gap=2
+          row #n66 gap=2 align=center
+            input #n68 select value="All sources"
+          row #n69 gap=2 align=center
+            text #n70 "Sort by" size=s shade=mid
+            input #n71 select value="Date added"
+        line #n28
+      text #n4 "PageSummary" size=l bold
+      line #n5
+      col #n6 gap=2
+        text #n7 "Page" size=s shade=mid
+        text #n8 "The Hidden Psychology of Social Media" bold size=xl
+      col #n9 gap=2
+        text #n10 "Source" size=s shade=mid
+        text #n11 "psychologytoday.com" mono shade=mid size=s
+      line #n12
+      col #n13 gap=2
+        text #n14 "Summary" size=s shade=mid bold
+        text #n15 "Article explores how platform algorithms exploit cognitive biases to maximize engagement. Discusses variable reward schedules, FOMO mechanics, and dopamine feedback loops that keep users scrolling. Includes interviews with former product designers discussing addiction-by-design strategies." size=s
+      line #n16
+      col #n17 gap=2
+        text #n59 "Key Points" size=s shade=mid bold
+        table #n60
+          tr #n61 "Metric | Value"
+          tr #n62 "Infinite scroll mimics slot machine psychology | Psychology" data
+          tr #n63 "Read time | 8 minutes" data
+          tr #n64 "Cited sources | 47" data
+      line #n22
+      row #n23 gap=2
+        button #n24 "Save" primary size=l
+  screen #n29 "Settings"
+    col #n30 pad=4 gap=3
+      text #n31 "Settings" size=l bold
+      line #n72
+      col #n73 gap=2
+        text #n74 "Note" size=s shade=mid bold
+        text #n75 "Your settings are synced across all devices. Changes take effect immediately." size=s shade=light
+      line #n32
+      col #n33 gap=3
+        col #n34 gap=2
+          text #n35 "Display" size=s shade=mid bold
+          row #n36 gap=2 align=center
+            text #n37 "Dark Mode" grow
+            input #n38 toggle on
+        col #n39 gap=2
+          text #n40 "Preferences" size=s shade=mid bold
+          row #n41 gap=2 align=center
+            text #n42 "Auto-save summaries" grow
+            input #n43 toggle
+          row #n44 gap=2 align=center
+            text #n45 "Show reading time" grow
+            input #n46 toggle on
+          row #n47 gap=2 align=center
+            text #n48 "Citation format" grow
+            input #n49 select value=APA
+        col #n50 gap=2
+          text #n51 "Data" size=s shade=mid bold
+          row #n52 gap=2
+            button #n53 "Export all summaries" ghost
+            button #n54 "Clear cache" ghost
+        line #n55
+        row #n56 gap=2
+          button #n57 "Done" primary

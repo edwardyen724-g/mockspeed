@@ -73,6 +73,25 @@ export const OPS = {
   none: "none of these",
 };
 
+// What kind of element a sentence acts on, in a person's words. Jev answers this with the route;
+// code then offers only the elements of that kind (KIND_TYPES — the format's own types, not a
+// reading of the sentence) to `which`. Measured 2026-09-23 on four sentences across the ten
+// baseline apps: 40/40 answered at 0.92-1.00.
+export const KINDS = {
+  text: "words: a title, heading, name, label, number or line of text",
+  button: "a button",
+  input: "a field to type or choose in: a text box, search box, checkbox, toggle or dropdown",
+  picture: "a picture or shape: an image, avatar, icon, map or status dot",
+  group: "a group that holds other elements: a list, cards, a bar, header, navigation, menu, sidebar, panel, section or area",
+  table: "a table",
+  chart: "a chart, graph or diagram",
+  screen: "a whole screen or page",
+};
+export const KIND_TYPES = {
+  text: ["text", "tr", "node"], button: ["button"], input: ["input"], picture: ["shape"],
+  group: ["row", "col", "grid", "table", "graph"], table: ["table"], chart: ["chart", "graph", "progress"], screen: ["screen"],
+};
+
 // nodes: [{ id, screen, line }] — `line` is describe(node). Jev sees each node as one line, and the
 // target question offers every node as a label, so there are no indices to bleed between.
 // screens: screen names; viewing: the one on the person's screen. `routing` adds the questions
@@ -113,6 +132,12 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
       instructions: "Which single visible edit does `instruction` ask for? `marked` is the element the speaker has pointed at, if any.",
       criteria: OPS,
     },
+    kind: { type: "choice", instructions: "What kind of element does `said` act on?", criteria: KINDS },
+    // Asked of the whole mockup, beside `which`'s narrower choice: when the two disagree ("the
+    // navigation" in an app without one, where `which` still picks its likeliest group), the
+    // person is asked. Measured 2026-09-23: 36/40; this wording, asked of a narrowed list
+    // ("one of `elements`"), scored 12/39.
+    exists: { type: "noul", instructions: "Is the element `said` names on the mockup described in `elements`?" },
   };
   if (!routing) for (const q of ["route", "job", "whole", "request", "frame"]) delete questions[q];
   // Whether "this", "it" or "that" means the marked element is a question about meaning, so Jev
@@ -133,11 +158,14 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
       criteria: Object.fromEntries(screens.map((n) => [n, `the ${n} screen`])),
     };
   }
-  if (nodes.length) {
+  // With an element marked, the same choice over every element tells a sentence that points at it
+  // and also names another ("move this next to the search bar") from one that only points. Which
+  // element an unmarked sentence means is `which`'s question, asked over the elements of its kind.
+  if (nodes.length && marked) {
     questions.target = {
       type: "choice",
       // Reads the whole sentence: an element is named by its visible words, which may be quoted.
-      instructions: "Which element in `elements` does `said` act on? Each label is that element's id; its description is the element. If `said` points at it with a word like this, that or it, the answer is `marked`.",
+      instructions: TARGET,
       criteria: Object.fromEntries(nodes.map((n) => [n.id, `${n.line}${n.screen ? ` · on ${n.screen}` : ""}`])),
     };
   }
@@ -175,12 +203,90 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
     points: answers.points?.noul ?? null,
     screen: answers.screen?.choice ?? null,
     screenConfidence: answers.screen?.confidence ?? 0,
+    kind: answers.kind?.choice ?? null,
+    kindConfidence: answers.kind?.confidence ?? 0,
+    exists: answers.exists?.noul ?? null,
   };
 }
 
-// Where a new piece goes: one choice over the gaps on a screen (trial/tree.mjs `gaps`), each
-// labelled by position and described by what is around it. A second request, because the gaps
-// depend on the screen the first one chose.
+const TARGET = "Which element in `elements` does `said` act on? Each label is that element's id; its description is the element. If `said` points at it with a word like this, that or it, the answer is `marked`.";
+
+// Which element a sentence acts on, chosen among the candidates code offers: the elements of the
+// kind Jev named, that the edit would change. Each is labelled with where it sits (`place`: "item
+// 2 of a list of 4 texts", "at the left, narrow", "the largest text on Runs"), which is what tells
+// a side nav's items from a heading. Measured 2026-09-23 on "make the navigation darker", "turn
+// the main list into a table", "remove the last button" and "make the title bigger" across the ten
+// baseline apps: one choice over every node was right and sure (≥ 0.7) 15/40, and offered the
+// screen and layout rows as "which one?" options; this choice 29-30/40. Offering `none` as an
+// option instead of asking `exists` beside it took "the title" and "the main list" to none on
+// half the apps, so it is not offered.
+// pool: [{ id, line, place, screen }].
+export async function which({ utterance, pool, viewing = null, apiKey, signal }) {
+  const label = (n) => `${n.line}${n.place ? ` · ${n.place}` : ""}${n.screen ? ` · on ${n.screen}` : ""}`;
+  const started = Date.now();
+  const { answers } = await ask({
+    apiKey,
+    state: { said: utterance, instruction: unquoted(utterance), marked: null, viewing, elements: pool.map((n) => `${n.id} — ${label(n)}`) },
+    questions: { target: { type: "choice", instructions: TARGET, criteria: Object.fromEntries(pool.map((n) => [n.id, label(n)])) } },
+  }, signal);
+  if (!answers?.target) throw new Error("jev returned no answer for target");
+  const ranked = Object.entries(answers.target.probabilities ?? {}).sort((a, b) => b[1] - a[1]).map(([k]) => k).filter((k) => pool.some((n) => n.id === k));
+  return { ms: Date.now() - started, id: answers.target.choice, confidence: answers.target.confidence ?? 0, ranked };
+}
+
+// Where a new piece goes on a screen, one level at a time (trial/tree.mjs `partsOf`, `spotsIn`):
+// first which part of the screen, then where in it. `open` — whether the sentence leaves the spot
+// open — is asked with the first level: when Jev is unsure where in a part, an open sentence is
+// placed next to the element it belongs with (`nextTo`), or at the end of the part, rather than
+// the person being asked about a spot they never named. Measured 2026-09-23: `open` 0.94-0.96 for
+// "add a note to the X screen" and "add a filter", 0.01-0.02 for "at the top" and "to the top".
+const PART = "Which part of the screen should the new piece `said` asks for go in? Each option is one part of the screen: what it holds, and where it is and how big. If `said` points with this, it or here, it means the part that holds `marked`.";
+const SPOT = "Where should the new piece `said` asks for go? Each option is either a gap between elements, described by what is around it, or somewhere inside one element that holds others. If `said` points with this, it or here, it means next to `marked`.";
+const OPEN = "Does `said` leave open where on the screen the new piece goes — it names no place such as the top, the bottom, a side, or next to, above, below or inside something?";
+export async function spot({ utterance, options, screen, marked = null, first = false, withOpen = false, apiKey, signal }) {
+  const started = Date.now();
+  const questions = { spot: { type: "choice", instructions: first ? PART : SPOT, criteria: Object.fromEntries(options.map((o, i) => [`o${i + 1}`, o.text])) } };
+  if (withOpen) questions.open = { type: "noul", instructions: OPEN };
+  const { answers } = await ask({ apiKey, state: { said: utterance, screen: screen ?? null, marked: marked ?? null }, questions }, signal);
+  if (!answers?.spot) throw new Error("jev returned no answer for spot");
+  const at = (label) => (/^o\d+$/.test(label ?? "") ? Number(label.slice(1)) - 1 : -1);
+  const ranked = Object.entries(answers.spot.probabilities ?? {}).sort((a, b) => b[1] - a[1]).map(([l]) => at(l)).filter((i) => i >= 0 && i < options.length);
+  return { ms: Date.now() - started, index: at(answers.spot.choice), confidence: answers.spot.confidence ?? 0, ranked, open: answers.open?.noul ?? null };
+}
+
+// For a sentence that leaves the spot open: which element the new piece belongs right after.
+// Measured 2026-09-23: "add a filter", after a search row was added, chose a search field on all
+// 6 apps that got this far (0.33-0.86); "add a note to the X screen" spread (0.11-0.40), and so
+// mostly goes to the part's end.
+export async function nextTo({ utterance, elements, screen, marked = null, apiKey, signal }) {
+  const started = Date.now();
+  const { answers } = await ask({
+    apiKey,
+    state: { said: utterance, screen: screen ?? null, marked: marked ?? null, elements: elements.map((e) => `${e.id} — ${e.text}`) },
+    questions: { next: { type: "choice", instructions: "The new piece `said` asks for goes right after one element in `elements`, in the same row or column. Which element does it belong next to?", criteria: Object.fromEntries(elements.map((e) => [e.id, e.text])) } },
+  }, signal);
+  if (!answers?.next) throw new Error("jev returned no answer for next");
+  return { ms: Date.now() - started, id: answers.next.choice, confidence: answers.next.confidence ?? 0 };
+}
+
+// Whether a part of a split sentence needs an earlier part — one still waiting on the person —
+// done first: "make it bold" after "add a card" does; "make the title bigger" after "add a
+// filter" does not, and goes ahead. Measured 2026-09-23 on 13 pairs, twice: 13/13 both times
+// (independent 0.09-0.47, dependent 0.89-0.96); a wording that asked only about a piece `earlier`
+// creates scored 13/13 and 12/13.
+export async function needs({ utterance, earlier, context, apiKey, signal }) {
+  const started = Date.now();
+  const { answers } = await ask({
+    apiKey,
+    state: { said: utterance, earlier, context },
+    questions: { needs: { type: "noul", instructions: "`said` and `earlier` are parts of one request, `context`. Does `said` need `earlier` to be done first — because it acts on or is placed relative to something `earlier` adds, removes or puts in place — rather than on what is already on the mockup?" } },
+  }, signal);
+  if (!answers?.needs) throw new Error("jev returned no answer for needs");
+  return { ms: Date.now() - started, noul: answers.needs.noul ?? 0 };
+}
+
+// Where a whole new screen goes: one choice over the gaps between screens (trial/tree.mjs
+// `screenGaps`), each labelled by position.
 export async function place({ utterance, gaps, screen, marked = null, apiKey, signal }) {
   const started = Date.now();
   const { answers } = await ask({

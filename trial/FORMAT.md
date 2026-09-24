@@ -89,6 +89,28 @@ text on `dark` turns white), `border` (1px outline), `divider` (a line between c
 Everything is greyscale. Emphasis is only ever size, weight and shade — concrete properties a
 person can name and see change.
 
+**Shared elements.** `share=<name>` on any node below a screen says it is one element drawn on
+several screens — the side nav, a top bar, a bottom bar. Every copy carries the same name; the copies
+may differ in which item is current, or one may have an item more. An edit to a copy, or to anything
+in one, is made to every copy (a node's copies are the nodes at the same place inside the other
+copies, when they are of the same type), and Jev is shown each shared element once. The renderer
+draws `share` as nothing.
+
+```
+  screen "Runs"
+    row h=fill
+      col share=nav w=200 fill=light pad=3
+        text "Runs" bold
+        text "Agents" shade=mid
+      …
+  screen "Agents"
+    row h=fill
+      col share=nav w=200 fill=light pad=3
+        text "Runs" shade=mid
+        text "Agents" bold
+      …
+```
+
 ## In memory
 
 ```js
@@ -139,6 +161,21 @@ export function serialize(root, { ids = true } = {})   // → outline text that 
 export function index(root)               // → [{ id, type, text, screen, depth, parentId, node }] in document order
 export function find(root, id)            // → { node, parent, index } | null
 export function describe(node)            // → one short human line: 'text "Runs" · l bold', 'col #nav · w=200 fill=light · "Relay · Runs · Agents"'
+export function shapeOf(node)             // → "a list of 5 rows", "holds text, row" — what a container is made of
+export function positionOf(root, id)      // → "item 2 of a list of 4 texts", "at the left, narrow", "at the top of the screen"
+// where a new piece goes, top down — only inside a padded container (a screen has no padding of its own)
+export function padded(root, id)          // → whether a container, or one around it below the screen, has pad
+export function sectionsOf(root, screenId) // → the parts of a screen: its children, through a lone wrapper, a full-height row of columns split
+export function partsOf(root, screenId, skip)   // → [{ into, text }] — the first choice: which part, where it is and how big
+export function spotsIn(root, id, skip)   // → [{ anchor, position, text } | { into, text }] — a container's own gaps, and the ways into it
+export function edgesOf(root, screenId, id, skip) // → just below / above a stacked part, landing in the padded part next to it
+export function neighboursIn(root, id, skip) // → [{ id, text }] — what a piece can follow when the sentence leaves the spot open
+// shared elements
+export function shares(root)              // → Map name → [copy roots]
+export function copiesOf(root, id)        // → [{ id, copy }] — the same node in the other copies
+export function firstCopy(root, id)       // → the copy that stands for all of them
+export function sharedView(root)          // → { hidden, screens } — each shared element once, on all its screens
+export function mirrorsOf(root, anchor, position) // → the same place in the other copies, when the place is inside a shared element
 export function applyPatch(root, patchText)          // → { root, notes: string[], warnings: string[] }  (new object; input untouched)
 export function apply(root, op, id, arg)  // → { ok, root, note, changed }  (new object; input untouched)
 ```

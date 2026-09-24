@@ -29,8 +29,8 @@ const num = (re, s) => { const m = String(s ?? "").match(re); return m ? Number(
 // One app's steps, in the page's terms: Jev's decisions, the questions, what changed, the verdict.
 function stepsOf(r, verdict) {
   return r.steps.map((st, si) => {
-    const jev = st.log.filter((e) => (e.op === "route" && /^jev/.test(e.source ?? "")) || e.op === "place")
-      .map((e) => ({ kind: e.op === "place" ? "where" : "route", route: e.route ?? null, said: e.said ?? "", text: e.note ?? "", detail: e.source ?? "" }));
+    const jev = st.log.filter((e) => (e.op === "route" && /^jev/.test(e.source ?? "")) || e.op === "place" || (e.op === "target" && /^jev/.test(e.source ?? "")))
+      .map((e) => ({ kind: e.op === "place" ? "where" : e.op === "target" ? "which" : "route", route: e.route ?? null, said: e.said ?? "", text: e.note ?? "", detail: e.source ?? "" }));
     const split = st.log.find((e) => e.op === "split");
     const writes = st.log.filter((e) => e.op === "piece" || e.op === "move" || (e.op === "done" && /^built/.test(e.note ?? ""))).map((e) => e.note);
     const edits = st.log.filter((e) => e.target && !e.refused && !["route", "place", "choice", "human", "ask", "said", "split", "piece", "move"].includes(e.op)).map((e) => e.note);

@@ -815,6 +815,28 @@ export function shapeOf(node) {
   return `holds ${types}${kids.length > 5 ? ", …" : ""}`;
 }
 
+// Where a node sits among its siblings, in words for what a person sees: "item 2 of a list of 4
+// texts", "at the left, narrow", "at the top of the screen". Structure only, like shapeOf — which
+// of these is "the navigation" or "the title" is Jev's to say. It is what told a side nav's items
+// from a heading, and the nav from "the main list", when Jev chose among them (jev.mjs `which`).
+export function positionOf(root, id) {
+  const h = find(root, id);
+  if (!h?.parent) return "";
+  const kids = h.parent.children;
+  const ps = shapeOf(h.parent);
+  if (/^a list of/.test(ps)) return `item ${h.index + 1} of ${ps}`;
+  if (kids.length < 2) return "";
+  const end = h.index === 0 ? 0 : h.index === kids.length - 1 ? 2 : 1;
+  if (h.parent.type === "row") {
+    const p = h.node.props ?? {};
+    const fills = (q) => q?.grow || q?.w === "fill";
+    const size = fills(p) ? ", wide" : px(p.w) && kids.some((c) => fills(c.props)) ? ", narrow" : "";
+    return ["at the left", "in the middle", "at the right"][end] + size;
+  }
+  if (h.parent.type === "screen") return ["at the top of the screen", "", "at the bottom of the screen"][end];
+  return "";
+}
+
 // ---- gaps --------------------------------------------------------------------------------
 
 // Where a new piece can go on one screen, as places a person would name them: the top of a
@@ -847,6 +869,227 @@ export function gaps(root, screenId) {
     if (c.type !== "table") kids.forEach(walk);
   };
   walk(screen);
+  return out;
+}
+
+// ---- shared elements ---------------------------------------------------------------------
+// What a person sees on every screen — the side nav, a top bar, a tab bar — is one element drawn
+// on each. Each copy carries the same `share=<name>`, and an edit to a copy, or to anything in
+// one, is made to every copy: a node's copies are the nodes at the same place inside the other
+// copies, where they are of the same type (the copies may differ in which item is current, or one
+// may have an item more). Before this, each screen had its own nav, "make the navigation darker"
+// darkened one of three, and "the title" was one of several identical texts to choose between.
+
+const shareOf = (n) => (n?.props?.share != null && n.type !== "app" && n.type !== "screen" ? String(n.props.share) : null);
+
+// The copies of every shared element, in document order: Map name → [copy roots].
+export function shares(root) {
+  const out = new Map();
+  for (const { node } of index(root)) {
+    const k = shareOf(node);
+    if (k != null) out.set(k, [...(out.get(k) ?? []), node]);
+  }
+  return out;
+}
+
+// The nodes that are `id` on the other screens: [{ id, copy }] with `copy` the id of the copy root
+// each is in. Empty for a node in no shared element.
+export function copiesOf(root, id) {
+  let h = find(root, id);
+  if (!h) return [];
+  const path = [];
+  while (shareOf(h.node) == null) {
+    if (!h.parent) return [];
+    path.unshift(h.index);
+    h = find(root, h.parent.id);
+  }
+  const type = find(root, id).node.type;
+  const out = [];
+  for (const other of shares(root).get(shareOf(h.node)) ?? []) {
+    if (other === h.node) continue;
+    let t = other;
+    for (const i of path) { t = t?.children?.[i]; if (!t) break; }
+    if (t && t.type === type) out.push({ id: t.id, copy: other.id });
+  }
+  return out;
+}
+
+// The copy of `id` that stands for all of them — the one in the first copy — so that each shared
+// element is offered once. Itself when it is in no shared element, or is in the first copy.
+export function firstCopy(root, id) {
+  const order = index(root).map((n) => n.id);
+  return [id, ...copiesOf(root, id).map((c) => c.id)].sort((a, b) => order.indexOf(a) - order.indexOf(b))[0];
+}
+
+// How the tree is shown to Jev: each shared element once. `hidden` holds every node inside a copy
+// after the first; `screens` gives each node in a first copy the screens all its copies are on.
+export function sharedView(root) {
+  const hidden = new Set(), screens = new Map();
+  const at = new Map(index(root).map((n) => [n.id, n.screen]));
+  for (const copies of shares(root).values()) {
+    if (copies.length < 2) continue;
+    const on = [...new Set(copies.map((c) => at.get(c.id)).filter(Boolean))];
+    for (const n of index(copies[0])) screens.set(n.id, on);
+    for (const c of copies.slice(1)) for (const n of index(c)) hidden.add(n.id);
+  }
+  return { hidden, screens };
+}
+
+// Where else a change at a place must be made: the same place in every other copy, when the place
+// is inside a shared element — in it, in something in it, or the element itself replaced — and
+// not merely next to one.
+export function mirrorsOf(root, anchor, position) {
+  const h = find(root, anchor);
+  if (!h) return [];
+  if (shareOf(h.node) != null && !["inside_start", "inside_end", "replace"].includes(position)) return [];
+  return copiesOf(root, anchor).map((c) => c.id);
+}
+
+// ---- where a new piece goes, top down ------------------------------------------------------
+// One choice over every gap on a screen spread Jev's answer over 40-70 gaps, and its favourite,
+// "at the top of the screen", put pieces above the header, against the artboard's edge: a screen
+// draws no padding of its own; its parts (bars, columns, the main area) carry it. So a piece is
+// placed top down, as a person would say it: which part of the screen, then where in it — each a
+// choice among a few options — and only ever inside a padded container. Measured 2026-09-23 on
+// the ten baseline apps (a search field at the top, a note on a named screen, a button moved to
+// the top): the flat choice answered "at the top of the <X> screen" 25/26 times. Top down, with a
+// filter added after the search as well, 26/33 landed inside the padding (three filters at the
+// end of the main area rather than beside the search) and 7 asked.
+
+const LAYOUT = new Set(["row", "col", "grid", "table"]);
+// A container with nothing of its own to see or keep apart — no fill, border or padding.
+const plain = (n) => LAYOUT.has(n.type) && n.props?.fill == null && !n.props?.border && !(Number(n.props?.pad) > 0);
+const labelOf = (n) => { const s = shapeOf(n); return s ? `${describe(n)} · ${s}` : describe(n); };
+
+// Whether something put into this container sits inside a screen's padding: it, or a container
+// around it below the screen, has pad set.
+export function padded(root, id) {
+  for (let h = find(root, id); h && h.node.type !== "screen" && h.node.type !== "app"; h = h.parent ? find(root, h.parent.id) : null) {
+    if (Number(h.node.props?.pad) > 0) return true;
+  }
+  return false;
+}
+
+// Whether a padded gap can be reached inside n (a graph takes new nodes wherever it is).
+function reachable(root, n, skip) {
+  if (skip.has(n.id)) return false;
+  if (n.type === "graph") return true;
+  if (!LAYOUT.has(n.type)) return false;
+  return padded(root, n.id) || (n.children ?? []).some((k) => reachable(root, k, skip));
+}
+
+// The parts of a screen a person names first — its bars, columns and main area: the screen's
+// children, looking through a wrapper that is the only thing on it (the row that holds a side nav
+// and the content beside it — padded or not: its own gaps would make a new column, and "a search
+// field at the top" went there on two apps), and splitting the row that fills the rest of the
+// screen with columns (a side nav beside the content, under a top bar) into its columns. A tab bar
+// is a row of columns too, but a strip of set height, and stays one part.
+const bordered = (n) => n.props?.fill != null || !!n.props?.border;
+const holdsOnlyContainers = (n) => LAYOUT.has(n.type) && n.children?.length > 0 && n.children.every((k) => LAYOUT.has(k.type));
+const splitsScreen = (n) => n.type === "row" && n.children?.length >= 2 && holdsOnlyContainers(n) && !bordered(n) && (n.props?.h === "fill" || !!n.props?.grow);
+export function sectionsOf(root, screenId) {
+  const s = find(root, screenId)?.node;
+  if (!s || s.type !== "screen") return [];
+  let kids = s.children ?? [];
+  while (kids.length === 1 && kids[0].children?.length && (plain(kids[0]) || (holdsOnlyContainers(kids[0]) && !bordered(kids[0])))) kids = kids[0].children;
+  return kids.flatMap((k) => (splitsScreen(k) ? k.children : [k]));
+}
+
+// Where a part is and how big, in words: "the top part of the screen, a strip 80 px tall", "the
+// right side of the screen, the widest part, filling the rest of the width". Measured 2026-09-23:
+// with these words "add a note to the <X> screen" chose the screen's main area on 10/10 apps
+// (0.56-1.00); with the container's description alone, 7/10, and a side nav or top bar the rest.
+function partWhere(n, across, i, count) {
+  const p = n.props ?? {};
+  const bits = [];
+  const end = i === 0 ? 0 : i === count - 1 ? 2 : 1;
+  if (count > 1) bits.push(across ? ["the left side", "the middle", "the right side"][end] + " of the screen" : ["the top part", "the middle", "the bottom part"][end] + " of the screen");
+  const main = across ? p.w : p.h;
+  if (p.grow || main === "fill") bits.push(across ? "the widest part, filling the rest of the width" : "the largest part, filling the rest of the height");
+  else if (px(main)) bits.push(across ? `a narrow column ${px(main)} px wide` : `a strip ${px(main)} px tall`);
+  return bits.join(", ");
+}
+
+// The first choice: which part of the screen. Each option is { into: id, text }. `skip` holds an
+// element being moved, which is not a place to move it to.
+export function partsOf(root, screenId, skip = new Set()) {
+  return sectionsOf(root, screenId).filter((n) => reachable(root, n, skip)).map((n) => {
+    const h = find(root, n.id);
+    return { into: n.id, text: `${labelOf(n)} — ${partWhere(n, h.parent.type === "row", h.index, h.parent.children.length)}` };
+  });
+}
+
+// The gaps of one container, each named by what is on either side. The gap an element being moved
+// (in `skip`) sits in now says so, so that "move it to the top" of what is already first can be
+// answered "already there" (the server sees the tree unchanged and says so).
+function ownGaps(c, skip) {
+  if (c.type === "graph") return [{ anchor: c.id, position: "inside_end", text: `inside ${labelOf(c)}, as a new node or edge` }];
+  const all = c.children ?? [];
+  const kids = all.filter((k) => !skip.has(k.id));
+  const at = all.findIndex((k) => skip.has(k.id));
+  const now = at < 0 ? null : at === 0 ? "start" : at === all.length - 1 ? "end" : all[at - 1].id;
+  const here = (key) => (now === key ? ", where it is now" : "");
+  const across = c.type === "row";
+  const w = labelOf(c);
+  const out = [{ anchor: c.id, position: "inside_start", text: `at the ${across ? "start (left end)" : "top"} of ${w}${kids.length ? `, ${across ? "left of" : "above"} ${describe(kids[0])}` : ""}${here("start")}` }];
+  for (let i = 0; i < kids.length - 1; i++) {
+    out.push({ anchor: kids[i].id, position: "after", text: `in ${w}, ${across ? "right of" : "below"} ${describe(kids[i])}, ${across ? "left of" : "above"} ${describe(kids[i + 1])}${here(kids[i].id)}` });
+  }
+  if (kids.length) out.push({ anchor: c.id, position: "inside_end", text: `at the ${across ? "end (right end)" : "bottom"} of ${w}, ${across ? "right of" : "below"} ${describe(kids[kids.length - 1])}${here("end")}` });
+  return out;
+}
+
+// The next choice, inside a container already chosen: its own gaps (when they are inside the
+// padding) and "somewhere inside" each container in it that has a padded gap. A gap is
+// { anchor, position, text }; a way down is { into, text }.
+export function spotsIn(root, id, skip = new Set()) {
+  const c = find(root, id)?.node;
+  if (!c || skip.has(c.id)) return [];
+  if (c.type === "graph") return ownGaps(c, skip);
+  const out = padded(root, c.id) ? ownGaps(c, skip) : [];
+  for (const k of c.children ?? []) {
+    if (skip.has(k.id) || !reachable(root, k, skip)) continue;
+    if (k.type === "graph") { out.push(...ownGaps(k, skip)); continue; }
+    const pos = positionOf(root, k.id);
+    out.push({ into: k.id, text: `somewhere inside ${labelOf(k)}${pos ? ` (${pos})` : ""}` });
+  }
+  return out;
+}
+
+// Just outside a part of the screen, kept inside the padding by landing in the part next to it:
+// "just below the app bar" is the top of the area under it. Offered with the spots in a part,
+// because "a search field at the top" of a phone screen chose its top bar at 0.98-1.00, and then
+// nowhere in the bar (0.24). With these, "just below" was its answer (0.35-0.56).
+export function edgesOf(root, screenId, id, skip = new Set()) {
+  if (!sectionsOf(root, screenId).some((s) => s.id === id)) return [];
+  const h = find(root, id);
+  if (!h?.parent || h.parent.type === "row") return [];
+  const out = [];
+  const next = h.parent.children[h.index + 1], prev = h.parent.children[h.index - 1];
+  const fits = (n) => n && !skip.has(n.id) && LAYOUT.has(n.type) && padded(root, n.id);
+  if (fits(next)) out.push({ anchor: next.id, position: "inside_start", text: `just below ${describe(h.node)}, at the top of ${describe(next)}` });
+  if (fits(prev)) out.push({ anchor: prev.id, position: "inside_end", text: `just above ${describe(h.node)}, at the bottom of ${describe(prev)}` });
+  return out;
+}
+
+// The elements a new piece can follow when the sentence leaves the spot open ("add a filter"):
+// everything inside `id` whose row or column is padded, each with where it sits. Jev picks the one
+// the piece belongs next to — a filter beside the search field — and code puts it right after.
+export function neighboursIn(root, id, skip = new Set()) {
+  const c = find(root, id)?.node;
+  if (!c) return [];
+  const out = [];
+  const walk = (n) => {
+    for (const k of n.children ?? []) {
+      if (skip.has(k.id) || k.type === "edge" || k.type === "node") continue;
+      if (padded(root, n.id) && n.type !== "graph") {
+        const pos = positionOf(root, k.id);
+        out.push({ id: k.id, text: `${labelOf(k)}${pos ? ` · ${pos}` : ""}` });
+      }
+      if (LAYOUT.has(k.type) && k.type !== "table") walk(k);
+    }
+  };
+  walk(c);
   return out;
 }
 
