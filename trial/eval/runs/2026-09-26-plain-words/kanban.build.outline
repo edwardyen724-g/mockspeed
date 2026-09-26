@@ -1,0 +1,56 @@
+app #n1 "Design Studio" web
+  screen #n2 "Board"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Board" bold
+        text #n6 "Team" shade=mid
+        text #n7 "Archive" shade=mid
+      col #n8 grow pad=4 gap=4
+        row #n9 gap=4 h=fill
+          col #n10 w=280 gap=2
+            text #n11 "Backlog" bold size=s shade=dark
+            col #n12 gap=2
+              col #n13 border pad=3 gap=1
+                text #n14 "Rebrand site hero" bold size=s
+                text #n15 "Sarah" size=xs shade=mid
+                shape #n16 circle w=20 h=20
+              col #n17 border pad=3 gap=1
+                text #n18 "Update brand guidelines" bold size=s
+                text #n19 "Marcus" size=xs shade=mid
+                shape #n20 circle w=20 h=20
+              col #n21 border pad=3 gap=1
+                text #n22 "Logo exploration concepts" bold size=s
+                text #n23 "Unassigned" size=xs shade=mid
+          col #n24 w=280 gap=2
+            text #n25 "In Progress" bold size=s shade=dark
+            col #n26 gap=2
+              col #n27 border pad=3 gap=1
+                text #n28 "Mobile app wireframes" bold size=s
+                text #n29 "Elena" size=xs shade=mid
+                shape #n30 circle w=20 h=20
+              col #n31 border pad=3 gap=1
+                text #n32 "Client feedback review" bold size=s
+                text #n33 "James" size=xs shade=mid
+                shape #n34 circle w=20 h=20
+          col #n35 w=280 gap=2
+            text #n36 "Ready" bold size=s shade=dark
+            col #n37 gap=2
+              col #n38 border pad=3 gap=1
+                text #n39 "Email template design" bold size=s
+                text #n40 "Sarah" size=xs shade=mid
+                shape #n41 circle w=20 h=20
+              col #n42 border pad=3 gap=1
+                text #n43 "Social media assets" bold size=s
+                text #n44 "Marcus" size=xs shade=mid
+                shape #n45 circle w=20 h=20
+          col #n46 w=280 gap=2
+            text #n47 "Done" bold size=s shade=dark
+            col #n48 gap=2
+              col #n49 border pad=3 gap=1
+                text #n50 "Q4 pitch deck" bold size=s
+                text #n51 "Elena" size=xs shade=mid
+                shape #n52 circle w=20 h=20
+              col #n53 border pad=3 gap=1
+                text #n54 "Annual report layout" bold size=s
+                text #n55 "James" size=xs shade=mid
+                shape #n56 circle w=20 h=20

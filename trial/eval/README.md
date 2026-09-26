@@ -29,6 +29,52 @@ leaves every other question ("which one?", "where should it go?") unanswered, re
 "?" in its output is a question the app put to the person, not a failure — the judges say whether
 each question was fair or needless.
 
+## Plain words — `runs/2026-09-26-plain-words`
+
+Phase 1a of `docs/plan-web-2026-09-26.md`: what a person reads is in their words, and the
+questions with no decision behind them are gone.
+
+1. **One module owns the words.** `trial/words.mjs` writes every question, choice, reply and
+   page string. Things are named by what is on them ("the “You are owed” card", "the “Order
+   now” button"). Places are named by what is around them ("between “Address” and “Hours”").
+   A website has pages; a phone app has screens. Jev and the writer still read tree.mjs's lines,
+   so their measured wording is unchanged. Scores, timings, model names and the engine's log sit
+   behind `?debug=1`. `trial/test/words.test.mjs` renders every template against the twenty
+   outlines of `runs/2026-09-23-jev-fixes` and fails on an engine word outside quotes.
+2. **No "start a new app?"** An empty canvas builds. A new app on a full canvas replaces it and
+   offers "Bring back “Relay”" (Undo), as does the new **New** button, until phase 3's project
+   list keeps it.
+3. **No "change the mockup, or is it a remark?"** When Jev's request gate and its route disagree,
+   the sentence is taken as a change.
+4. **No "what kind of change?"** once the element is known (marked and pointed at, or an
+   escalated edit's target): Jev's top answer is taken when it is add, rewrite or several.
+5. **No "which screen?"** when the sentence names something on one screen ("under the
+   address"): a new Jev question, `anchor`, says which screen that thing is on. It was probed
+   before use, since none of the ten sentences here names one (the question never fired in this
+   run). 20 sentences over six apps, twice: 24/24 right at 0.94-1.00 for a thing on another
+   screen. The `screen` question was under 0.6 on 18 of those 24, and its top pick was wrong 6
+   times. 16/16 stayed on the screen being looked at when the sentence names nothing, or names
+   something on several screens.
+
+354 Jev decisions, builds 10/10, no errors. Against `2026-09-23-jev-fixes`, same sentences:
+
+| | jev-fixes | plain words |
+|---|---|---|
+| questions put to the person | 49 | **33** |
+| "start a new app?" | 9 | **0** |
+| "change or remark?" | 0 | 0 |
+| "what kind of change?" | 1 | 0 |
+| which one / where / remove | 21 / 12 / 6 | 16 / 12 / 5 |
+| answers the script gave | 16 | **5** |
+| sentences that changed the mock | 87 | 87 |
+| questions, choices and replies with an engine word | 110 | **1** |
+
+The one engine word left is the writer's own: asked to add a search field that already existed,
+it answered in words, quoting the outline ("…at row · input "Search"…"). "Add a search field at
+the top" changed 6 apps where the baseline changed 9. No new code ran there: Jev's spot scores on
+two apps' differently written top parts fell to 0.24 and 0.08, and the email writer declined as
+above. Not judged: the five-agent judges (step 4) were not run on this run.
+
 ## After the Jev fixes — `runs/2026-09-23-jev-fixes`
 
 Five changes, each probed on a sentence set before the server changed:

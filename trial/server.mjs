@@ -9,9 +9,10 @@
 // and whether "this" points at the marked element. The writer (trial/writer.mjs) only writes — a
 // whole app, one piece, or a sentence split into single changes. Code applies what was decided.
 //
-// Decisions that belong to the person — replacing the app on the canvas, removing something,
-// which element or gap when Jev is not sure — come back as `choices`, which the page shows next
-// to the text box; the answer comes back to /answer. Runs beside canvas/ so the two can be compared.
+// Decisions that belong to the person — removing something, which element or gap when Jev is not
+// sure — come back as `choices`, which the page shows next to the text box; the answer comes back
+// to /answer. Every string the person reads comes from trial/words.mjs; the log's own notes, Jev's
+// scores and timings are for ?debug=1. Runs beside canvas/ so the two can be compared.
 
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -21,6 +22,7 @@ import { parse, Stream, serialize, index, find, describe, shapeOf, positionOf, a
 import { render } from "./render.mjs";
 import { decide, place, spot, nextTo, which, needs, KIND_TYPES } from "./jev.mjs";
 import { writeApp, writePiece, split, MODEL } from "./writer.mjs";
+import * as W from "./words.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -87,6 +89,11 @@ let rev = 0, seq = 0, busy = null;
 // The sentence waiting on the person's choice, with Jev's decision about it, so the answer carries
 // on from there instead of asking Jev again.
 let pending = null;
+// What the page offers after acting — "Bring back “Relay”" once a new app has replaced it. Unlike a
+// question it waits on nothing: the next request, answer or undo clears it.
+let offer = null;
+// The page a build is drawing, for the line under the text box while it runs.
+let drawing = null;
 const watchers = [];
 
 function announce(specChanged = true) {
@@ -136,25 +143,33 @@ function asking(text, choices, { pick = [], keep = {} } = {}) {
   return { note: text, changed: false, choices: stamped, pick };
 }
 const answer = (label, body, primary = false) => ({ label, primary, post: { path: "/answer", body } });
-const cancel = () => answer("leave it", { kind: "cancel" });
+const cancel = () => answer(W.LEAVE, { kind: "cancel" });
 function settle() { pending = null; question = null; }
 
 // ---- routing -----------------------------------------------------------------------------
 async function ask({ utterance, marked, viewing }) {
-  if (busy) return { note: `still working on "${busy}" — one request at a time`, changed: false };
-  if (!apiKey) return { note: "no TYPESAFE_API_KEY — start with --env", blocked: true };
+  if (busy) return { note: W.reply.busy(busy), changed: false };
+  if (!apiKey) return { note: W.reply.notSetUp, debug: "no TYPESAFE_API_KEY — start with --env", blocked: true };
   busy = utterance;
   settle();
-  note({ note: utterance, op: "ask", source: "you" });
+  offer = null;
+  note({ note: utterance, op: "ask", source: "you", say: utterance });
+  let r;
   try {
-    return await handle({ utterance, marked, viewing, started: Date.now(), depth: 0 });
+    r = await handle({ utterance, marked, viewing, started: Date.now(), depth: 0 });
   } catch (e) {
     note({ note: `error: ${e.message}`, op: "done", source: "canvas", refused: true });
-    return { note: `error: ${e.message}`, changed: false, error: true };
+    r = { note: W.reply.error, debug: e.message, changed: false, error: true };
   } finally {
     busy = null;
+    drawing = null;
   }
+  said(r);
+  return r;
 }
+
+// The reply, in the history the person reads (the log's other entries are for ?debug=1).
+function said(r) { note({ op: "reply", note: r.note, say: r.note, refused: r.changed === false && !r.choices?.length }); }
 
 // One sentence, from Jev's first decision to the change on the canvas (or the question to the
 // person). `depth` is 1 for the parts of a sentence the writer split; `context` is then the whole
@@ -171,13 +186,12 @@ async function handle({ utterance, marked, viewing, started, depth, context = nu
   const confident = d.routeConfidence >= ACT_ROUTE;
   const gate = d.request >= FIRE;
   // Jev asks itself twice whether this is a request — the gate, and the route's "none". When both
-  // are sure and they disagree, that is not code's to settle: the person says which it was.
-  if (confident && gate !== (d.route !== "none")) {
-    note({ op: "route", route: "?", note: "Jev's gate and route disagree", source: why, said: utterance });
-    return asking(`change the mockup, or is “${utterance}” a remark?`,
-      [answer("change the mockup", { kind: "proceed" }, true), answer("it's a remark", { kind: "cancel" })], { keep: ctx });
-  }
-  let route = confident ? d.route : gate ? "write" : "none";
+  // are sure and they disagree, the sentence is a change: in a mock editor a sentence is a change
+  // unless it is a question (docs/plan-web-2026-09-26.md §3B, decided 2026-09-26), and Undo takes it
+  // back. The person is no longer asked "change the mockup, or is it a remark?".
+  const disagree = confident && gate !== (d.route !== "none");
+  if (disagree) note({ op: "route", route: "?", note: "Jev's gate and route disagree — taken as a change", source: why, said: utterance });
+  let route = disagree ? (d.route !== "none" ? d.route : "write") : confident ? d.route : gate ? "write" : "none";
   // A direct edit is one change by definition. When Jev's own job answer is confidently "several",
   // the direct route cannot carry the sentence ("make this bold and move it to the top" routed
   // direct at 0.96 with job several at 0.80, and the move was lost), so it goes to be split.
@@ -189,7 +203,7 @@ async function proceed(ctx, route, why) {
   const { utterance } = ctx;
   if (route === "none") {
     note({ op: "route", route, note: "not a request — nothing changed", source: why, said: utterance });
-    return { note: `not a request — nothing changed (${why})`, changed: false };
+    return { note: W.reply.notAChange, debug: why, changed: false };
   }
   if (route === "direct") {
     note({ op: "route", route, note: `direct — ${ctx.d.op} ${ctx.d.opConfidence.toFixed(2)}`, source: why, said: utterance });
@@ -211,22 +225,21 @@ async function direct(ctx) {
   const escalate = (why, target = null) => ({ escalate: why, target });
   // Clearing is asked about at any confidence: it is never quietly handed to the writer.
   if (d.op === "clear") {
-    return asking("clear the whole canvas? undo brings it back", [answer("yes, clear it", { kind: "apply", op: "clear" }, true), cancel()], { keep: ctx });
+    return asking(W.ask.clear, [answer(W.ask.clearYes, { kind: "apply", op: "clear" }, true), cancel()], { keep: ctx });
   }
   if (!nodes().length) return escalate("the canvas is empty");
   if (d.op === "none" || d.opConfidence < ACT_OP) return escalate(`no single edit (${d.op} ${d.opConfidence.toFixed(2)})`);
 
-  const verb = d.op.replace("_", " ");
   const pointed = marked && d.points != null && d.points >= POINTS;
   // The sentence points at the marked element and also names a different one: the person says which.
   if (pointed && d.targetConfidence >= ACT_TARGET && d.target !== marked) {
-    return asking(`${verb} — the one you marked, or the one you named?`, [
-      answer(`the marked ${lineOf(marked)}`, { kind: "apply", op: d.op, target: marked, span: d.span }, true),
-      answer(lineOf(d.target), { kind: "apply", op: d.op, target: d.target, span: d.span }),
+    return asking(W.ask.pointedOrNamed(d.op), [
+      answer(W.ask.pointedChoice(root, marked), { kind: "apply", op: d.op, target: marked, span: d.span }, true),
+      answer(W.ask.namedChoice(root, d.target), { kind: "apply", op: d.op, target: d.target, span: d.span }),
       cancel(),
     ], { pick: [marked, d.target], keep: ctx });
   }
-  const target = pointed ? marked : await choose(ctx, { op: d.op, verb, body: (id) => ({ kind: "apply", op: d.op, target: id, span: d.span }) });
+  const target = pointed ? marked : await choose(ctx, { op: d.op, body: (id) => ({ kind: "apply", op: d.op, target: id, span: d.span }) });
   if (typeof target !== "string") return target;
   return finishEdit(ctx, d.op, target, d.span, pointed ? `jev · the marked element (points ${d.points.toFixed(2)})` : "jev");
 }
@@ -279,25 +292,26 @@ function candidates(kind, op) {
     const shape = shapeOf(n.node);
     const place = [positionOf(root, n.id), largest.has(n.id) ? `the largest text on ${n.screen}` : "", part.get(n.id) ?? "",
       limit.has(n.id) ? `already as far as ${op} goes` : ""].filter(Boolean).join(", ");
-    return { id: n.id, screen: view.screens.get(n.id)?.join(", ") ?? n.screen, place, limit: limit.has(n.id), line: shape ? `${describe(n.node)} · ${shape}` : describe(n.node) };
+    const pages = view.screens.get(n.id) ?? [n.screen].filter(Boolean);
+    return { id: n.id, screen: pages.join(", "), pages, place, limit: limit.has(n.id), line: shape ? `${describe(n.node)} · ${shape}` : describe(n.node) };
   });
 }
 
 // The element an unmarked sentence means: Jev chooses among the candidates, and acts when it is
 // sure and its answer to "is it on the mockup at all?" does not say no. Otherwise the person picks
 // from Jev's three likeliest — with a note when Jev does not see the thing named. Returns an id,
-// or a reply (a question, or "there is no button"). `body(id)` is the answer a choice posts.
-async function choose(ctx, { op = null, verb, body }) {
+// or a reply (a question, or "there is no button"). `body(id)` is the answer a choice posts; `op`
+// is the edit (none for a rewrite, which the person reads as "change").
+async function choose(ctx, { op = null, body }) {
   const { d, utterance } = ctx;
   if (d.kind === "screen") {
     const s = pickScreen(ctx);
     return typeof s === "string" ? screenList().find((x) => x.text === s).id : s;
   }
   const pool = candidates(d.kind, op);
-  const what = { text: "text like that", button: "button", input: "field", picture: "picture or shape", group: "group like that", table: "table", chart: "chart" }[d.kind] ?? "element like that";
   if (!pool.length) {
-    note({ op: "target", note: `no ${what} on the mockup`, source: `jev · kind ${d.kind} ${d.kindConfidence.toFixed(2)}`, said: utterance, refused: true });
-    return { note: `there is no ${what} on the mockup — nothing changed`, changed: false };
+    note({ op: "target", note: `no ${d.kind} on the mockup`, source: `jev · kind ${d.kind} ${d.kindConfidence.toFixed(2)}`, said: utterance, refused: true });
+    return { note: W.reply.noSuch(d.kind), changed: false };
   }
   const w = pool.length === 1 ? { id: pool[0].id, confidence: 1, ranked: [pool[0].id], ms: 0 } : await which({ utterance, pool, viewing: ctx.viewing, apiKey });
   const known = pool.some((n) => n.id === w.id);
@@ -306,9 +320,10 @@ async function choose(ctx, { op = null, verb, body }) {
   // The person is offered what the edit would change, before what is already as far as it goes.
   const ranked = w.ranked.map((id) => pool.find((n) => n.id === id));
   const top = [...ranked.filter((n) => !n.limit), ...ranked.filter((n) => n.limit)].slice(0, 3);
-  const lead = d.exists < 0.5 ? `I don't see that on the mockup — ${verb} one of these?` : `${verb} — which one?`;
-  return asking(lead,
-    [...top.map((n, i) => answer(`${i + 1} · ${n.line}${n.screen ? ` · ${n.screen}` : ""}`, body(n.id), i === 0 && d.exists >= 0.5)), cancel()],
+  const many = screenList().length > 1;
+  const named = W.distinct(root, top.map((n) => n.id));
+  return asking(W.ask.which(op ?? "change", { seen: d.exists >= 0.5 }),
+    [...top.map((n, i) => answer(W.ask.whichChoice(root, n.id, i, many ? n.pages : [], named[i]), body(n.id), i === 0 && d.exists >= 0.5)), cancel()],
     { pick: top.map((n) => n.id), keep: ctx });
 }
 
@@ -323,7 +338,7 @@ function applyEverywhere(op, target, arg) {
     const x = apply(tree, op, c.id, arg);
     if (x.changed) { tree = x.root; more += 1; }
   }
-  return more ? { ...r, root: tree, note: `${r.note} · and on ${more} other screen${more === 1 ? "" : "s"}, where it is shared` } : r;
+  return more ? { ...r, root: tree, copies: more, note: `${r.note} · and on ${more} other screen${more === 1 ? "" : "s"}, where it is shared` } : r;
 }
 
 // The patch that puts `text` at a place (tree.mjs placeAt), and at the same place in every other
@@ -347,56 +362,61 @@ function placeEverywhere(anchor, position, text) {
 // picked it, and for a removal that is their yes).
 function finishEdit(ctx, op, target, span, how, chosen = false) {
   const { utterance, d } = ctx;
-  if (!find(root, target) && op !== "clear") return { note: "that element is gone — say it again", changed: false };
+  if (!find(root, target) && op !== "clear") return { note: W.reply.gone, changed: false };
   // A move that names where it should end up is a placement, not one step.
   if ((op === "move_earlier" || op === "move_later") && d.dest >= FIRE) return { moveTo: target };
   if (op === "rename" && (!span || d.spanConfidence < ACT_SPAN)) return { escalate: "rename without clear new words", target };
   if (DESTRUCTIVE.has(op) && !chosen) {
-    return asking(`remove ${lineOf(target)}?`, [answer("yes, remove it", { kind: "apply", op, target, chosen: true }, true), cancel()], { pick: [target], keep: ctx });
+    return asking(W.ask.remove(root, target), [answer(W.ask.removeYes, { kind: "apply", op, target, chosen: true }, true), cancel()], { pick: [target], keep: ctx });
   }
+  // Named before the edit: a removed or renamed thing is not there to be named by its old words after.
+  const what = W.name(root, target);
+  const across = find(root, target)?.parent?.type === "row";
   const r = applyEverywhere(op, target, span);
   // "already bold" is an answer; "has no set width" is a job for the writer, who can set one.
   if (!r.changed && !r.limit) return { escalate: r.note, target };
   const entry = { note: r.note, op, conf: d.opConfidence, ms: d.ms, source: how, said: utterance, target };
   if (r.changed) commit(r.root, entry); else note({ ...entry, refused: true });
-  return { note: r.note, changed: r.changed, target };
+  const say = r.changed ? W.reply.edited(root, op, what, { copies: r.copies ?? 0, across, to: span }) : W.reply.limit(op, what);
+  return { note: say, changed: r.changed, target, debug: r.note };
 }
 
 // ---- the writer's jobs ---------------------------------------------------------------------
 async function writeJob(ctx) {
-  const { utterance, d, fallbackTarget, depth } = ctx;
-  if (!llmKey) return { note: "this needs writing, and there is no ANTHROPIC_API_KEY — start with --env", blocked: true };
-  const empty = !screenList().length;
-  // Jev's answer stands. Below its threshold the person says what kind of change it is.
-  const job = d.jobConfidence >= ACT_JOB ? d.job : null;
-
-  if (empty) {
-    if (job === "new_app") return build(ctx);
-    return asking(`the canvas is empty — start a new app from “${utterance}”?`, [answer("start a new app", { kind: "start" }, true), cancel()], { keep: ctx });
-  }
-  if (job === "new_app") {
-    return asking(`start a new app for “${utterance}”? it replaces “${root.text}” — undo brings it back`,
-      [answer("start a new app", { kind: "start" }, true), answer(`keep “${root.text}”`, { kind: "cancel" })], { keep: ctx });
-  }
+  const { d, fallbackTarget, depth, marked } = ctx;
+  if (!llmKey) return { note: W.reply.notSetUp, debug: "this needs writing, and there is no ANTHROPIC_API_KEY — start with --env", blocked: true };
+  // An empty canvas builds, whatever the sentence: there is nothing else it could be about and
+  // nothing to lose, so "start a new app?" has no decision behind it (plan §3B).
+  if (!screenList().length) return build(ctx);
+  // Jev's answer stands. Below its threshold the person says what kind of change it is — unless
+  // the thing it acts on is known already (the marked element the sentence points at, or the one
+  // an escalated edit was aimed at): then Jev's top answer is taken (plan §3B), when it is a change
+  // to this app. A new app from a sentence about one of its elements is not taken on a low score.
+  const known = fallbackTarget || (marked && d.points != null && d.points >= POINTS);
+  const job = d.jobConfidence >= ACT_JOB || (known && ["add", "rewrite", "several"].includes(d.job)) ? d.job : null;
+  // A new app on a full canvas replaces it, and the old one is offered back (build).
+  if (job === "new_app") return build(ctx);
   if (job === "add") return addPiece(ctx);
   if (job === "rewrite") return rewritePiece(ctx);
   if (job === "several") {
-    if (depth > 0) return { note: "that part is still several changes — say them one at a time", changed: false };
+    if (depth > 0) return { note: W.reply.tooMany, changed: false };
     return several(ctx);
   }
-  return asking("what kind of change is it?", [
-    answer("add something new to this app", { kind: "job", job: "add" }, true),
-    answer(fallbackTarget ? `change ${lineOf(fallbackTarget)}` : "change an element that is there", { kind: "job", job: "rewrite" }),
-    answer("several changes at once", { kind: "job", job: "several" }),
-    answer("start a new app", { kind: "start" }),
+  return asking(W.ask.job, [
+    answer(W.ask.jobAdd, { kind: "job", job: "add" }, true),
+    answer(W.ask.jobChange(root, fallbackTarget), { kind: "job", job: "rewrite" }),
+    answer(W.ask.jobSeveral, { kind: "job", job: "several" }),
+    answer(W.ask.jobNewApp, { kind: "start" }),
     cancel(),
   ], { keep: ctx });
 }
 
 // A new app, drawn line by line as the writer streams it onto an empty canvas. What it runs on is
-// Jev's answer when Jev is sure of it; otherwise the writer's.
+// Jev's answer when Jev is sure of it; otherwise the writer's. On a full canvas it replaces the app
+// there, which is offered back ("Bring back “Relay”") — until there is a project list to keep it in.
 async function build({ utterance, started, d }) {
   const before = root;
+  const was = screenList().length ? String(root.text ?? "") : null;
   past.push(before);
   const stream = new Stream();
   let screens = 0;
@@ -410,7 +430,7 @@ async function build({ utterance, started, d }) {
         if (/^\s*\/\//.test(line)) { replies.push(line.replace(/^\s*\/\/\s*/, "")); return; }
         const { node } = stream.push(line);
         root = stream.root;
-        if (node?.type === "screen") { screens += 1; log.push({ op: "screen", note: `screen "${node.text ?? ""}"`, source: WHO }); }
+        if (node?.type === "screen") { screens += 1; drawing = node.text ?? ""; log.push({ op: "screen", note: `screen "${node.text ?? ""}"`, source: WHO }); }
         announceSoon();
       },
     });
@@ -428,26 +448,34 @@ async function build({ utterance, started, d }) {
     announce();
     note({ op: "said", note: replies.join(" ") || `${WHO} wrote no screens`, source: WHO });
     note({ op: "done", note: `no build · ${secsSince(started)}`, source: "canvas" });
-    return { note: `${WHO}: ${replies.join(" ") || "no screens written"}`, changed: false };
+    return { note: replies.join(" ") || W.reply.wroteNothing, debug: `${WHO} wrote no screens`, changed: false };
   }
   const warn = stream.warnings.length ? ` · ${stream.warnings.length} parser warnings` : "";
   note({ op: "done", note: `built "${root.text}"${frame ? ` (${frame}, as Jev decided)` : ""}: ${screens} screens, ${index(root).length - 1} nodes from ${t.lines} lines (first at ${t.firstLineMs} ms, ${t.outputTokens} tokens) · ${secsSince(started)}${warn}`, source: "canvas" });
   for (const w of stream.warnings.slice(0, 5)) note({ op: "said", note: `parser: ${w}`, source: "tree" });
-  return { note: `built "${root.text}" · ${screens} screens · ${secsSince(started)}`, changed: true };
+  if (was != null) offer = [{ label: W.reply.bringBack(was), post: { path: "/undo", body: {} } }];
+  return { note: W.reply.built(root, screens) + (was != null ? ` ${W.reply.replaced(was)}` : ""), changed: true, offer, debug: `built in ${secsSince(started)}` };
 }
 
 // Which screen a sentence is about: the marked element's when it points at it, Jev's answer when
-// Jev is sure, and otherwise the person's choice among Jev's likeliest — a question, returned as is.
+// Jev is sure, the screen of the element it places something next to when Jev is sure of that
+// ("under the address" — the address is on one screen), and otherwise the person's choice among
+// Jev's likeliest — a question, returned as is. A move stays on its element's screen (`fallback`)
+// unless the sentence names another.
 function pickScreen(ctx, fallback = null) {
   const { d, marked, viewing } = ctx;
   if (marked && d.points != null && d.points >= POINTS) return screenOf(marked);
   const known = (n) => screenList().some((s) => s.text === n);
   if (d.screen && d.screenConfidence >= ACT_SCREEN && known(d.screen)) return d.screen;
   if (fallback && known(fallback)) return fallback;
+  if (d.anchorScreen && d.anchorConfidence >= ACT_SCREEN && known(d.anchorScreen)) {
+    note({ op: "place", note: `on ${d.anchorScreen}, where what it names is`, conf: d.anchorConfidence, source: `jev · screen of what it names ${d.anchorConfidence.toFixed(2)}`, said: ctx.utterance });
+    return d.anchorScreen;
+  }
   const top = Object.entries(d.screens ?? {}).sort((a, b) => b[1] - a[1]).map(([n]) => n).filter(known).slice(0, 3);
-  const offer = top.length ? top : screenList().slice(0, 3).map((s) => s.text);
-  return asking("which screen?", [
-    ...offer.map((n, i) => answer(`the ${n} screen${n === viewing ? " (the one you are looking at)" : ""}`, { kind: "screen", screen: n }, i === 0)),
+  const likely = top.length ? top : screenList().slice(0, 3).map((s) => s.text);
+  return asking(W.ask.page(root), [
+    ...likely.map((n, i) => answer(W.ask.pageChoice(root, n, viewing), { kind: "screen", screen: n }, i === 0)),
     cancel(),
   ], { keep: ctx });
 }
@@ -459,8 +487,8 @@ async function pickScreenGap(ctx, list) {
   note({ op: "place", note: `${list[p.index]?.text ?? "?"}`, conf: p.confidence, ms: p.ms, source: `jev · gap ${p.confidence.toFixed(2)} of ${list.length} · ${p.ms} ms`, said: ctx.utterance });
   if (p.index >= 0 && p.confidence >= ACT_GAP) return list[p.index];
   const top = p.ranked.slice(0, 3).map((i) => list[i]);
-  return asking("where should it go?",
-    [...top.map((g, i) => answer(`${i + 1} · ${g.text}`, { kind: "place", anchor: g.anchor, position: g.position, text: g.text }, i === 0)), cancel()],
+  return asking(W.ask.where,
+    [...top.map((g, i) => answer(W.ask.whereChoice(root, g, i), { kind: "place", anchor: g.anchor, position: g.position, text: g.text }, i === 0)), cancel()],
     { pick: top.map((g) => g.anchor), keep: ctx });
 }
 
@@ -474,7 +502,7 @@ async function pickScreenGap(ctx, list) {
 // element being moved. Returns a gap { anchor, position, text }, or a reply.
 async function pickGap(ctx, screenName, { markedLine = null, kind = "place", extra = {}, skip = new Set(), from = null } = {}) {
   const screen = screenList().find((s) => s.text === screenName);
-  if (!screen || (from && !find(root, from))) return { note: "that spot is gone — say it again", changed: false };
+  if (!screen || (from && !find(root, from))) return { note: W.reply.gone, changed: false };
   let opts = from ? spotsIn(root, from, skip) : partsOf(root, screen.id, skip);
   let first = !from, within = from, open = null;
   // A screen with no padded part at all has only its own gaps to offer.
@@ -504,11 +532,11 @@ async function pickGap(ctx, screenName, { markedLine = null, kind = "place", ext
       if (g) return g;
     }
     const top = s.ranked.slice(0, 3).map((i) => opts[i]);
-    return asking("where should it go?",
-      [...top.map((g, i) => answer(`${i + 1} · ${g.text}`, g.into ? { kind: `${kind}_in`, into: g.into, ...extra } : { kind, anchor: g.anchor, position: g.position, text: g.text, ...extra }, i === 0)), cancel()],
+    return asking(W.ask.where,
+      [...top.map((g, i) => answer(W.ask.whereChoice(root, g, i, skip), g.into ? { kind: `${kind}_in`, into: g.into, ...extra } : { kind, anchor: g.anchor, position: g.position, text: g.text, ...extra }, i === 0)), cancel()],
       { pick: top.map((g) => g.into ?? g.anchor), keep: ctx });
   }
-  return { note: `no place for it on ${screenName} — say where`, changed: false };
+  return { note: W.reply.noPlace(root, screenName), changed: false };
 }
 
 // A sentence that leaves the spot open, once its part is chosen: right after the element Jev says
@@ -535,9 +563,9 @@ async function addPiece(ctx, chosen = null, chosenScreen = null) {
     else if (d.whole <= WHOLE_LO) whole = false;
     else {
       const here = ctx.viewing ?? screenList()[0].text;
-      return asking("a new screen, or on a screen that is there?", [
-        answer("a new screen", { kind: "whole", whole: true }, d.whole >= 0.5),
-        answer(`on a screen that is there (you are looking at ${here})`, { kind: "whole", whole: false }, d.whole < 0.5),
+      return asking(W.ask.whole(root), [
+        answer(W.ask.wholeNew(root), { kind: "whole", whole: true }, d.whole >= 0.5),
+        answer(W.ask.wholeOn(root, here), { kind: "whole", whole: false }, d.whole < 0.5),
         cancel(),
       ], { keep: ctx });
     }
@@ -555,15 +583,15 @@ async function addPiece(ctx, chosen = null, chosenScreen = null) {
     }
     if (!gap.anchor) return gap;
   }
-  if (!find(root, gap.anchor)) return { note: "that spot is gone — say it again", changed: false };
+  if (!find(root, gap.anchor)) return { note: W.reply.gone, changed: false };
   let w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, apiKey: llmKey, model: LLM });
   // The piece must be the shape Jev decided on. Once more with the shape spelled out, and then no.
   if (wrongShape(w.text, whole)) w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, retry: true, apiKey: llmKey, model: LLM });
   if (wrongShape(w.text, whole)) {
     note({ op: "said", note: `${WHO} wrote ${whole ? "no screen line" : "a whole screen"} twice — nothing changed`, source: "canvas", refused: true });
-    return { note: `the writer did not write ${whole ? "a screen" : "a piece for a screen"} — nothing changed; say it again`, changed: false };
+    return { note: W.reply.missed, debug: `the writer did not write ${whole ? "a screen" : "a piece for a screen"}`, changed: false };
   }
-  return landPiece(next, w, placeEverywhere(gap.anchor, gap.position, w.text), `added ${gap.text}`);
+  return landPiece(next, w, placeEverywhere(gap.anchor, gap.position, w.text), { debug: `added ${gap.text}`, where: W.place(root, gap) });
 }
 
 // A piece written as a whole screen starts with a screen line; one for an existing screen has none.
@@ -580,10 +608,10 @@ function wrongShape(text, whole) {
 async function rewritePiece(ctx, chosen = null) {
   const { utterance, marked, d, fallbackTarget } = ctx;
   const pointed = marked && d.points != null && d.points >= POINTS;
-  const target = chosen ?? (pointed ? marked : fallbackTarget ?? await choose(ctx, { verb: "change", body: (id) => ({ kind: "rewrite", target: id }) }));
+  const target = chosen ?? (pointed ? marked : fallbackTarget ?? await choose(ctx, { body: (id) => ({ kind: "rewrite", target: id }) }));
   if (typeof target !== "string") return target;
   const hit = find(root, target);
-  if (!hit) return { note: "that element is gone — say it again", changed: false };
+  if (!hit) return { note: W.reply.gone, changed: false };
   const isScreen = hit.node.type === "screen";
   const args = { utterance, outline: serialize(root, { ids: false }), replacing: serialize(hit.node, { ids: false }), screen: isScreen, apiKey: llmKey, model: LLM };
   let w = await writePiece(args);
@@ -593,9 +621,9 @@ async function rewritePiece(ctx, chosen = null) {
   let text = w.text;
   if (isScreen && wrongShape(text, true)) text = `screen "${String(hit.node.text ?? "").replace(/"/g, "'")}"\n` + text.split("\n").map((l) => (l.trim() ? "  " + l : l)).join("\n");
   if (!isScreen && wrongShape(text, false)) {
-    return { note: "the writer wrote a whole screen for one element — nothing changed; say it again", changed: false };
+    return { note: W.reply.missed, debug: "the writer wrote a whole screen for one element", changed: false };
   }
-  return landPiece(ctx, { ...w, text }, placeEverywhere(target, "replace", text), `rewrote ${lineOf(target)}`);
+  return landPiece(ctx, { ...w, text }, placeEverywhere(target, "replace", text), { debug: `rewrote ${lineOf(target)}`, changed: W.name(root, target) });
 }
 
 // A move to a place the sentence names: Jev picks the place on the element's screen (top down, as
@@ -604,7 +632,7 @@ async function rewritePiece(ctx, chosen = null) {
 // ("move it to the top" for the first item of a column) is said, not done.
 async function movePiece(ctx, target, chosen = null, chosenScreen = null) {
   const hit = find(root, target);
-  if (!hit) return { note: "that element is gone — say it again", changed: false };
+  if (!hit) return { note: W.reply.gone, changed: false };
   let gap = chosen;
   if (!gap) {
     const screenName = ctx.from ? screenOf(ctx.from) : chosenScreen ?? pickScreen(ctx, screenOf(target));
@@ -618,32 +646,38 @@ async function movePiece(ctx, target, chosen = null, chosenScreen = null) {
   }
   const text = serialize(hit.node);
   const without = applyPatch(root, `remove ${target}\n`).root;
-  if (!find(without, gap.anchor)) return { note: "that spot is gone — say it again", changed: false };
+  if (!find(without, gap.anchor)) return { note: W.reply.gone, changed: false };
   const r = applyPatch(without, placeAt(without, gap.anchor, gap.position, text));
+  const what = W.name(root, target);
   if (serialize(r.root) === serialize(root)) {
     note({ op: "move", note: `${lineOf(target)} is already ${gap.text}`, said: ctx.utterance, target, source: "jev · where it goes", refused: true });
-    return { note: `${lineOf(target)} is already there — nothing moved`, changed: false };
+    return { note: W.reply.alreadyThere(what), changed: false };
   }
+  const to = W.place(root, gap, new Set([target]));
   commit(r.root, { op: "move", note: `moved ${lineOf(target)} ${gap.text}`, said: ctx.utterance, target, source: "jev · where it goes" });
   note({ op: "done", note: `moved · ${secsSince(ctx.started)}`, source: "canvas" });
-  return { note: `moved ${gap.text}`, changed: true };
+  return { note: W.reply.moved(what, to), changed: true, debug: `moved ${gap.text}` };
 }
 
-// Put a written piece where it was decided, or say why not.
-function landPiece({ utterance, started }, w, placed, what) {
+// Put a written piece where it was decided, or say why not. The person reads what was added and
+// where (`where`, in words.mjs's words), or what was changed (`changed`, its name before).
+function landPiece({ utterance, started }, w, placed, { debug, where = null, changed = null }) {
   const patch = placed?.patch ?? null;
-  if (placed?.copies) what += ` · and on ${placed.copies} other screen${placed.copies === 1 ? "" : "s"}, where it is shared`;
+  const copies = placed?.copies ?? 0;
+  if (copies) debug += ` · and on ${copies} other screen${copies === 1 ? "" : "s"}, where it is shared`;
   if (!patch || /^\s*\/\//.test(w.text)) {
-    const said = w.text.replace(/^\s*\/\/\s*/gm, "").trim() || `${WHO} wrote nothing`;
-    note({ op: "said", note: said, source: WHO });
+    // The writer answered in words instead of writing a piece; the person reads its words.
+    const said = w.text.replace(/^\s*\/\/\s*/gm, "").trim();
+    note({ op: "said", note: said || `${WHO} wrote nothing`, source: WHO });
     note({ op: "done", note: `no change · ${secsSince(started)}`, source: "canvas" });
-    return { note: `${WHO}: ${said}`, changed: false };
+    return { note: said || W.reply.wroteNothing, changed: false };
   }
+  const say = changed != null ? W.reply.changed(root, changed, copies) : W.reply.added(root, W.pieceName(root, w.text), where, copies);
   const r = applyPatch(root, patch);
-  commit(r.root, { op: "piece", note: `${what} (${w.lines} lines from ${WHO}, ${w.ms} ms)`, said: utterance, source: `${WHO} → tree` });
+  commit(r.root, { op: "piece", note: `${debug} (${w.lines} lines from ${WHO}, ${w.ms} ms)`, said: utterance, source: `${WHO} → tree` });
   for (const x of r.warnings.slice(0, 5)) note({ op: "said", note: `parser: ${x}`, source: "tree", refused: true });
-  note({ op: "done", note: `${what} · ${secsSince(started)}`, source: "canvas" });
-  return { note: what, changed: true };
+  note({ op: "done", note: `${debug} · ${secsSince(started)}`, source: "canvas" });
+  return { note: say, changed: true, debug };
 }
 
 // Several changes: the writer cuts the sentence into single changes, keeping the person's own
@@ -652,7 +686,7 @@ function landPiece({ utterance, started }, w, placed, what) {
 async function several(ctx) {
   const s = await split({ utterance: ctx.utterance, marked: Boolean(ctx.marked), apiKey: llmKey, model: LLM });
   note({ op: "split", note: s.parts.join(" / "), source: `${WHO} · ${s.parts.length} parts · ${s.ms} ms`, said: ctx.utterance });
-  if (!s.parts.length) return { note: "the writer found no changes in that", changed: false };
+  if (!s.parts.length) return { note: W.reply.noChanges, changed: false };
   return runParts({ ctx, parts: s.parts, done: [], waiting: [], dropped: [] });
 }
 
@@ -696,7 +730,7 @@ async function nextPart(rest) {
   while (waiting.length) {
     const w = waiting.shift();
     const left = waiting.length;
-    const more = left ? ` — ${left} more ${left === 1 ? "part waits" : "parts wait"} for this answer` : "";
+    const more = left ? W.reply.more(left) : "";
     const carry = { ctx, parts, done, waiting, dropped: [...dropped], current: w.i };
     if (w.asked) {
       pending = { ...w.asked.pending, rest: carry };
@@ -716,89 +750,101 @@ async function nextPart(rest) {
     }
     done.push(r);
   }
-  return { note: done.map((r) => r.note).join(" · ") || "nothing changed", changed: changed() };
+  return { note: done.map((r) => r.note).join(" ") || W.reply.nothingChanged, changed: changed() };
 }
 
 // The person's answer to a question the canvas asked.
 async function onAnswer(body) {
   if (busy) {
     // Too soon: the question stays up, under the text box, to be answered when this finishes.
-    return { note: `still working on "${busy}" — answer when it finishes`, changed: false, ...(question ?? {}) };
+    return { note: W.reply.busyAnswer(busy), changed: false, ...(question ?? {}) };
   }
   if (!pending || body.q !== pending.q) {
     settle();
-    return { note: "that question has gone — say it again", changed: false, choices: [] };
+    return { note: W.reply.stale, changed: false, choices: [] };
   }
+  // What the person picked, in the words they were offered, for the history they read.
+  const picked = question?.choices.find((c) => JSON.stringify(c.post.body) === JSON.stringify(body))?.label ?? null;
+  const human = (text) => note({ op: "human", note: text, source: "you", ...(picked ? { say: picked } : {}) });
   const ctx = pending;
   const rest = ctx.rest ?? null;
   settle();
+  offer = null;
   if (body.kind === "cancel") {
-    note({ op: "human", note: "left as it is", source: "you" });
-    if (!rest) return { note: "left as it is", changed: false };
+    human("left as it is");
+    if (!rest) { const r = { note: W.reply.left, changed: false }; said(r); return r; }
   }
   busy = ctx.utterance ?? body.kind;
   const next = { ...ctx, started: Date.now() };
+  let r;
   try {
-    let r;
-    if (body.kind === "cancel") {
-      // A part of a split sentence the person left: the other waiting parts are still theirs to
-      // settle, and a part that needed this one is left with it.
-      return await nextPart({ ...rest, dropped: [...(rest.dropped ?? []), rest.current] });
-    } else if (body.kind === "apply") {
-      note({ op: "human", note: body.target ? `you chose ${lineOf(body.target)}` : "you said yes", source: "you" });
-      r = body.op === "clear" ? clearAll(next) : finishEdit(next, body.op, body.target, body.span ?? null, "jev's edit · your choice", true);
-      if (r.moveTo) r = await movePiece(next, r.moveTo);
-      else if (r.escalate) r = await writeJob({ ...next, fallbackTarget: r.target ?? null });
-    } else if (body.kind === "proceed") {
-      note({ op: "human", note: "you said: change the mockup", source: "you" });
-      r = await proceed(next, next.d.route !== "none" ? next.d.route : "write", "your answer");
-    } else if (body.kind === "start") {
-      note({ op: "human", note: "you chose: start a new app", source: "you" });
-      r = await build(next);
-    } else if (body.kind === "whole") {
-      note({ op: "human", note: body.whole ? "you chose: a new screen" : "you chose: on a screen that is there", source: "you" });
-      r = await addPiece({ ...next, whole: body.whole });
-    } else if (body.kind === "screen") {
-      note({ op: "human", note: `you chose the ${body.screen} screen`, source: "you" });
-      r = next.moving ? await movePiece(next, next.moving, null, body.screen) : await addPiece(next, null, body.screen);
-    } else if (body.kind === "place") {
-      note({ op: "human", note: `you chose: ${body.text}`, source: "you" });
-      r = await addPiece(next, { anchor: body.anchor, position: body.position, text: body.text });
-    } else if (body.kind === "place_in") {
-      note({ op: "human", note: `you chose: somewhere in ${lineOf(body.into)}`, source: "you" });
-      r = await addPiece({ ...next, from: body.into });
-    } else if (body.kind === "move") {
-      note({ op: "human", note: `you chose: ${body.text}`, source: "you" });
-      r = await movePiece(next, body.target, { anchor: body.anchor, position: body.position, text: body.text });
-    } else if (body.kind === "move_in") {
-      note({ op: "human", note: `you chose: somewhere in ${lineOf(body.into)}`, source: "you" });
-      r = await movePiece({ ...next, from: body.into }, body.target);
-    } else if (body.kind === "rewrite") {
-      note({ op: "human", note: `you chose ${lineOf(body.target)}`, source: "you" });
-      r = await rewritePiece(next, body.target);
-    } else if (body.kind === "job") {
-      note({ op: "human", note: `you chose: ${body.job}`, source: "you" });
-      r = await writeJob({ ...next, d: { ...next.d, job: body.job, jobConfidence: 1 } });
-    } else {
-      return { note: `unknown answer ${body.kind}`, changed: false };
-    }
-    // The parts of a split sentence that were waiting on this answer carry on now.
-    if (rest && !r.choices) return await nextPart({ ...rest, done: [...rest.done, r] });
-    if (rest && r.choices && pending) pending.rest = rest;
-    return r;
+    r = await answered(body, next, rest, human);
   } catch (e) {
     note({ note: `error: ${e.message}`, op: "done", source: "canvas", refused: true });
-    return { note: `error: ${e.message}`, changed: false, error: true };
+    r = { note: W.reply.error, debug: e.message, changed: false, error: true };
   } finally {
     busy = null;
+    drawing = null;
   }
+  said(r);
+  return r;
+}
+
+async function answered(body, next, rest, human) {
+  let r;
+  if (body.kind === "cancel") {
+    // A part of a split sentence the person left: the other waiting parts are still theirs to
+    // settle, and a part that needed this one is left with it.
+    return await nextPart({ ...rest, dropped: [...(rest.dropped ?? []), rest.current] });
+  } else if (body.kind === "apply") {
+    human(body.target ? `you chose ${lineOf(body.target)}` : "you said yes");
+    r = body.op === "clear" ? clearAll(next) : finishEdit(next, body.op, body.target, body.span ?? null, "jev's edit · your choice", true);
+    if (r.moveTo) r = await movePiece(next, r.moveTo);
+    else if (r.escalate) r = await writeJob({ ...next, fallbackTarget: r.target ?? null });
+  } else if (body.kind === "proceed") {
+    human("you said: change the mockup");
+    r = await proceed(next, next.d.route !== "none" ? next.d.route : "write", "your answer");
+  } else if (body.kind === "start") {
+    human("you chose: start a new app");
+    r = await build(next);
+  } else if (body.kind === "whole") {
+    human(body.whole ? "you chose: a new screen" : "you chose: on a screen that is there");
+    r = await addPiece({ ...next, whole: body.whole });
+  } else if (body.kind === "screen") {
+    human(`you chose the ${body.screen} screen`);
+    r = next.moving ? await movePiece(next, next.moving, null, body.screen) : await addPiece(next, null, body.screen);
+  } else if (body.kind === "place") {
+    human(`you chose: ${body.text}`);
+    r = await addPiece(next, { anchor: body.anchor, position: body.position, text: body.text });
+  } else if (body.kind === "place_in") {
+    human(`you chose: somewhere in ${lineOf(body.into)}`);
+    r = await addPiece({ ...next, from: body.into });
+  } else if (body.kind === "move") {
+    human(`you chose: ${body.text}`);
+    r = await movePiece(next, body.target, { anchor: body.anchor, position: body.position, text: body.text });
+  } else if (body.kind === "move_in") {
+    human(`you chose: somewhere in ${lineOf(body.into)}`);
+    r = await movePiece({ ...next, from: body.into }, body.target);
+  } else if (body.kind === "rewrite") {
+    human(`you chose ${lineOf(body.target)}`);
+    r = await rewritePiece(next, body.target);
+  } else if (body.kind === "job") {
+    human(`you chose: ${body.job}`);
+    r = await writeJob({ ...next, d: { ...next.d, job: body.job, jobConfidence: 1 } });
+  } else {
+    return { note: W.reply.stale, debug: `unknown answer ${body.kind}`, changed: false };
+  }
+  // The parts of a split sentence that were waiting on this answer carry on now.
+  if (rest && !r.choices) return await nextPart({ ...rest, done: [...rest.done, r] });
+  if (rest && r.choices && pending) pending.rest = rest;
+  return r;
 }
 
 function clearAll(ctx) {
   const r = apply(root, "clear", null);
   if (r.changed) commit(r.root, { note: r.note, op: "clear", source: "jev's edit · your yes", said: ctx.utterance });
   else note({ note: r.note, op: "clear", refused: true });
-  return { note: r.note, changed: r.changed };
+  return { note: r.changed ? W.reply.edited(root, "clear") : W.reply.limit("clear", W.name(root, root.id)), changed: r.changed, debug: r.note };
 }
 
 // ---- http --------------------------------------------------------------------------------
@@ -847,7 +893,9 @@ createServer(async (req, res) => {
   try {
     if (url.pathname === "/") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
-      return res.end(readFileSync(join(HERE, "shell.html"), "utf8"));
+      // The page's own words ({{placeholder}} and the rest) are words.mjs's, like everything else.
+      const escHtml = (t) => String(t).replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+      return res.end(readFileSync(join(HERE, "shell.html"), "utf8").replace(/\{\{(\w+)\}\}/g, (m, k) => (Object.hasOwn(W.ui, k) ? escHtml(W.ui[k]) : m)));
     }
     if (url.pathname === "/mock") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
@@ -863,23 +911,43 @@ createServer(async (req, res) => {
       return;
     }
     if (url.pathname === "/state") {
-      const els = nodes().map((n) => ({ key: n.id, id: n.id, screen: n.screen, kind: n.type, tier: "", text: n.line }));
-      return json(res, { title: root.text ?? "mock", elements: els, screens: screenList().length, log, busy, question, jev: Boolean(apiKey), llm: llmKey ? LLM : null, canUndo: past.length > 0, out: OUT });
+      // `text` (the engine's line) and `kind` stay for trial/eval; the page shows `selected`.
+      const els = nodes().map((n) => ({ key: n.id, id: n.id, screen: n.screen, kind: n.type, tier: "", text: n.line, selected: W.selected(root, n.id) }));
+      return json(res, {
+        title: root.text ?? "mock", heading: screenList().length ? root.text ?? W.ui.title : W.ui.title, status: W.status(root),
+        elements: els, screens: screenList().length, log, busy, working: busy ? W.working(root, busy, drawing) : null,
+        question, offer, jev: Boolean(apiKey), llm: llmKey ? LLM : null, canUndo: past.length > 0, out: OUT,
+      });
     }
     if (url.pathname === "/ask" && req.method === "POST") return json(res, await ask(await body(req)));
     if (url.pathname === "/answer" && req.method === "POST") return json(res, await onAnswer(await body(req)));
     if (url.pathname === "/undo" && req.method === "POST") {
-      if (busy) return json(res, { note: `still working on "${busy}" — undo when it finishes`, changed: false });
-      if (!past.length) return json(res, { note: "nothing to undo", changed: false });
+      if (busy) return json(res, { note: W.reply.busy(busy), changed: false });
+      if (!past.length) return json(res, { note: W.reply.nothingToUndo, changed: false });
       settle();
+      offer = null;
       root = past.pop();
-      log.push({ note: "undone", op: "undo", source: "you" });
+      log.push({ note: "undone", op: "undo", source: "you", say: W.reply.undone });
       announce();
-      return json(res, { note: "undone", changed: true, choices: [] });
+      return json(res, { note: W.reply.undone, changed: true, choices: [] });
+    }
+    // Start again on an empty canvas; the app that was there is one click away, as after a new app
+    // replaced it. A project list keeps it for good (plan phase 3).
+    if (url.pathname === "/new" && req.method === "POST") {
+      if (busy) return json(res, { note: W.reply.busy(busy), changed: false });
+      if (!screenList().length) return json(res, { note: W.reply.started(null), changed: false, choices: [] });
+      const was = String(root.text ?? "");
+      settle();
+      past.push(root);
+      root = blank();
+      offer = [{ label: W.reply.bringBack(was), post: { path: "/undo", body: {} } }];
+      log.push({ note: "new — the canvas emptied", op: "new", source: "you", say: W.reply.started(was) });
+      announce();
+      return json(res, { note: W.reply.started(was), changed: true, choices: [], offer });
     }
     if (url.pathname === "/save" && req.method === "POST") {
       writeFileSync(resolve(OUT), serialize(root));
-      return json(res, { note: `saved ${OUT}`, changed: false });
+      return json(res, { note: W.reply.saved(OUT), changed: false });
     }
     if (url.pathname === "/spec") {
       res.writeHead(200, { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" });
@@ -887,7 +955,7 @@ createServer(async (req, res) => {
     }
     res.writeHead(404).end("not found");
   } catch (e) {
-    json(res, { note: `error: ${e.message}`, changed: false, error: true }, 500);
+    json(res, { note: W.reply.error, debug: e.message, changed: false, error: true }, 500);
   }
 }).listen(PORT, () => {
   console.error(`trial: http://localhost:${PORT}  ·  jev ${apiKey ? "on" : "off (no key)"}  ·  writer ${llmKey ? LLM : "off (no key)"}  ·  save → ${OUT}`);

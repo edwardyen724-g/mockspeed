@@ -9,8 +9,9 @@
 // find an element nobody marked, act on a marked one, remove, place a new piece, a whole screen,
 // rewrite "the main list", split two changes, move to a named place, a quoted screen name, and a
 // question that should change nothing. Where the app asks the person, this script plays the person
-// for the two answers a test needs — "start a new app" and "yes, remove it" — and records every
-// other question ("which one?", "where should it go?") as asked, then leaves it.
+// for the answers a test needs — "yes, remove it", and "start a new app" from servers before
+// 2026-09-26 (a new app now replaces the canvas without asking, and offers the old one back) — and
+// records every other question ("which one?", "where should it go?") as asked, then leaves it.
 //
 // Writes <out-dir>/results.json (every step with its slice of the app's log: Jev's route, job,
 // screen and gap decisions with confidences, questions, answers, what changed) and each app's
@@ -50,7 +51,7 @@ for (const key of Object.keys(prompts)) {
     // Answer the questions a test needs answered, as the person would; record the rest.
     while (r.choices?.length) {
       const start = r.choices.find((c) => c.post.body.kind === "start");
-      const yes = r.choices.find((c) => c.post.body.kind === "apply" && /^yes/.test(c.label));
+      const yes = r.choices.find((c) => c.post.body.kind === "apply" && /^yes/i.test(c.label));
       asked.push({ question: r.note, options: r.choices.map((c) => c.label) });
       const pick = start ?? yes;
       if (!pick) {
@@ -68,7 +69,7 @@ for (const key of Object.keys(prompts)) {
     const log = at >= 0 ? all.slice(at) : [];
     // Jev's decisions in the step: routes (and whether a split part waits), elements, places.
     const jev = log.filter((e) => ["route", "target", "place"].includes(e.op) && /^jev/.test(e.source ?? "")).length;
-    steps.push({ kind, sentence, marked, reply: r.note, changed: Boolean(r.changed), asked, human, jev, ms, log });
+    steps.push({ kind, sentence, marked, reply: r.note, ...(r.debug ? { debug: r.debug } : {}), changed: Boolean(r.changed), asked, human, jev, ms, log });
     return r;
   }
 

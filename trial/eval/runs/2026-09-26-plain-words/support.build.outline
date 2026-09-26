@@ -1,0 +1,85 @@
+app #n1 "Support" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Inbox" bold
+        text #n6 "Open" bold shade=dark
+        text #n7 "Resolved" shade=mid
+        text #n8 "Snoozed" shade=mid
+      col #n9 grow pad=3 gap=3
+        row #n10 justify=between align=center
+          text #n11 "Conversations" size=l bold
+          button #n12 "New" primary
+        col #n13 grow gap=2
+          row #n14 border pad=2 gap=2 align=center
+            shape #n15 circle w=10 h=10 fill=dark
+            col #n16 grow
+              text #n17 "Elena Rodriguez" bold data
+              text #n18 "My invoice won't load" shade=mid size=s data
+            text #n19 "2m" shade=mid size=s data
+          row #n20 border pad=2 gap=2 align=center
+            shape #n21 circle w=10 h=10 fill=dark
+            col #n22 grow
+              text #n23 "James Chen" bold data
+              text #n24 "Password reset not working" shade=mid size=s data
+            text #n25 "14m" shade=mid size=s data
+          row #n26 border pad=2 gap=2 align=center
+            shape #n27 circle w=10 h=10 fill=mid
+            col #n28 grow
+              text #n29 "Sofia Bergstrom" bold data
+              text #n30 "Subscription cancellation" shade=mid size=s data
+            text #n31 "3h" shade=mid size=s data
+  screen #n32 "Conversation"
+    row #n33 h=fill
+      col #n34 share=nav w=200 fill=light pad=3 gap=2
+        text #n35 "Inbox" bold
+        text #n36 "Open" bold shade=dark
+        text #n37 "Resolved" shade=mid
+        text #n38 "Snoozed" shade=mid
+      col #n39 grow pad=3 gap=2 fill=light
+        row #n40 justify=between align=center
+          text #n41 "Elena Rodriguez" size=l bold
+          button #n42 "Resolve" primary
+        col #n43 grow gap=2
+          row #n44 gap=2
+            shape #n45 circle w=32 h=32
+            col #n46
+              text #n47 "Elena Rodriguez" size=s bold
+              text #n48 "2:14 PM" size=xs shade=mid
+          text #n49 "Hi, when I try to open my invoice from last month it just shows a blank page. I've tried on Chrome and Firefox." size=m data
+          row #n50 gap=2
+            shape #n51 circle w=32 h=32
+            col #n52
+              text #n53 "Marcus (You)" size=s bold
+              text #n54 "2:16 PM" size=xs shade=mid
+          text #n55 "Hi Elena, thanks for reporting this. Can you confirm your account email?" size=m data
+          row #n56 gap=2
+            shape #n57 circle w=32 h=32
+            col #n58
+              text #n59 "Elena Rodriguez" size=s bold
+              text #n60 "2:18 PM" size=xs shade=mid
+          text #n61 "Sure, it's e.rodriguez@acmeco.com" size=m data
+          row #n62 gap=2
+            shape #n63 circle w=32 h=32
+            col #n64
+              text #n65 "Marcus (You)" size=s bold
+              text #n66 "2:19 PM" size=xs shade=mid
+          text #n67 "Perfect, I found the issue. It's now fixed on our end. Please try again." size=m data
+      col #n68 w=280 fill=mid pad=3 gap=3 border
+        text #n69 "Customer" bold
+        col #n70 gap=2
+          text #n71 "Elena Rodriguez" size=s bold data
+          text #n72 "e.rodriguez@acmeco.com" size=xs shade=light data
+        line #n73
+        text #n74 "Account" bold size=s
+        col #n75 gap=1 size=xs shade=light
+          text #n76 "Status: Active" data
+          text #n77 "Joined: Jan 15, 2023" data
+          text #n78 "Plan: Professional" data
+          text #n79 "MRR: $99/mo" data
+        line #n80
+        text #n81 "History" bold size=s
+        col #n82 gap=1 size=xs shade=light
+          text #n83 "3 tickets this month" data
+          text #n84 "Avg response: 2h" data
+          text #n85 "Last contact: 1d ago" data

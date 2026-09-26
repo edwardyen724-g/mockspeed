@@ -1,0 +1,191 @@
+app #n1 "Meals" phone
+  screen #n2 "Home"
+    row #n3 h=60 pad=3 align=center justify=between fill=light share=header
+      text #n4 "Meals" bold size=xxl
+      shape #n5 circle w=40 h=40
+    col #n6 grow gap=3 pad=3
+      row #n7 gap=2 align=center
+        shape #n8 circle w=32 h=32
+        col #n9 gap=1 grow
+          text #n10 "Tonight's Dinner" bold
+          text #n11 "Lemon pasta" shade=mid size=s
+      row #n12 gap=2 align=center
+        shape #n13 circle w=32 h=32
+        col #n14 gap=1 grow
+          text #n15 "Tomorrow" bold
+          text #n16 "Grilled salmon" shade=mid size=s
+      row #n17 gap=2 align=center
+        shape #n18 circle w=32 h=32
+        col #n19 gap=1 grow
+          text #n20 "This week" bold
+          text #n21 "5 meals planned" shade=mid size=s
+      line #n22
+      text #n23 "This Week" bold pad=2
+      col #n24 gap=2
+        col #n25 border pad=2 gap=1
+          text #n26 "Monday" bold size=s
+          text #n27 "Chicken stir-fry" shade=mid size=s
+        col #n28 border pad=2 gap=1
+          text #n29 "Tuesday" bold size=s
+          text #n30 "Pasta carbonara" shade=mid size=s
+        col #n31 border pad=2 gap=1
+          text #n32 "Wednesday" bold size=s
+          text #n33 "Fish tacos" shade=mid size=s
+        col #n34 border pad=2 gap=1
+          text #n35 "Thursday" bold size=s
+          text #n36 "Beef curry" shade=mid size=s
+    row #n37 h=60 pad=2 justify=between align=center fill=mid border share=tabs
+      text #n38 "Home" bold
+      text #n39 "Plan" shade=mid
+      text #n40 "Recipes" shade=mid
+      text #n41 "List" shade=mid
+  screen #n42 "Recipes"
+    row #n43 h=60 pad=3 align=center justify=between fill=light share=header
+      text #n44 "Meals" bold size=xxl
+      shape #n45 circle w=40 h=40
+    col #n46 grow gap=3 pad=3
+      input #n47 "Search recipes" search
+      col #n48 gap=2
+        col #n49 border pad=3 gap=2
+          shape #n50 w=fill h=120
+          text #n51 "Lemon Pasta" bold
+          text #n52 "30 min • 4 servings" shade=mid size=s
+        col #n53 border pad=3 gap=2
+          shape #n54 w=fill h=120
+          text #n55 "Grilled Salmon" bold
+          text #n56 "25 min • 2 servings" shade=mid size=s
+        col #n57 border pad=3 gap=2
+          shape #n58 w=fill h=120
+          text #n59 "Pad Thai" bold
+          text #n60 "20 min • 2 servings" shade=mid size=s
+        col #n61 border pad=3 gap=2
+          shape #n62 w=fill h=120
+          text #n63 "Chocolate Cake" bold
+          text #n64 "45 min • 8 servings" shade=mid size=s
+    row #n65 h=60 pad=2 justify=between align=center fill=mid border share=tabs
+      text #n66 "Home" shade=mid
+      text #n67 "Plan" shade=mid
+      text #n68 "Recipes" bold
+      text #n69 "List" shade=mid
+  screen #n70 "Meal Plan"
+    row #n71 h=60 pad=3 align=center justify=between fill=light share=header
+      text #n72 "Meals" bold size=xxl
+      shape #n73 circle w=40 h=40
+    col #n74 grow gap=3 pad=3
+      row #n75 gap=2 justify=between
+        text #n76 "Week of Jan 15" bold
+        button #n77 "Edit" ghost size=m
+      col #n78 gap=3
+        col #n79 gap=1
+          text #n80 "Monday" bold size=s shade=dark
+          col #n81 border pad=2 gap=1
+            text #n82 "Breakfast" bold size=s
+            text #n83 "Scrambled eggs" shade=mid size=xs
+          col #n84 border pad=2 gap=1
+            text #n85 "Lunch" bold size=s
+            text #n86 "Caesar salad" shade=mid size=xs
+          col #n87 border pad=2 gap=1
+            text #n88 "Dinner" bold size=s
+            text #n89 "Chicken stir-fry" shade=mid size=xs
+        col #n90 gap=1
+          text #n91 "Tuesday" bold size=s shade=dark
+          col #n92 border pad=2 gap=1
+            text #n93 "Breakfast" bold size=s
+            text #n94 "Oatmeal" shade=mid size=xs
+          col #n95 border pad=2 gap=1
+            text #n96 "Lunch" bold size=s
+            text #n97 "Tuna sandwich" shade=mid size=xs
+          col #n98 border pad=2 gap=1
+            text #n99 "Dinner" bold size=s
+            text #n100 "Pasta carbonara" shade=mid size=xs
+      button #n101 "Generate Shopping List" primary w=fill
+    row #n102 h=60 pad=2 justify=between align=center fill=mid border share=tabs
+      text #n103 "Home" shade=mid
+      text #n104 "Plan" bold
+      text #n105 "Recipes" shade=mid
+      text #n106 "List" shade=mid
+  screen #n107 "Shopping List"
+    row #n108 h=60 pad=3 align=center justify=between fill=light share=header
+      text #n109 "Meals" bold size=xxl
+      shape #n110 circle w=40 h=40
+    col #n111 grow gap=2 pad=3
+      row #n112 gap=2 justify=between align=center
+        text #n113 "This Week's List" bold
+      col #n115 gap=2
+        col #n116 gap=1
+          text #n117 "Produce" bold size=s shade=dark
+          row #n118 gap=2 align=center pad=1
+            input #n119 "" check
+            text #n120 "Chicken breast" grow
+            text #n121 "1 lb" shade=mid size=s
+          row #n122 gap=2 align=center pad=1
+            input #n123 "" check
+            text #n124 "Salmon fillet" grow
+            text #n125 "1 lb" shade=mid size=s
+          row #n126 gap=2 align=center pad=1
+            input #n127 "" check
+            text #n128 "Pasta" grow
+            text #n129 "1 box" shade=mid size=s
+        col #n130 gap=1
+          text #n131 "Dairy" bold size=s shade=dark
+          row #n132 gap=2 align=center pad=1
+            input #n133 "" check
+            text #n134 "Eggs" grow
+            text #n135 "1 doz" shade=mid size=s
+          row #n136 gap=2 align=center pad=1
+            input #n137 "" check
+            text #n138 "Parmesan" grow
+            text #n139 "4 oz" shade=mid size=s
+        col #n140 gap=1
+          text #n141 "Pantry" bold size=s shade=dark
+          row #n142 gap=2 align=center pad=1
+            input #n143 "" check
+            text #n144 "Olive oil" grow
+            text #n145 "1 bottle" shade=mid size=s
+          row #n146 gap=2 align=center pad=1
+            input #n147 "" check
+            text #n148 "Garlic" grow
+            text #n149 "1 bulb" shade=mid size=s
+    row #n150 h=60 pad=2 justify=between align=center fill=mid border share=tabs
+      text #n151 "Home" shade=mid
+      text #n152 "Plan" shade=mid
+      text #n153 "Recipes" shade=mid
+      text #n154 "List" bold
+  screen #n155 "Settings"
+    row #n156 h=60 pad=3 align=center justify-between fill=light share=header
+      text #n157 "Meals" bold size=xxl
+      shape #n158 circle w=40 h=40
+    col #n159 grow gap=3 pad=3
+      col #n160 gap=1
+        text #n161 "Account" bold size=s shade=dark
+        row #n162 gap=2 justify=between align=center pad=2 border
+          text #n163 "Email"
+          text #n164 "alex@example.com" shade=mid size=s
+        row #n165 gap=2 justify=between align=center pad=2 border
+          text #n166 "Dietary preferences"
+          text #n167 "Vegetarian" shade=mid size=s
+      col #n168 gap=1
+        text #n169 "Notifications" bold size=s shade=dark
+        row #n170 gap=2 justify=between align=center pad=2 border
+          text #n171 "Meal reminders"
+          input #n172 "" toggle on
+        row #n173 gap=2 justify=between align=center pad=2 border
+          text #n174 "Shopping list alerts"
+          input #n175 "" toggle
+      col #n176 gap=1
+        text #n177 "App" bold size=s shade=dark
+        row #n178 gap=2 justify=between align=center pad=2 border
+          text #n179 "Version"
+          text #n180 "1.2.3" shade=mid size=s
+        row #n181 gap=2 justify=between align=center pad=2 border
+          text #n182 "Clear cache"
+          button #n183 "Clear" ghost size=m
+      button #n184 "Sign Out" ghost w=fill
+      col #n190 gap=1 pad=3 fill=light border
+        text #n191 "Note" bold size=s shade=dark
+        text #n192 "Changes to dietary preferences will update your meal recommendations." shade=mid size=s
+    row #n185 h=60 pad=2 justify=between align=center fill=mid border share=tabs
+      text #n186 "Home" shade=mid
+      text #n187 "Plan" shade=mid
+      text #n188 "Recipes" shade=mid
+      text #n189 "List" shade=mid

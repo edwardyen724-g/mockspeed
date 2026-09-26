@@ -1,0 +1,91 @@
+app #n1 "Studio" web
+  screen #n2 "Tracks"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Studio" bold
+        text #n6 "Tracks" bold
+        text #n7 "Mixer" shade=mid
+        text #n8 "Effects" shade=mid
+      col #n9 grow pad=3 gap=3
+        row #n10 gap=2 align=center
+          button #n11 "＋ Track" primary
+          button #n12 "Play" ghost
+          button #n13 "Stop" ghost
+          text #n14 "120 BPM" shade=mid
+        row #n15 h=fill gap=3
+          col #n16 w=120 gap=1 pad=2 fill=light border
+            text #n17 "Drums" size=s bold
+            text #n18 "Kit 808" size=xs shade=mid
+            line #n19
+            text #n20 "Piano" size=s bold
+            text #n21 "Grand" size=xs shade=mid
+            line #n22
+            text #n23 "Bass" size=s bold
+            text #n24 "Synth" size=xs shade=mid
+          col #n25 grow h=fill border gap=0
+            row #n26 h=60 gap=1 pad=1 align=center border
+              shape #n27 "waveform" w=800 h=50
+              text #n28 "0:00" size=xs shade=mid align=end
+            row #n29 h=60 gap=1 pad=1 align=center border
+              shape #n30 "waveform" w=600 h=50
+              text #n31 "0:15" size=xs shade=mid align=end
+            row #n32 h=60 gap=1 pad=1 align=center border
+              shape #n33 "waveform" w=700 h=50
+              text #n34 "0:08" size=xs shade=mid align=end
+  screen #n35 "Mixer"
+    row #n36 h=fill
+      col #n37 share=nav w=200 fill=light pad=3 gap=2
+        text #n38 "Studio" bold
+        text #n39 "Tracks" shade=mid
+        text #n40 "Mixer" bold
+        text #n41 "Effects" shade=mid
+      col #n42 grow pad=3 gap=4
+        text #n43 "Mixer" bold
+        row #n44 gap=6 h=fill
+          col #n45 gap=3 w=140
+            col #n46 gap=2 align=center
+              text #n47 "Drums" size=s bold
+              progress #n48 "" value=35
+              text #n49 "-12dB" size=xs shade=mid mono
+            col #n50 gap=2 align=center
+              text #n51 "Piano" size=s bold
+              progress #n52 "" value=65
+              text #n53 "-4dB" size=xs shade=mid mono
+            col #n54 gap=2 align=center
+              text #n55 "Bass" size=s bold
+              progress #n56 "" value=55
+              text #n57 "-8dB" size=xs shade=mid mono
+          col #n58 gap=3 w=140
+            col #n59 gap=2 align=center
+              text #n60 "Master" bold
+              progress #n61 "" value=75
+              text #n62 "-2dB" size=xs shade=mid mono
+              row #n63 gap=2 justify=center pad=2 border
+                shape #n64 "L" circle w=20 h=20
+                shape #n65 "R" circle w=20 h=20
+  screen #n66 "Effects"
+    row #n67 h=fill
+      col #n68 share=nav w=200 fill=light pad=3 gap=2
+        text #n69 "Studio" bold
+        text #n70 "Tracks" shade=mid
+        text #n71 "Mixer" shade=mid
+        text #n72 "Effects" bold
+      col #n73 grow pad=3 gap=3
+        text #n74 "Effects" bold
+        col #n75 gap=2 border pad=3
+          row #n76 justify=between align=center
+            text #n77 "Reverb" bold
+            button #n78 "×" ghost
+          text #n79 "Decay" size=s shade=mid
+          progress #n80 "" value=60
+          text #n81 "Wet" size=s shade=mid
+          progress #n82 "" value=40
+        col #n83 gap=2 border pad=3
+          row #n84 justify=between align=center
+            text #n85 "Delay" bold
+            button #n86 "×" ghost
+          text #n87 "Time" size=s shade=mid
+          progress #n88 "" value=50
+          text #n89 "Feedback" size=s shade=mid
+          progress #n90 "" value=35
+        button #n91 "＋ Add Effect" ghost w=fill

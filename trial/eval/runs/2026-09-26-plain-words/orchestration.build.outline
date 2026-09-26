@@ -1,0 +1,111 @@
+app #n1 "Agents" web
+  screen #n2 "Agents"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Agents" bold
+        text #n6 "Runs" shade=mid
+        text #n7 "Workflows" shade=mid
+        text #n8 "Logs" shade=mid
+      col #n9 grow pad=4 gap=4
+        row #n10 justify=between align=center
+          text #n11 "Active Agents" size=l bold
+          button #n12 "New Agent" primary
+        row #n13 gap=3 h=fill
+          graph #n14 dir=right h=fill
+            node #agent-1 "Email Handler" sub=processing
+            node #agent-2 "Data Validator" sub=idle
+            node #agent-3 "Notifier" sub=processing
+            node #agent-4 "Logger" sub=idle
+            edge #n15 agent-1 -> agent-2 "valid"
+            edge #n16 agent-2 -> agent-3 "notify"
+            edge #n17 agent-3 -> agent-4 "log"
+          col #n18 w=280 gap=2
+            col #n19 border pad=3 gap=2
+              row #n20 justify=between
+                text #n21 "Email Handler" bold
+                shape #n22 circle w=8 h=8 fill=dark
+              text #n23 "Tasks: 247" size=s shade=mid
+              text #n24 "Success: 98.2%" size=s shade=mid
+              progress #n25 "CPU" value=62
+              progress #n26 "Memory" value=45
+            col #n27 border pad=3 gap=2
+              row #n28 justify=between
+                text #n29 "Data Validator" bold
+                shape #n30 circle w=8 h=8 fill=mid
+              text #n31 "Tasks: 156" size=s shade=mid
+              text #n32 "Success: 100%" size=s shade=mid
+              progress #n33 "CPU" value=28
+              progress #n34 "Memory" value=31
+  screen #n35 "Runs"
+    row #n36 h=fill
+      col #n37 share=nav w=200 fill=light pad=3 gap=2
+        text #n38 "Agents" shade=mid
+        text #n39 "Runs" bold
+        text #n40 "Workflows" shade=mid
+        text #n41 "Logs" shade=mid
+      col #n42 grow pad=4 gap=3
+        text #n43 "Recent Runs" size=l bold
+        col #n44 gap=2
+          col #n45 border pad=3 gap=2
+            row #n46 justify=between align=center
+              text #n47 "Run #8042" bold
+              shape #n48 circle w=8 h=8 fill=dark data=completed
+            text #n49 "Email Pipeline" size=s shade=mid
+            row #n50 justify=between
+              text #n51 "Started 2m ago" size=s shade=mid
+              text #n52 "2,341 items" size=s shade=mid
+            progress #n53 "Process" value=100
+          col #n54 border pad=3 gap=2
+            row #n55 justify=between align=center
+              text #n56 "Run #8041" bold
+              shape #n57 circle w=8 h=8 fill=dark data=completed
+            text #n58 "Validation Flow" size=s shade=mid
+            row #n59 justify=between
+              text #n60 "Started 14m ago" size=s shade=mid
+              text #n61 "1,205 items" size=s shade=mid
+            progress #n62 "Process" value=100
+          col #n63 border pad=3 gap=2
+            row #n64 justify=between align=center
+              text #n65 "Run #8040" bold
+              shape #n66 circle w=8 h=8 fill=mid data=processing
+            text #n67 "Report Generator" size=s shade=mid
+            row #n68 justify=between
+              text #n69 "Started 3m ago" size=s shade=mid
+              text #n70 "456 items" size=s shade=mid
+            progress #n71 "Process" value=68
+  screen #n72 "Workflows"
+    row #n73 h=fill
+      col #n74 share=nav w=200 fill=light pad=3 gap=2
+        text #n75 "Agents" shade=mid
+        text #n76 "Runs" shade=mid
+        text #n77 "Workflows" bold
+        text #n78 "Logs" shade=mid
+      col #n79 grow pad=4 gap=3
+        text #n80 "Workflows" size=l bold
+        row #n81 gap=3
+          col #n82 grow
+            col #n83 border pad=3 gap=3
+              text #n84 "Email Processing" bold
+              text #n85 "4 agents • 89% uptime" size=s shade=mid
+              button #n86 "Edit" ghost
+          col #n87 grow
+            col #n88 border pad=3 gap=3
+              text #n89 "Data Validation" bold
+              text #n90 "3 agents • 100% uptime" size=s shade=mid
+              button #n91 "Edit" ghost
+          col #n92 grow
+            col #n93 border pad=3 gap=3
+              text #n94 "Report Generation" bold
+              text #n95 "5 agents • 94% uptime" size=s shade=mid
+              button #n96 "Edit" ghost
+        line #n97
+        col #n98 border pad=3 gap=2
+          text #n99 "Email Processing" bold size=m
+          graph #n100 dir=down h=300
+            node #w-1 "Fetch Mail" sub=email-service
+            node #w-2 "Parse Content" sub=text-processor
+            node #w-3 "Extract Data" sub=nlp-agent
+            node #w-4 "Store Result" sub=database
+            edge #n101 w-1 -> w-2
+            edge #n102 w-2 -> w-3
+            edge #n103 w-3 -> w-4

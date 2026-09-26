@@ -1,0 +1,147 @@
+app #n1 "Studio" web
+  screen #n2 "Tracks"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Studio" bold
+        text #n6 "Tracks" bold size=xl
+        text #n7 "Mixer" shade=mid
+        text #n8 "Effects" shade=mid
+      col #n9 grow pad=3 gap=3
+        button #n142 "All" primary size=s
+        row #n140 gap=2 align=center
+          text #n141 "Filter" shade=mid size=s
+          button #n143 "Drums" ghost size=s
+          button #n144 "Piano" ghost size=s
+          button #n145 "Bass" ghost size=s
+        row #n92 gap=2 align=center
+          input #n93 "Search tracks..." search w=200
+        row #n10 gap=2 align=center
+          button #n11 "＋ Track" primary size=l
+          button #n12 "Play" ghost
+          text #n14 "120 BPM" shade=mid
+        row #n15 h=fill gap=3
+          col #n16 w=120 gap=1 pad=2 fill=light border
+            text #n17 "Drums" size=s bold
+            text #n18 "Kit 808" size=xs shade=mid
+            line #n19
+            text #n20 "Piano" size=s bold
+            text #n21 "Grand" size=xs shade=mid
+            line #n22
+            text #n23 "Bass" size=s bold
+            text #n24 "Synth" size=xs shade=mid
+          col #n25 grow h=fill border gap=0
+            row #n26 h=60 gap=1 pad=1 align=center border
+              shape #n27 "waveform" w=800 h=50
+              text #n28 "0:00" size=xs shade=mid align=end
+            row #n29 h=60 gap=1 pad=1 align=center border
+              shape #n30 "waveform" w=600 h=50
+              text #n31 "0:15" size=xs shade=mid align=end
+            row #n32 h=60 gap=1 pad=1 align=center border
+              shape #n33 "waveform" w=700 h=50
+              text #n34 "0:08" size=xs shade=mid align=end
+  screen #n35 "Mixer"
+    row #n36 h=fill
+      col #n37 share=nav w=200 fill=mid pad=3 gap=2
+        text #n38 "Studio" bold
+        text #n39 "Tracks" shade=mid size=xl
+        text #n40 "Mixer" bold
+        text #n41 "Effects" shade=mid
+      col #n42 grow pad=3 gap=4
+        text #n43 "Mixer" bold
+        row #n44 gap=6 h=fill
+          col #n45 gap=3 w=140
+            col #n46 gap=2 align=center
+              text #n47 "Drums" size=s bold
+              progress #n48 "" value=35
+              text #n49 "-12dB" size=xs shade=mid mono
+            col #n50 gap=2 align=center
+              text #n51 "Piano" size=s bold
+              progress #n52 "" value=65
+              text #n53 "-4dB" size=xs shade=mid mono
+            col #n54 gap=2 align=center
+              text #n55 "Bass" size=s bold
+              progress #n56 "" value=55
+              text #n57 "-8dB" size=xs shade=mid mono
+          col #n58 gap=3 w=140
+            col #n59 gap=2 align=center
+              text #n60 "Master" bold
+              progress #n61 "" value=75
+              text #n62 "-2dB" size=xs shade=mid mono
+              row #n63 gap=2 justify=center pad=2 border
+                shape #n64 "L" circle w=20 h=20
+                shape #n65 "R" circle w=20 h=20
+  screen #n66 "Effects"
+    row #n67 h=fill
+      col #n68 share=nav w=200 fill=mid pad=3 gap=2
+        text #n69 "Studio" bold
+        text #n70 "Tracks" shade=mid size=xl
+        text #n71 "Mixer" shade=mid
+        text #n72 "Effects" bold
+      col #n73 grow pad=3 gap=3
+        text #n74 "Effects" bold
+        col #n75 gap=2 border pad=3
+          row #n76 justify=between align=center
+            text #n77 "Reverb" bold
+            button #n78 "×" ghost
+          text #n79 "Decay" size=s shade=mid
+          progress #n80 "" value=60
+          text #n81 "Wet" size=s shade=mid
+          progress #n82 "" value=40
+        col #n83 gap=2 border pad=3
+          row #n84 justify=between align=center
+            text #n85 "Delay" bold
+            button #n86 "×" ghost
+          text #n87 "Time" size=s shade=mid
+          progress #n88 "" value=50
+          text #n89 "Feedback" size=s shade=mid
+          progress #n90 "" value=35
+        button #n91 "＋ Add Effect" ghost w=fill
+  screen #n94 "Settings"
+    row #n95 h=fill
+      col #n96 share=nav w=200 fill=mid pad=3 gap=2
+        text #n97 "Studio" bold
+        text #n98 "Tracks" shade=mid size=xl
+        text #n99 "Mixer" shade=mid
+        text #n100 "Effects" shade=mid
+        text #n101 "Settings" bold
+      col #n102 grow pad=3 gap=4
+        text #n103 "Settings" bold
+        col #n146 gap=2 border pad=3
+          text #n147 "Note" bold size=s
+          text #n148 "Your project will be auto-saved every 5 minutes." shade=mid size=s
+        col #n104 gap=3
+          col #n105 gap=2 border pad=3
+            text #n106 "Project" bold size=s
+            row #n107 justify=between align=center
+              text #n108 "Sample Rate" shade=mid
+              text #n109 "48 kHz" mono
+            row #n110 justify=between align=center
+              text #n111 "Bit Depth" shade=mid
+              text #n112 "24-bit" mono
+            row #n113 justify=between align=center
+              text #n114 "Tempo" shade=mid
+              input #n115 "" value="120" w=80
+            row #n116 justify=between align=center
+              text #n117 "Time Signature" shade=mid
+              input #n118 "" value=4/4 w=80
+          col #n119 gap=2 border pad=3
+            text #n120 "Audio" bold size=s
+            row #n121 justify=between align=center
+              text #n122 "Output Device" shade=mid
+              input #n123 "" value="System Default" w=150
+            row #n124 justify=between align=center
+              text #n125 "Latency" shade=mid
+              text #n126 "2.5 ms" mono
+          col #n127 gap=2 border pad=3
+            text #n128 "Display" bold size=s
+            row #n129 justify=between align=center
+              text #n130 "Zoom Level" shade=mid
+              input #n131 "" value=100% w=80
+            row #n132 justify=between align=center
+              text #n133 "Theme" shade=mid
+              input #n134 "" value=Dark w=80
+          col #n135 gap=2 border pad=3
+            text #n136 "Advanced" bold size=s
+            row #n137 gap=2
+              button #n138 "Export Project" ghost
+              button #n139 "Save Backup" ghost

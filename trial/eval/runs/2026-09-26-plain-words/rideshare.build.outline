@@ -1,0 +1,162 @@
+app #n1 "Driver" phone
+  screen #n2 "Home"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Home" bold
+        text #n6 "Earnings" shade=mid
+        text #n7 "History" shade=mid
+        text #n8 "Profile" shade=mid
+      col #n9 grow pad=3 gap=3
+        row #n10 justify=between align=center
+          text #n11 "Ready to drive?" size=l bold
+          shape #n12 circle w=12 h=12 fill=dark
+        row #n13 gap=2 pad=3 border fill=light
+          col #n14 grow
+            text #n15 "Online" bold size=m
+            text #n16 "Accept rides nearby" shade=mid size=s
+          button #n17 "Go Online" primary
+        col #n18 gap=3
+          col #n19 border pad=3
+            row #n20 justify=between align=center
+              text #n21 "Upcoming" size=m bold
+              text #n22 "1 ride" shade=mid size=s
+            line #n23
+            col #n24 gap=2
+              row #n25 justify=between
+                col #n26
+                  text #n27 "Marcus J." bold
+                  text #n28 "In 4 minutes" shade=mid size=s
+                text #n29 "$12.50" bold
+              row #n30 justify=between align=center
+                text #n31 "📍 Downtown to Airport" size=s
+                button #n32 "Details" ghost
+          col #n33 border pad=3
+            row #n34 justify=between
+              text #n35 "Today's earnings" bold
+              text #n36 "$187.40" bold size=l
+            text #n37 "32 rides • 4.8★" shade=mid size=s
+    row #n38 share=tabs justify=between pad=3 border h=60
+      text #n39 "Home" bold
+      text #n40 "Earnings" shade=mid
+      text #n41 "History" shade=mid
+      text #n42 "Profile" shade=mid
+  screen #n43 "Earnings"
+    row #n44 h=fill
+      col #n45 share=nav w=200 fill=light pad=3 gap=2
+        text #n46 "Home" shade=mid
+        text #n47 "Earnings" bold
+        text #n48 "History" shade=mid
+        text #n49 "Profile" shade=mid
+      col #n50 grow pad=3 gap=3
+        text #n51 "This week" size=l bold
+        row #n52 gap=3
+          col #n53 grow border pad=3
+            text #n54 "$847" size=xl bold
+            text #n55 "Total earnings" shade=mid size=s
+          col #n56 grow border pad=3
+            text #n57 "127" size=xl bold
+            text #n58 "Total rides" shade=mid size=s
+        text #n59 "Daily breakdown" bold
+        col #n60 gap=2
+          row #n61 justify=between pad=2
+            text #n62 "Mon, Jan 15" data
+            text #n63 "$142" bold data
+          row #n64 justify=between pad=2
+            text #n65 "Tue, Jan 16" data
+            text #n66 "$156" bold data
+          row #n67 justify=between pad=2
+            text #n68 "Wed, Jan 17" data
+            text #n69 "$203" bold data
+          row #n70 justify=between pad=2
+            text #n71 "Thu, Jan 18" data
+            text #n72 "$198" bold data
+          row #n73 justify=between pad=2
+            text #n74 "Fri, Jan 19" data
+            text #n75 "$148" bold data
+    row #n76 share=tabs justify=between pad=3 border h=60
+      text #n77 "Home" shade=mid
+      text #n78 "Earnings" bold
+      text #n79 "History" shade=mid
+      text #n80 "Profile" shade=mid
+  screen #n81 "History"
+    row #n82 h=fill
+      col #n83 share=nav w=200 fill=light pad=3 gap=2
+        text #n84 "Home" shade=mid
+        text #n85 "Earnings" shade=mid
+        text #n86 "History" bold
+        text #n87 "Profile" shade=mid
+      col #n88 grow pad=3 gap=3
+        text #n89 "All rides" size=l bold
+        col #n90 gap=2
+          row #n91 border pad=3 justify=between align=start
+            col #n92 grow
+              text #n93 "Sarah M." bold data
+              text #n94 "Downtown → Airport" shade=mid size=s data
+              text #n95 "2:15 PM" shade=mid size=s data
+            col #n96 align=end
+              text #n97 "$24.50" bold data
+              text #n98 "4.9★" shade=mid size=s data
+          row #n99 border pad=3 justify=between align=start
+            col #n100 grow
+              text #n101 "James T." bold data
+              text #n102 "Mall → Residential" shade=mid size=s data
+              text #n103 "1:42 PM" shade=mid size=s data
+            col #n104 align=end
+              text #n105 "$18.75" bold data
+              text #n106 "5.0★" shade=mid size=s data
+          row #n107 border pad=3 justify=between align=start
+            col #n108 grow
+              text #n109 "Lisa K." bold data
+              text #n110 "Train Station → Hotel" shade=mid size=s data
+              text #n111 "12:08 PM" shade=mid size=s data
+            col #n112 align=end
+              text #n113 "$31.25" bold data
+              text #n114 "4.8★" shade=mid size=s data
+          row #n115 border pad=3 justify=between align=start
+            col #n116 grow
+              text #n117 "David R." bold data
+              text #n118 "Airport → Downtown" shade=mid size=s data
+              text #n119 "10:35 AM" shade=mid size=s data
+            col #n120 align=end
+              text #n121 "$26.00" bold data
+              text #n122 "Cancelled" shade=mid size=s data
+    row #n123 share=tabs justify=between pad=3 border h=60
+      text #n124 "Home" shade=mid
+      text #n125 "Earnings" shade=mid
+      text #n126 "History" bold
+      text #n127 "Profile" shade=mid
+  screen #n128 "Profile"
+    row #n129 h=fill
+      col #n130 share=nav w=200 fill=light pad=3 gap=2
+        text #n131 "Home" shade=mid
+        text #n132 "Earnings" shade=mid
+        text #n133 "History" shade=mid
+        text #n134 "Profile" bold
+      col #n135 grow pad=3 gap=3
+        col #n136 align=center gap=2
+          shape #n137 circle w=60 h=60
+          text #n138 "Marcus Johnson" bold size=l data
+          text #n139 "Driver ID: #48302" shade=mid size=s data
+        col #n140 border pad=3 gap=2
+          row #n141 justify=between
+            text #n142 "Rating" bold
+            text #n143 "4.82★" bold data
+          row #n144 justify=between
+            text #n145 "Rides completed" bold
+            text #n146 "1,247" bold data
+          row #n147 justify=between
+            text #n148 "Acceptance rate" bold
+            text #n149 "96%" bold data
+        col #n150 border pad=3 gap=1
+          text #n151 "Vehicle" bold
+          text #n152 "2021 Honda Civic" shade=mid size=s data
+          text #n153 "License: CA 7XYZ192" shade=mid size=s data
+        col #n154 gap=2
+          button #n155 "Edit vehicle" ghost
+          button #n156 "Support" ghost
+          button #n157 "Sign out" ghost
+    row #n158 share=tabs justify=between pad=3 border h=60
+      text #n159 "Home" shade=mid
+      text #n160 "Earnings" shade=mid
+      text #n161 "History" shade=mid
+      text #n162 "Profile" bold

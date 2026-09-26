@@ -1,0 +1,95 @@
+app #n1 "Splitwise" phone
+  screen #n2 "Home"
+    row #n3 h=60 pad=3 fill=light align=center
+      text #n4 "Splitwise" bold size=xxl
+    col #n5 grow gap=3 pad=3
+      col #n6 border pad=3 gap=2
+        text #n7 "You are owed" shade=mid size=s
+        text #n8 "$247.50" bold size=xl
+        text #n9 "From 3 people" shade=mid size=xs
+      col #n10 border pad=3 gap=2
+        text #n11 "You owe" shade=mid size=s
+        text #n12 "$89.25" bold size=xl
+        text #n13 "To 2 people" shade=mid size=xs
+      line #n14
+      text #n15 "Recent activity" bold size=m
+      col #n16 gap=2
+        table #n111
+          tr #n112 "Person | Date | Amount"
+          tr #n113 "Alex paid $75 for groceries | Jan 15 | $25.00" bold data
+          tr #n114 "You paid $120 for utilities | Jan 12 | $40.00" data
+          tr #n115 "Morgan paid $90 for internet | Jan 10 | $22.50" bold data
+    row #n35 share=tabs h=60 justify=between pad=3 border align=center fill=light
+      text #n36 "Home" bold
+      text #n37 "Add" shade=mid
+      text #n38 "Friends" shade=mid
+      text #n39 "Me" shade=mid
+  screen #n40 "Add expense"
+    row #n41 h=60 pad=3 fill=light align=center
+      text #n42 "Add expense" bold size=l
+    col #n43 grow gap=3 pad=3
+      input #n44 "Description" value=Rent
+      input #n45 "Amount" value=$
+      col #n46 gap=2
+        text #n47 "With" bold size=s
+        col #n48 gap=2
+          row #n49 gap=2 align=center
+            shape #n50 circle w=32 h=32
+            col #n51 grow
+              text #n52 "Alex" bold
+              text #n53 "owes $600" shade=mid size=xs
+            shape #n54 circle w=20 h=20 border
+          row #n55 gap=2 align=center
+            shape #n56 circle w=32 h=32
+            col #n57 grow
+              text #n58 "Jordan" bold
+              text #n59 "owes $600" shade=mid size=xs
+            shape #n60 circle w=20 h=20 border
+          row #n61 gap=2 align=center
+            shape #n62 circle w=32 h=32
+            col #n63 grow
+              text #n64 "Morgan" bold
+              text #n65 "owes $600" shade=mid size=xs
+            shape #n66 circle w=20 h=20 border
+      col #n67 gap=2
+        text #n68 "Paid by" bold size=s
+        row #n69 gap=2 align=center
+          shape #n70 circle w=32 h=32
+          text #n71 "You" bold grow
+          shape #n72 circle w=20 h=20 fill=dark
+      button #n73 "Save" primary w=fill size=l
+    row #n74 share=tabs h=60 justify=between pad=3 border align=center fill=light
+      text #n75 "Home" shade=mid
+      text #n76 "Add" bold
+      text #n77 "Friends" shade=mid
+      text #n78 "Me" shade=mid
+  screen #n79 "Friends"
+    row #n80 h=60 pad=3 fill=light align=center
+      text #n81 "Friends" bold size=l
+    col #n82 grow gap=3 pad=3
+      input #n83 "Search" search
+      text #n84 "Balances" bold size=m
+      col #n85 gap=2
+        row #n86 gap=3 align=center
+          shape #n87 circle w=36 h=36
+          col #n88 grow
+            text #n89 "Alex" bold
+            text #n90 "owes you $75" shade=mid size=xs
+          text #n91 "$75" bold
+        row #n92 gap=3 align=center
+          shape #n93 circle w=36 h=36
+          col #n94 grow
+            text #n95 "Jordan" bold
+            text #n96 "you owe $89.25" shade=mid size=xs
+          text #n97 "$89.25" shade=mid
+        row #n98 gap=3 align=center
+          shape #n99 circle w=36 h=36
+          col #n100 grow
+            text #n101 "Morgan" bold
+            text #n102 "owes you $172.50" shade=mid size=xs
+          text #n103 "$172.50" bold
+    row #n105 share=tabs h=60 justify=between pad=3 border align=center fill=light
+      text #n106 "Home" shade=mid
+      text #n107 "Add" shade=mid
+      text #n108 "Friends" bold
+      text #n109 "Me" shade=mid

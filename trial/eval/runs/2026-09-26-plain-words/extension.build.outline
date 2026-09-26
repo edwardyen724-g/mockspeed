@@ -1,0 +1,27 @@
+app #n1 "PageSummary" panel
+  screen #n2 "Summary"
+    col #n3 pad=3 gap=3 h=fill
+      text #n4 "PageSummary" size=s bold
+      line #n5
+      col #n6 gap=2 grow
+        text #n7 "The New York Times" size=m bold
+        text #n8 "What to Know About the Latest Climate Report" size=l bold shade=dark
+        text #n9 "Published 2 hours ago" size=xs shade=mid
+        line #n10
+        text #n11 "Key Points" size=s bold
+        text #n12 "Global temperatures rose 1.1°C since pre-industrial times" size=s data
+        text #n13 "Extreme weather events increased 35% in the past decade" size=s data
+        text #n14 "Policy changes needed by 2030 for 1.5°C pathway" size=s data
+        line #n15
+        text #n16 "Sentiment" size=s bold
+        row #n17 gap=2 align=center
+          shape #n18 circle w=12 h=12 fill=mid
+          text #n19 "Cautionary" size=s
+        line #n20
+        text #n21 "Topics" size=s bold
+        row #n22 gap=1 wrap
+          text #n23 "Climate" size=xs pill fill=light
+          text #n24 "Environment" size=xs pill fill=light
+          text #n25 "Policy" size=xs pill fill=light
+      button #n26 "Read Full Article" primary w=fill
+      button #n27 "Share" ghost w=fill

@@ -1,0 +1,172 @@
+app #n1 "Mail" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Mail" bold size=l
+        text #n6 "Inbox" bold
+        text #n7 "Sent" shade=mid
+        text #n8 "Drafts" shade=mid
+        text #n9 "Spam" shade=mid
+        text #n10 "Trash" shade=mid
+        line #n11
+        text #n12 "Folders" size=xs shade=mid bold pad=1
+        text #n13 "Work" shade=mid
+        text #n14 "Personal" shade=mid
+      col #n15 grow pad=4 gap=3
+        button #n20 "Compose" primary size=l
+        row #n16 justify=between align=center
+          text #n17 "Inbox" bold size=l
+          row #n18 gap=2
+            input #n19 "Search" search w=200
+        col #n21 gap=1 grow
+          table #n185
+            tr #n186 "From | Subject | Time"
+            tr #n187 "Sarah Chen | Project timeline update | 2:34 PM" data
+            tr #n188 "Design Team | New mockups ready for review | 1:12 PM" data
+            tr #n189 "Alex Park | Meeting notes from standup | 10:45 AM" data
+            tr #n190 "Newsletter | Your weekly digest | Yesterday" data
+            tr #n191 "Support Team | Your ticket #4521 has been resolved | Yesterday" data
+        col #n192 gap=2 pad=2 border
+          text #n193 "Filter" size=s bold shade=mid
+          row #n194 gap=2
+            input #n195 "From" search w=fill
+            input #n196 "Subject" search w=fill
+          row #n197 gap=2
+            button #n198 "Unread" ghost size=s
+            button #n199 "Has Attachment" ghost size=s
+            button #n200 "Clear" ghost size=s
+  screen #n52 "Message"
+    row #n53 h=fill
+      col #n54 share=nav w=200 fill=mid pad=3 gap=2
+        text #n55 "Mail" bold size=l
+        text #n56 "Inbox" shade=mid
+        text #n57 "Sent" shade=mid
+        text #n58 "Drafts" shade=mid
+        text #n59 "Spam" shade=mid
+        text #n60 "Trash" shade=mid
+        line #n61
+        text #n62 "Folders" size=xs shade=mid bold pad=1
+        text #n63 "Work" shade=mid
+        text #n64 "Personal" shade=mid
+      col #n65 grow pad=4 gap=3
+        row #n66 justify=between align=center
+          button #n67 "← Back" ghost
+          row #n68 gap=2
+            button #n69 "Archive" ghost
+            button #n70 "Spam" ghost
+            button #n71 "Delete" ghost
+        col #n72 gap=3 grow
+          col #n73 gap=1
+            text #n74 "Project timeline update" bold size=l
+            row #n75 gap=2 align=center
+              shape #n76 circle w=32 h=32
+              col #n77 grow
+                text #n78 "Sarah Chen" bold
+                text #n79 "sarah.chen@company.com" size=s shade=mid
+              text #n80 "2:34 PM" size=s shade=mid
+          line #n81
+          text #n82 "Hi,\n\nWe've finalized the project timeline for Q2. The design phase starts Monday and we're on track for launch in June. Could you review the attached schedule?\n\nThanks,\nSarah" size=m
+          line #n83
+          col #n84 gap=2 pad=3 fill=light border
+            text #n85 "Timeline_Q2.pdf" bold
+            text #n86 "1.2 MB" size=s shade=mid
+          col #n87 gap=2
+            text #n88 "Reply" size=s
+            input #n89 area value=""
+  screen #n90 "Compose"
+    row #n91 h=fill
+      col #n92 share=nav w=200 fill=mid pad=3 gap=2
+        text #n93 "Mail" bold size=l
+        text #n94 "Inbox" shade=mid
+        text #n95 "Sent" shade=mid
+        text #n96 "Drafts" bold
+        text #n97 "Spam" shade=mid
+        text #n98 "Trash" shade=mid
+        line #n99
+        text #n100 "Folders" size=xs shade=mid bold pad=1
+        text #n101 "Work" shade=mid
+        text #n102 "Personal" shade=mid
+      col #n103 grow pad=4 gap=2
+        row #n104 justify=between
+          text #n105 "New Message" bold size=l
+          button #n106 "× Close" ghost
+        col #n107 gap=3 grow
+          input #n108 "To:" value=sarah.chen@company.com
+          input #n109 "Subject:" value="Re: Project timeline update"
+          input #n110 "Cc:" value=""
+          line #n111
+          input #n112 area value="Hi Sarah,\n\nThanks for sending the timeline. Everything looks good. I'll have my team review the design schedule." grow h=300
+          row #n113 gap=2 justify=end pad=2
+            button #n114 "Save Draft" ghost
+            button #n115 "Send" primary
+  screen #n116 "Settings"
+    row #n117 h=fill
+      col #n118 share=nav w=200 fill=mid pad=3 gap=2
+        text #n119 "Mail" bold size=l
+        text #n120 "Inbox" shade=mid
+        text #n121 "Sent" shade=mid
+        text #n122 "Drafts" shade=mid
+        text #n123 "Spam" shade=mid
+        text #n124 "Trash" shade=mid
+        line #n125
+        text #n126 "Folders" size=xs shade=mid bold pad=1
+        text #n127 "Work" shade=mid
+        text #n128 "Personal" shade=mid
+      col #n129 grow pad=4 gap=4
+        row #n130 justify=between align=center
+          text #n131 "Settings" bold size=l
+          button #n132 "← Back" ghost
+        col #n133 gap=3 grow
+          col #n134 gap=2
+            text #n135 "Account" bold size=m
+            col #n136 gap=2 pad=3 border
+              row #n137 justify=between align=center
+                col #n138 grow
+                  text #n139 "Email Address" bold
+                  text #n140 "sarah.chen@company.com" size=s shade=mid
+                button #n141 "Edit" ghost
+              line #n142
+              row #n143 justify=between align=center
+                col #n144 grow
+                  text #n145 "Password" bold
+                  text #n146 "Last changed 3 months ago" size=s shade=mid
+                button #n147 "Change" ghost
+          line #n148
+          col #n149 gap=2
+            text #n150 "Notifications" bold size=m
+            col #n151 gap=2 pad=3 border
+              row #n152 justify=between align=center
+                col #n153 grow
+                  text #n154 "Email Notifications"
+                  text #n155 "Get notified for new messages" size=s shade=mid
+                input #n156 toggle on
+              line #n157
+              row #n158 justify=between align=center
+                col #n159 grow
+                  text #n160 "Desktop Notifications"
+                  text #n161 "Show alerts on your computer" size=s shade=mid
+                input #n162 toggle
+              line #n163
+              row #n164 justify=between align=center
+                col #n165 grow
+                  text #n166 "Digest Emails"
+                  text #n167 "Weekly summary of your mail" size=s shade=mid
+                input #n168 toggle on
+          line #n169
+          col #n170 gap=2
+            text #n171 "Display" bold size=m
+            col #n172 gap=2 pad=3 border
+              row #n173 justify=between align=center
+                col #n174 grow
+                  text #n175 "Theme"
+                button #n176 "Light" primary size=s
+              line #n177
+              row #n178 justify=between align=center
+                col #n179 grow
+                  text #n180 "Text Size"
+                button #n181 "Medium" primary size=s
+          line #n182
+          button #n183 "Sign Out" ghost
+        col #n201 gap=2 pad=3 border fill=light
+          text #n202 "Note" bold size=s shade=mid
+          text #n203 "Changes to your settings are saved automatically." size=s shade=mid

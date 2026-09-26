@@ -1,0 +1,66 @@
+app #n1 "Design Studio" web
+  screen #n2 "Board"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Board" bold size=xxl
+        text #n6 "Team" shade=mid
+        text #n7 "Archive" shade=mid
+      col #n8 grow pad=4 gap=4
+        button #n110 "Status" ghost size=s
+        row #n108 gap=2 align=center
+          text #n109 "Filter" size=s shade=mid
+          button #n111 "Assigned to" ghost size=s
+          button #n112 "Clear" ghost size=s
+        table #n97
+          tr #n98 "Task | Assigned to | Status"
+          tr #n99 "Rebrand site hero | Sarah | Backlog" data
+          tr #n100 "Update brand guidelines | Marcus | Backlog" data
+          tr #n101 "Logo exploration concepts | Unassigned | Backlog" data
+          tr #n102 "Mobile app wireframes | Elena | In Progress" data
+          tr #n103 "Client feedback review | James | In Progress" data
+          tr #n104 "Email template design | Sarah | Ready" data
+          tr #n105 "Social media assets | Marcus | Ready" data
+          tr #n106 "Q4 pitch deck | Elena | Done" data
+          tr #n107 "Annual report layout | James | Done" data
+  screen #n57 "Settings"
+    row #n58 h=fill
+      col #n59 share=nav w=200 fill=mid pad=3 gap=2
+        text #n60 "Board" shade=mid size=l
+        text #n61 "Team" shade=mid
+        text #n62 "Archive" shade=mid
+      col #n63 grow pad=4 gap=4
+        text #n64 "Settings" bold size=xl
+        col #n113 gap=2 pad=3 fill=light border
+          text #n114 "Your workspace is on the Pro plan" size=s shade=mid
+          text #n115 "Renew on January 15, 2025" size=xs shade=mid
+        col #n65 gap=3
+          col #n66 gap=1
+            text #n67 "Notifications" bold size=s
+            text #n68 "Email me about task updates" size=s
+            row #n69 gap=2
+              input #n70 check on
+              text #n71 "Assigned tasks" size=s
+            row #n72 gap=2
+              input #n73 check on
+              text #n74 "Team mentions" size=s
+            row #n75 gap=2
+              input #n76 check
+              text #n77 "Daily digest" size=s
+          line #n78
+          col #n79 gap=1
+            text #n80 "Workspace" bold size=s
+            row #n81 justify=between align=center
+              text #n82 "Workspace name" size=s
+              text #n83 "Design Studio" size=s shade=mid
+            row #n84 justify=between align=center
+              text #n85 "Members" size=s
+              text #n86 "8" size=s shade=mid
+          line #n87
+          col #n88 gap=1
+            text #n89 "Display" bold size=s
+            row #n90 justify=between align=center
+              text #n91 "Theme" size=s
+              text #n92 "Light" size=s shade=mid
+            row #n93 justify=between align=center
+              text #n94 "Card size" size=s
+              text #n95 "Medium" size=s shade=mid

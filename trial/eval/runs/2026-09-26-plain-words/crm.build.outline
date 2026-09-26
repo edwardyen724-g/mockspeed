@@ -1,0 +1,123 @@
+app #n1 "Pipeline" web
+  screen #n2 "Leads"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Pipeline" bold
+        text #n6 "Leads" bold shade=dark
+        text #n7 "Active" shade=mid
+        text #n8 "Closed" shade=mid
+        text #n9 "Lost" shade=mid
+      col #n10 grow pad=4 gap=3
+        row #n11 justify=between align=center
+          text #n12 "Leads" size=l bold
+          button #n13 "Add Lead" primary
+        col #n14 gap=2
+          row #n15 pad=3 border gap=3 align=center
+            shape #n16 circle w=12 h=12 fill=dark
+            col #n17 grow
+              text #n18 "Sarah Chen" bold
+              text #n19 "Looking for 3BR in Marina District" shade=mid size=s
+            text #n20 "Pre-approval" size=s
+            text #n21 "2 days ago" shade=mid size=s
+          row #n22 pad=3 border gap=3 align=center
+            shape #n23 circle w=12 h=12 fill=mid
+            col #n24 grow
+              text #n25 "Marcus Rodriguez" bold
+              text #n26 "First-time buyer, $400–500K budget" shade=mid size=s
+            text #n27 "Initial consult" size=s
+            text #n28 "5 days ago" shade=mid size=s
+          row #n29 pad=3 border gap=3 align=center
+            shape #n30 circle w=12 h=12 fill=dark
+            col #n31 grow
+              text #n32 "Jennifer Kim" bold
+              text #n33 "Relocating, needs schools nearby" shade=mid size=s
+            text #n34 "Showing scheduled" size=s
+            text #n35 "1 day ago" shade=mid size=s
+          row #n36 pad=3 border gap=3 align=center
+            shape #n37 circle w=12 h=12 fill=light
+            col #n38 grow
+              text #n39 "David Walsh" bold
+              text #n40 "Investor, multi-unit properties" shade=mid size=s
+            text #n41 "Awaiting feedback" size=s
+            text #n42 "8 days ago" shade=mid size=s
+  screen #n43 "Showings"
+    row #n44 h=fill
+      col #n45 share=nav w=200 fill=light pad=3 gap=2
+        text #n46 "Pipeline" bold
+        text #n47 "Leads" shade=mid
+        text #n48 "Active" shade=mid
+        text #n49 "Closed" shade=mid
+        text #n50 "Lost" shade=mid
+      col #n51 grow pad=4 gap=3
+        row #n52 justify=between align=center
+          text #n53 "Upcoming Showings" size=l bold
+          button #n54 "Schedule" primary
+        col #n55 gap=2
+          row #n56 pad=3 border gap=3
+            col #n57 grow
+              text #n58 "428 Maple Street" bold
+              text #n59 "Sarah Chen" size=s shade=mid
+              text #n60 "2-bed, $695K" size=s shade=mid
+            text #n61 "Thu 2:30 PM" bold
+            button #n62 "Details" ghost
+          row #n63 pad=3 border gap=3
+            col #n64 grow
+              text #n65 "612 Valencia Ave" bold
+              text #n66 "Marcus Rodriguez" size=s shade=mid
+              text #n67 "3-bed, $475K" size=s shade=mid
+            text #n68 "Fri 10:00 AM" bold
+            button #n69 "Details" ghost
+          row #n70 pad=3 border gap=3
+            col #n71 grow
+              text #n72 "1847 Golden Gate Ave" bold
+              text #n73 "Jennifer Kim" size=s shade=mid
+              text #n74 "4-bed, $850K" size=s shade=mid
+            text #n75 "Sat 11:00 AM" bold
+            button #n76 "Details" ghost
+  screen #n77 "Deal"
+    row #n78 h=fill
+      col #n79 share=nav w=200 fill=light pad=3 gap=2
+        text #n80 "Pipeline" bold
+        text #n81 "Leads" shade=mid
+        text #n82 "Active" shade=mid
+        text #n83 "Closed" shade=mid
+        text #n84 "Lost" shade=mid
+      col #n85 grow pad=4 gap=3
+        row #n86 justify=between align=center
+          text #n87 "Sarah Chen" size=l bold
+          button #n88 "⋮" ghost
+        col #n89 gap=2 pad=3 border
+          row #n90 justify=between
+            col #n91
+              text #n92 "Property" size=s shade=mid
+              text #n93 "428 Maple Street" bold
+            col #n94 align=end
+              text #n95 "Price" size=s shade=mid
+              text #n96 "$695,000" bold
+          line #n97
+          row #n98 justify=between
+            col #n99
+              text #n100 "Status" size=s shade=mid
+              text #n101 "Showing scheduled" bold
+            col #n102 align=end
+              text #n103 "Next step" size=s shade=mid
+              text #n104 "Home inspection" bold
+          line #n105
+          row #n106 justify=between
+            col #n107
+              text #n108 "Financing" size=s shade=mid
+              text #n109 "Pre-approved, 20% down" bold
+            col #n110 align=end
+              text #n111 "Timeline" size=s shade=mid
+              text #n112 "30 days" bold
+        col #n113 gap=1
+          text #n114 "Notes" size=s shade=mid bold
+          text #n115 "Motivated buyer. Strong financial profile. Viewed 3 properties this month." shade=mid size=s
+        col #n116 gap=2
+          text #n117 "Activity" size=s shade=mid bold
+          text #n118 "Sent pre-approval letter" shade=mid size=s data
+          text #n119 "2 days ago" shade=light size=s
+          text #n120 "Scheduled showing at 428 Maple" shade=mid size=s data
+          text #n121 "1 day ago" shade=light size=s
+          text #n122 "Initial consultation" shade=mid size=s data
+          text #n123 "3 days ago" shade=light size=s

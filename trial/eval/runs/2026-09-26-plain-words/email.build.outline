@@ -1,0 +1,115 @@
+app #n1 "Mail" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Mail" bold size=l
+        text #n6 "Inbox" bold
+        text #n7 "Sent" shade=mid
+        text #n8 "Drafts" shade=mid
+        text #n9 "Spam" shade=mid
+        text #n10 "Trash" shade=mid
+        line #n11
+        text #n12 "Folders" size=xs shade=mid bold pad=1
+        text #n13 "Work" shade=mid
+        text #n14 "Personal" shade=mid
+      col #n15 grow pad=4 gap=3
+        row #n16 justify=between align=center
+          text #n17 "Inbox" bold size=l
+          row #n18 gap=2
+            input #n19 "Search" search w=200
+            button #n20 "Compose" primary
+        col #n21 gap=1 grow
+          row #n22 pad=2 border align=center gap=3
+            input #n23 value="" check
+            col #n24 grow
+              text #n25 "Sarah Chen" bold
+              text #n26 "Project timeline update" shade=mid
+            text #n27 "2:34 PM" size=s shade=mid
+          row #n28 pad=2 border align=center gap=3
+            input #n29 value="" check
+            col #n30 grow
+              text #n31 "Design Team" bold
+              text #n32 "New mockups ready for review" shade=mid
+            text #n33 "1:12 PM" size=s shade=mid
+          row #n34 pad=2 border align=center gap=3
+            input #n35 value="" check
+            col #n36 grow
+              text #n37 "Alex Park" bold
+              text #n38 "Meeting notes from standup" shade=mid
+            text #n39 "10:45 AM" size=s shade=mid
+          row #n40 pad=2 border align=center gap=3
+            input #n41 value="" check
+            col #n42 grow
+              text #n43 "Newsletter" bold
+              text #n44 "Your weekly digest" shade=mid
+            text #n45 "Yesterday" size=s shade=mid
+          row #n46 pad=2 border align=center gap=3
+            input #n47 value="" check
+            col #n48 grow
+              text #n49 "Support Team" bold
+              text #n50 "Your ticket #4521 has been resolved" shade=mid
+            text #n51 "Yesterday" size=s shade=mid
+  screen #n52 "Message"
+    row #n53 h=fill
+      col #n54 share=nav w=200 fill=light pad=3 gap=2
+        text #n55 "Mail" bold size=l
+        text #n56 "Inbox" shade=mid
+        text #n57 "Sent" shade=mid
+        text #n58 "Drafts" shade=mid
+        text #n59 "Spam" shade=mid
+        text #n60 "Trash" shade=mid
+        line #n61
+        text #n62 "Folders" size=xs shade=mid bold pad=1
+        text #n63 "Work" shade=mid
+        text #n64 "Personal" shade=mid
+      col #n65 grow pad=4 gap=3
+        row #n66 justify=between align=center
+          button #n67 "← Back" ghost
+          row #n68 gap=2
+            button #n69 "Archive" ghost
+            button #n70 "Spam" ghost
+            button #n71 "Delete" ghost
+        col #n72 gap=3 grow
+          col #n73 gap=1
+            text #n74 "Project timeline update" bold size=l
+            row #n75 gap=2 align=center
+              shape #n76 circle w=32 h=32
+              col #n77 grow
+                text #n78 "Sarah Chen" bold
+                text #n79 "sarah.chen@company.com" size=s shade=mid
+              text #n80 "2:34 PM" size=s shade=mid
+          line #n81
+          text #n82 "Hi,\n\nWe've finalized the project timeline for Q2. The design phase starts Monday and we're on track for launch in June. Could you review the attached schedule?\n\nThanks,\nSarah" size=m
+          line #n83
+          col #n84 gap=2 pad=3 fill=light border
+            text #n85 "Timeline_Q2.pdf" bold
+            text #n86 "1.2 MB" size=s shade=mid
+          col #n87 gap=2
+            text #n88 "Reply" size=s
+            input #n89 area value=""
+  screen #n90 "Compose"
+    row #n91 h=fill
+      col #n92 share=nav w=200 fill=light pad=3 gap=2
+        text #n93 "Mail" bold size=l
+        text #n94 "Inbox" shade=mid
+        text #n95 "Sent" shade=mid
+        text #n96 "Drafts" bold
+        text #n97 "Spam" shade=mid
+        text #n98 "Trash" shade=mid
+        line #n99
+        text #n100 "Folders" size=xs shade=mid bold pad=1
+        text #n101 "Work" shade=mid
+        text #n102 "Personal" shade=mid
+      col #n103 grow pad=4 gap=2
+        row #n104 justify=between
+          text #n105 "New Message" bold size=l
+          button #n106 "× Close" ghost
+        col #n107 gap=3 grow
+          input #n108 "To:" value=sarah.chen@company.com
+          input #n109 "Subject:" value="Re: Project timeline update"
+          input #n110 "Cc:" value=""
+          line #n111
+          input #n112 area value="Hi Sarah,\n\nThanks for sending the timeline. Everything looks good. I'll have my team review the design schedule." grow h=300
+          row #n113 gap=2 justify=end pad=2
+            button #n114 "Save Draft" ghost
+            button #n115 "Send" primary

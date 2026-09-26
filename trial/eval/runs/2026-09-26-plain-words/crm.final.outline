@@ -1,0 +1,159 @@
+app #n1 "Pipeline" web
+  screen #n2 "Leads"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Pipeline" bold
+        text #n6 "Leads" bold shade=dark
+        text #n7 "Active" shade=mid
+        text #n8 "Closed" shade=mid
+        text #n9 "Lost" shade=mid
+      col #n10 grow pad=4 gap=3
+        button #n13 "Add Lead" primary size=l
+        row #n124 pad=3 gap=2 align=center
+          input #n125 "Search leads..." search grow
+        row #n11 justify=between align=center
+          text #n12 "Leads" size=xxl bold
+        col #n14 gap=2
+          table #n175
+            tr #n176 "Name | Details | Status | Updated"
+            tr #n177 "Sarah Chen | Looking for 3BR in Marina District | Pre-approval | 2 days ago" data
+            tr #n178 "Marcus Rodriguez | First-time buyer, $400–500K budget | Initial consult | 5 days ago" data
+            tr #n179 "Jennifer Kim | Relocating, needs schools nearby | Showing scheduled | 1 day ago" data
+            tr #n180 "David Walsh | Investor, multi-unit properties | Awaiting feedback | 8 days ago" data
+        row #n181 pad=3 gap=2 align=center
+          text #n182 "Filter:" size=s shade=mid
+          button #n183 "Status" ghost size=s
+          button #n184 "Updated" ghost size=s
+          button #n185 "Budget" ghost size=s
+  screen #n43 "Showings"
+    row #n44 h=fill
+      col #n45 share=nav w=200 fill=mid pad=3 gap=2
+        text #n46 "Pipeline" bold
+        text #n47 "Leads" shade=mid
+        text #n48 "Active" shade=mid
+        text #n49 "Closed" shade=mid
+        text #n50 "Lost" shade=mid
+      col #n51 grow pad=4 gap=3
+        row #n52 justify=between align=center
+          text #n53 "Upcoming Showings" size=l bold
+          button #n54 "Schedule" primary
+        col #n55 gap=2
+          row #n56 pad=3 border gap=3
+            col #n57 grow
+              text #n58 "428 Maple Street" bold
+              text #n59 "Sarah Chen" size=s shade=mid
+              text #n60 "2-bed, $695K" size=s shade=mid
+            text #n61 "Thu 2:30 PM" bold
+            button #n62 "Details" ghost
+          row #n63 pad=3 border gap=3
+            col #n64 grow
+              text #n65 "612 Valencia Ave" bold
+              text #n66 "Marcus Rodriguez" size=s shade=mid
+              text #n67 "3-bed, $475K" size=s shade=mid
+            text #n68 "Fri 10:00 AM" bold
+            button #n69 "Details" ghost
+          row #n70 pad=3 border gap=3
+            col #n71 grow
+              text #n72 "1847 Golden Gate Ave" bold
+              text #n73 "Jennifer Kim" size=s shade=mid
+              text #n74 "4-bed, $850K" size=s shade=mid
+            text #n75 "Sat 11:00 AM" bold
+            button #n76 "Details" ghost
+  screen #n77 "Deal"
+    row #n78 h=fill
+      col #n79 share=nav w=200 fill=mid pad=3 gap=2
+        text #n80 "Pipeline" bold
+        text #n81 "Leads" shade=mid
+        text #n82 "Active" shade=mid
+        text #n83 "Closed" shade=mid
+        text #n84 "Lost" shade=mid
+      col #n85 grow pad=4 gap=3
+        row #n86 justify=between align=center
+          text #n87 "Sarah Chen" size=l bold
+        col #n89 gap=2 pad=3 border
+          row #n90 justify=between
+            col #n91
+              text #n92 "Property" size=s shade=mid
+              text #n93 "428 Maple Street" bold
+            col #n94 align=end
+              text #n95 "Price" size=s shade=mid
+              text #n96 "$695,000" bold
+          line #n97
+          row #n98 justify=between
+            col #n99
+              text #n100 "Status" size=s shade=mid
+              text #n101 "Showing scheduled" bold
+            col #n102 align=end
+              text #n103 "Next step" size=s shade=mid
+              text #n104 "Home inspection" bold
+          line #n105
+          row #n106 justify=between
+            col #n107
+              text #n108 "Financing" size=s shade=mid
+              text #n109 "Pre-approved, 20% down" bold
+            col #n110 align=end
+              text #n111 "Timeline" size=s shade=mid
+              text #n112 "30 days" bold
+        col #n113 gap=1
+          text #n114 "Notes" size=s shade=mid bold
+          text #n115 "Motivated buyer. Strong financial profile. Viewed 3 properties this month." shade=mid size=s
+        col #n116 gap=2
+          text #n117 "Activity" size=s shade=mid bold
+          text #n118 "Sent pre-approval letter" shade=mid size=s data
+          text #n119 "2 days ago" shade=light size=s
+          text #n120 "Scheduled showing at 428 Maple" shade=mid size=s data
+          text #n121 "1 day ago" shade=light size=s
+          text #n122 "Initial consultation" shade=mid size=s data
+          text #n123 "3 days ago" shade=light size=s
+  screen #n126 "Settings"
+    row #n127 h=fill
+      col #n128 share=nav w=200 fill=mid pad=3 gap=2
+        text #n129 "Pipeline" bold
+        text #n130 "Leads" shade=mid
+        text #n131 "Active" shade=mid
+        text #n132 "Closed" shade=mid
+        text #n133 "Lost" shade=mid
+      col #n134 grow pad=4 gap=4
+        text #n135 "Settings" size=xl bold
+        col #n186 gap=2 pad=3 border
+          text #n187 "About" size=s shade=mid bold
+          text #n188 "Pipeline v2.1.4" shade=mid size=s
+          text #n189 "Last updated 3 days ago" shade=light size=s
+        col #n136 gap=3
+          col #n137 gap=2 pad=3 border
+            text #n138 "Account" size=s shade=mid bold
+            row #n139 justify=between align=center
+              text #n140 "Email"
+              text #n141 "alex@realestate.com" shade=mid
+            row #n142 justify=between align=center
+              text #n143 "Name"
+              text #n144 "Alex Morrison" shade=mid
+            row #n145 justify=between align=center
+              text #n146 "Phone"
+              text #n147 "(415) 555-0147" shade=mid
+          col #n148 gap=2 pad=3 border
+            text #n149 "Notifications" size=s shade=mid bold
+            row #n150 justify=between align=center
+              text #n151 "Email alerts for new leads"
+              input #n152 toggle on
+            row #n153 justify=between align=center
+              text #n154 "Daily summary"
+              input #n155 toggle on
+            row #n156 justify=between align=center
+              text #n157 "Showing reminders"
+              input #n158 toggle
+          col #n159 gap=2 pad=3 border
+            text #n160 "Preferences" size=s shade=mid bold
+            row #n161 justify=between align=center
+              text #n162 "Default currency"
+              text #n163 "USD" shade=mid
+            row #n164 justify=between align=center
+              text #n165 "Time zone"
+              text #n166 "Pacific Time" shade=mid
+            row #n167 justify=between align=center
+              text #n168 "Theme"
+              text #n169 "Light" shade=mid
+          col #n170 gap=2 pad=3 border
+            row #n171 justify=between align=center
+              button #n172 "Sign out" ghost
+              button #n173 "Delete account" ghost

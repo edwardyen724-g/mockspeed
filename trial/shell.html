@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>trial</title>
+<html><head><meta charset="utf-8"><title>{{title}}</title>
 <style>
   :root{--line:#e3e3e3;--faint:#8a8a8a}
   *{box-sizing:border-box}
@@ -49,19 +49,23 @@
   ol li.said-back{font-style:italic;color:#333}
   .busy #go{opacity:.4}
   footer{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:6px}
+  .ask button.offer{align-self:flex-start}
+  /* Scores, timings, model names, the file and the engine's own notes: only with ?debug=1. */
+  body:not(.debug) .dbg{display:none}
 </style></head>
 <body>
 <iframe id="mock" src="/mock"></iframe>
 <aside>
-  <header><h1 id="title">trial</h1><div class="sub" id="status">…</div></header>
-  <div class="marked" id="markedBox"><span class="none">click anything in the mock to mark it</span></div>
+  <header><h1 id="title">{{title}}</h1><div class="sub" id="status">…</div></header>
+  <div class="marked" id="markedBox"><span class="none">{{selectHint}}</span></div>
   <div class="say">
-    <form id="form"><input id="utterance" placeholder="describe an app, or say a change…" autocomplete="off"><button id="mic" type="button" title="voice">●</button><button class="go" id="go" type="submit">say</button></form>
+    <form id="form"><input id="utterance" placeholder="{{placeholder}}" autocomplete="off"><button id="mic" type="button" title="{{voice}}">●</button><button class="go" id="go" type="submit">{{say}}</button></form>
     <!-- Whatever the canvas needs the person to decide appears here, right under what they typed. -->
     <div class="note" id="note"></div>
     <div class="ask" id="ask"></div>
   </div>
-  <details open><summary>what can I say?</summary>
+  <!-- The engine's own vocabulary; suggestion chips replace it for a person (plan §3E). -->
+  <details open class="dbg"><summary>what can I say?</summary>
     <dl>
       <dt>create an app for …</dt><dd>Jev routes it to the writer; the outline is drawn as it streams</dd>
       <dt>add a search field at the top</dt><dd>Jev picks where it goes; the writer writes only the field</dd>
@@ -80,15 +84,21 @@
   </details>
   <ol id="log"></ol>
   <footer>
-    <button id="undo">undo</button>
-    <button id="save">save spec</button>
-    <button id="clear">unmark</button>
+    <button id="undo">{{undo}}</button>
+    <button id="new">{{new}}</button>
+    <button id="unselect">{{unselect}}</button>
+    <button id="save" class="dbg">{{save}}</button>
   </footer>
 </aside>
 <script>
 const $ = (id) => document.getElementById(id);
 const mock = $("mock");
 let marked = null, els = [], choices = [], picked = [];
+// ?debug=1 shows what the person does not need: Jev's scores and timings, the model, the engine's
+// notes in the log, the file the mock saves to.
+const DEBUG = new URLSearchParams(location.search).has("debug");
+document.body.classList.toggle("debug", DEBUG);
+const HINT = $("markedBox").textContent;
 
 const post = (path, body) => fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }).then((r) => r.json());
 
@@ -127,14 +137,22 @@ function redraw() {
 async function load() {
   const s = await fetch("/state").then((r) => r.json());
   els = s.elements;
-  $("title").textContent = s.title;
-  $("status").textContent = `${els.length} elements · ${s.llm ? s.llm.replace(/^claude-/, "") : "no translator"} → jev ${s.jev ? "on" : "off"} · save → ${s.out.split("/").pop()}`;
+  $("title").textContent = s.heading;
+  $("status").textContent = DEBUG
+    ? `${els.length} elements · ${s.llm ? s.llm.replace(/^claude-/, "") : "no translator"} → jev ${s.jev ? "on" : "off"} · save → ${s.out.split("/").pop()}`
+    : s.status;
   $("undo").disabled = !s.canUndo;
   document.body.classList.toggle("busy", Boolean(s.busy));
-  if (s.busy) $("note").textContent = `building "${s.busy}" · ${s.log.length && s.log[s.log.length - 1].note || ""}`;
-  // Newest first. A request reads as: what you typed, then each line the translator wrote with
-  // what Jev made of it, then the tally.
+  if (s.busy) $("note").textContent = DEBUG ? `building "${s.busy}" · ${s.log.length && s.log[s.log.length - 1].note || ""}` : s.working;
+  // Newest first. For a person: what they said, what they picked, and what happened. With
+  // ?debug=1, every step: each route with what Jev made of it, the writer's lines, the tally.
   $("log").innerHTML = s.log.slice().reverse().map((e) => {
+    if (!DEBUG) {
+      if (!e.say) return "";
+      if (e.op === "ask") return `<li class="you">${esc(e.say)}</li>`;
+      if (e.op === "human") return `<li class="route">→ ${esc(e.say)}</li>`;
+      return `<li class="${e.refused ? "refused" : ""}">${esc(e.say)}</li>`;
+    }
     if (e.op === "ask") return `<li class="you">${esc(e.note)}</li>`;
     if (e.op === "route") return `<li class="route">→ <b>${esc(e.route || "")}</b> · ${esc(e.note)}<div class="meta">${esc(e.source || "")}</div></li>`;
     if (e.op === "said") return `<li class="said-back">“${esc(e.note)}”<div class="meta">${esc(e.source || "")} said</div></li>`;
@@ -146,7 +164,8 @@ async function load() {
   $("log").scrollTop = 0;  // newest first, so the newest is what you see
   // The open question lives on the server: after a reload, in a second tab, or once it is answered,
   // what is under the text box is always what the canvas is actually waiting on.
-  const qs = s.question?.choices ?? [];
+  // After acting, what is offered instead — "Bring back “Relay”" — when nothing is being asked.
+  const qs = s.question?.choices ?? (s.offer ?? []).map((o) => ({ ...o, offer: true }));
   if (JSON.stringify(qs) !== JSON.stringify(choices)) {
     showChoices(qs, s.question?.pick ?? []);
     if (s.question && !s.busy) $("note").textContent = s.question.text;
@@ -159,9 +178,9 @@ const esc = (s) => String(s ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">"
 
 function showMark() {
   const e = els.find((x) => x.key === marked);
-  $("markedBox").innerHTML = e
-    ? `<b>${esc(e.kind)}</b> · <span class="none">#${esc(e.id)}${e.screen ? " · " + esc(e.screen) : ""}</span><br>${esc(e.text)}`
-    : `<span class="none">click anything in the mock to mark it</span>`;
+  $("markedBox").innerHTML = !e ? `<span class="none">${esc(HINT)}</span>`
+    : DEBUG ? `<b>${esc(e.kind)}</b> · <span class="none">#${esc(e.id)}${e.screen ? " · " + esc(e.screen) : ""}</span><br>${esc(e.text)}`
+    : esc(e.selected);
 }
 
 function setMark(key) {
@@ -219,12 +238,13 @@ $("form").addEventListener("submit", async (e) => {
 function showChoices(list, pick = []) {
   choices = list;
   picked = pick;
-  $("ask").innerHTML = list.map((c, i) => `<button data-i="${i}"${c.primary ? ' class="go"' : ""}>${esc(c.label)}</button>`).join("");
+  $("ask").innerHTML = list.map((c, i) => `<button data-i="${i}" class="${c.primary ? "go" : ""}${c.offer ? " offer" : ""}">${esc(c.label)}</button>`).join("");
   try { mock.contentWindow.postMessage({ type: "pick", keys: pick }, "*"); } catch {}
 }
 
 function handle(r) {
-  showChoices(r.choices ?? [], r.pick ?? []);
+  const offers = (r.offer ?? []).map((o) => ({ ...o, offer: true }));
+  showChoices(r.choices?.length ? r.choices : offers, r.pick ?? []);
   say(r);
 }
 
@@ -239,16 +259,16 @@ $("ask").addEventListener("click", async (e) => {
 
 function say(r) {
   const bits = [r.note];
-  if (r.ms) bits.push(`${r.ms} ms`);
-  if (r.opConfidence) bits.push(`${r.op} ${r.opConfidence.toFixed(2)}`);
+  if (DEBUG && r.debug) bits.push(r.debug);
   $("note").textContent = bits.filter(Boolean).join(" · ");
   $("note").className = "note" + (r.changed === false && !r.choices?.length ? " warn" : "");
   if (r.changed) redraw(); else load();
 }
 
-$("undo").onclick = async () => say(await post("/undo"));
+$("undo").onclick = async () => handle(await post("/undo"));
+$("new").onclick = async () => { setMark(null); handle(await post("/new")); };
 $("save").onclick = async () => say(await post("/save"));
-$("clear").onclick = () => setMark(null);
+$("unselect").onclick = () => setMark(null);
 
 // Voice, where the browser has it: interim words land in the box, the final one is sent.
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;

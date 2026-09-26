@@ -1,0 +1,115 @@
+app #n1 "Support" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Inbox" bold
+        text #n6 "Open" bold shade=dark
+        text #n7 "Resolved" shade=mid
+        text #n8 "Snoozed" shade=mid
+      col #n9 grow pad=3 gap=3
+        button #n12 "New" primary size=l
+        row #n86 pad=2 gap=2 align=center
+          input #n87 "Search conversations" search w=fill
+        row #n10 justify=between align=center
+          text #n11 "Conversations" size=l bold
+        col #n13 grow gap=2
+          table #n127
+            tr #n128 "Customer | Preview | Time"
+            tr #n129 "Elena Rodriguez | My invoice won't load | 2m" data
+            tr #n130 "James Chen | Password reset not working | 14m" data
+            tr #n131 "Sofia Bergstrom | Subscription cancellation | 3h" data
+  screen #n32 "Conversation"
+    row #n33 h=fill
+      col #n34 share=nav w=200 fill=mid pad=3 gap=2
+        text #n35 "Inbox" bold
+        text #n36 "Open" bold shade=dark
+        text #n37 "Resolved" shade=mid
+        text #n38 "Snoozed" shade=mid
+      col #n39 grow pad=3 gap=2 fill=light
+        row #n40 justify=between align=center
+          text #n41 "Elena Rodriguez" size=l bold
+          button #n42 "Resolve" primary
+        col #n43 grow gap=2
+          row #n44 gap=2
+            shape #n45 circle w=32 h=32
+            col #n46
+              text #n47 "Elena Rodriguez" size=s bold
+              text #n48 "2:14 PM" size=xs shade=mid
+          text #n49 "Hi, when I try to open my invoice from last month it just shows a blank page. I've tried on Chrome and Firefox." size=m data
+          row #n50 gap=2
+            shape #n51 circle w=32 h=32
+            col #n52
+              text #n53 "Marcus (You)" size=s bold
+              text #n54 "2:16 PM" size=xs shade=mid
+          text #n55 "Hi Elena, thanks for reporting this. Can you confirm your account email?" size=m data
+          row #n56 gap=2
+            shape #n57 circle w=32 h=32
+            col #n58
+              text #n59 "Elena Rodriguez" size=s bold
+              text #n60 "2:18 PM" size=xs shade=mid
+          text #n61 "Sure, it's e.rodriguez@acmeco.com" size=m data
+          row #n62 gap=2
+            shape #n63 circle w=32 h=32
+            col #n64
+              text #n65 "Marcus (You)" size=s bold
+              text #n66 "2:19 PM" size=xs shade=mid
+          text #n67 "Perfect, I found the issue. It's now fixed on our end. Please try again." size=m data
+      col #n68 w=280 fill=mid pad=3 gap=3 border
+        text #n69 "Customer" bold
+        col #n70 gap=2
+          text #n71 "Elena Rodriguez" size=s bold data
+          text #n72 "e.rodriguez@acmeco.com" size=xs shade=light data
+        line #n73
+        text #n74 "Account" bold size=s
+        col #n75 gap=1 size=xs shade=light
+          text #n76 "Status: Active" data
+          text #n77 "Joined: Jan 15, 2023" data
+          text #n78 "Plan: Professional" data
+          text #n79 "MRR: $99/mo" data
+        line #n80
+        text #n81 "History" bold size=s
+        col #n82 gap=1 size=xs shade=light
+          text #n83 "3 tickets this month" data
+          text #n84 "Avg response: 2h" data
+          text #n85 "Last contact: 1d ago" data
+  screen #n88 "Settings"
+    row #n89 h=fill
+      col #n90 share=nav w=200 fill=mid pad=3 gap=2
+        text #n91 "Inbox" bold shade=mid
+        text #n92 "Open" shade=mid
+        text #n93 "Resolved" shade=mid
+        text #n94 "Snoozed" shade=mid
+        line #n95
+        text #n96 "Settings" bold
+      col #n97 grow pad=3 gap=4
+        text #n98 "Settings" size=l bold
+        col #n132 gap=2
+          text #n133 "Note" bold
+          text #n134 "Changes to your settings are saved automatically." size=s shade=mid
+        col #n99 gap=3
+          col #n100 gap=2
+            text #n101 "Notifications" bold
+            row #n102 align=center justify=between
+              text #n103 "Email alerts" size=s
+              input #n104 toggle on
+            row #n105 align=center justify=between
+              text #n106 "Desktop notifications" size=s
+              input #n107 toggle
+          line #n108
+          col #n109 gap=2
+            text #n110 "Appearance" bold
+            row #n111 align=center justify=between
+              text #n112 "Dark mode" size=s
+              input #n113 toggle
+          line #n114
+          col #n115 gap=2
+            text #n116 "Account" bold
+            row #n117 justify=between align=center
+              text #n118 "Change password" size=s shade=mid
+              text #n119 ">" shade=mid
+            row #n120 justify=between align=center
+              text #n121 "Two-factor authentication" size=s shade=mid
+              text #n122 ">" shade=mid
+            row #n123 justify=between align=center
+              text #n124 "Sign out" size=s shade=mid
+              text #n125 ">" shade=mid

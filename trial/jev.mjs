@@ -158,6 +158,20 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
       criteria: Object.fromEntries(screens.map((n) => [n, `the ${n} screen`])),
     };
   }
+  // The screen of the element a sentence places something next to: "add our phone number under the
+  // address" names no screen, but the address is on one, so the person need not be asked which
+  // (docs/plan-web-2026-09-26.md §3B). Measured 2026-09-26 on 20 sentences over six apps, twice:
+  // an element on a screen other than `viewing`, 24/24 at 0.94-1.00 (the `screen` question was
+  // under 0.6 on 18 of them, and 6 times its top pick was the wrong screen); a sentence naming no
+  // element, or one on several screens, `viewing` 16/16 at 0.87-1.00. A wording without the example
+  // ("the element or place `said` names") scored 0.70-0.74 on "next to archive".
+  if (routing && screens.length > 1) {
+    questions.anchor = {
+      type: "choice",
+      instructions: "`said` may name an element already on the mockup to put something next to, above, below or inside (such as \"under the address\"). Which screen is that element on? `elements` lists every element with the screen it is on. If `said` names no element, answer the screen in `viewing`.",
+      criteria: Object.fromEntries(screens.map((n) => [n, `the ${n} screen`])),
+    };
+  }
   // With an element marked, the same choice over every element tells a sentence that points at it
   // and also names another ("move this next to the search bar") from one that only points. Which
   // element an unmarked sentence means is `which`'s question, asked over the elements of its kind.
@@ -203,6 +217,8 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
     points: answers.points?.noul ?? null,
     screen: answers.screen?.choice ?? null,
     screenConfidence: answers.screen?.confidence ?? 0,
+    anchorScreen: answers.anchor?.choice ?? null,
+    anchorConfidence: answers.anchor?.confidence ?? 0,
     kind: answers.kind?.choice ?? null,
     kindConfidence: answers.kind?.confidence ?? 0,
     exists: answers.exists?.noul ?? null,

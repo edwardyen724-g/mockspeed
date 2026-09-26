@@ -1,0 +1,68 @@
+app #n1 "PageSummary" panel
+  screen #n2 "Summary"
+    col #n3 pad=3 gap=3 h=fill
+      text #n65 "Filter" size=s shade=mid bold
+      button #n26 "Read Full Article" primary w=fill size=l
+      row #n64 gap=2 align=center
+        input #n66 select value="All Sources" w=fill
+      input #n28 "Search articles" search w=fill
+      text #n4 "PageSummary" size=s bold
+      line #n5
+      col #n6 gap=2 grow
+        text #n7 "The New York Times" size=m bold
+        text #n8 "What to Know About the Latest Climate Report" size=xxl bold shade=dark
+        text #n9 "Published 2 hours ago" size=xs shade=mid
+        line #n10
+        text #n11 "Key Points" size=s bold
+        text #n12 "Global temperatures rose 1.1°C since pre-industrial times" size=s data
+        text #n13 "Extreme weather events increased 35% in the past decade" size=s data
+        text #n14 "Policy changes needed by 2030 for 1.5°C pathway" size=s data
+        line #n15
+        text #n16 "Sentiment" size=s bold
+        row #n17 gap=2 align=center
+          shape #n18 circle w=12 h=12 fill=mid
+          text #n19 "Cautionary" size=s
+        line #n20
+        text #n21 "Topics" size=s bold
+        row #n22 gap=1 wrap
+          text #n23 "Climate" size=xs pill fill=light
+          text #n24 "Environment" size=xs pill fill=light
+          text #n25 "Policy" size=xs pill fill=light
+  screen #n29 "Settings"
+    col #n30 pad=3 gap=3 h=fill
+      text #n31 "PageSummary" size=s bold
+      line #n32
+      col #n33 gap=3 grow
+        col #n34 gap=2
+          text #n35 "Display" size=s bold
+          row #n36 gap=2 align=center justify=between
+            text #n37 "Dark Mode" size=s
+            input #n38 toggle
+          row #n39 gap=2 align=center justify=between
+            text #n40 "Font Size" size=s
+            input #n41 select value=Medium
+        line #n42
+        col #n43 gap=2
+          text #n44 "Content" size=s bold
+          row #n45 gap=2 align=center justify=between
+            text #n46 "Show Sentiment" size=s
+            input #n47 toggle on
+          row #n48 gap=2 align=center justify=between
+            text #n49 "Show Topics" size=s
+            input #n50 toggle on
+          row #n51 gap=2 align=center justify=between
+            text #n52 "Max Articles" size=s
+            input #n53 value="10"
+        line #n54
+        col #n55 gap=2
+          text #n56 "Notifications" size=s bold
+          row #n57 gap=2 align=center justify=between
+            text #n58 "Enable Alerts" size=s
+            input #n59 toggle
+          row #n60 gap=2 align=center justify=between
+            text #n61 "Alert Frequency" size=s
+            input #n62 select value=Daily
+      button #n63 "Reset to Defaults" ghost w=fill
+      col #n67 gap=2
+        text #n68 "Note" size=s bold
+        text #n69 "Settings are saved automatically to your device." size=s shade=mid
