@@ -44,7 +44,7 @@ function stepsOf(r, verdict) {
     else outcome = st.changed ? "changed" : "no change";
     const v = verdict?.steps?.find((x) => x.step === si + 1) ?? null;
     return {
-      sentence: st.sentence, kind: st.kind, marked: st.marked, jev, asked: st.asked, human: st.human, outcome,
+      sentence: st.sentence, kind: st.kind, marked: st.marked, jev, asked: st.asked, human: st.human, offers: st.offers ?? [], outcome,
       result: [...(split ? [`split into: ${split.note}`] : []), ...writes, ...edits].join(" · ") || st.reply, ms: st.ms,
       verdict: v ? { call: v.verdict, why: v.why } : null,
     };

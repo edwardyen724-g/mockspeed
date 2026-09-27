@@ -1,0 +1,154 @@
+app #n1 "Prospect Flow" web
+  screen #n2 "Pipeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Pipeline" bold
+        text #n6 "Showings" shade=mid
+        text #n7 "Closed" shade=mid
+        text #n8 "Settings" shade=mid
+      col #n9 grow pad=4 gap=3
+        text #n10 "Buyers" size=l bold
+        row #n11 gap=3 justify=between align=center
+          text #n12 "24 active" size=s shade=mid
+          button #n13 "New buyer" primary
+        row #n14 gap=3 h=fill
+          col #n15 w=250 gap=2 pad=2 border fill=light
+            text #n16 "Leads" bold size=s shade=dark
+            col #n17 gap=2
+              col #n18 border pad=2 gap=1
+                text #n19 "Sarah Chen" bold
+                text #n20 "Budget: $450K" size=xs shade=mid data
+                text #n21 "2-bed, downtown" size=xs shade=mid data
+              col #n22 border pad=2 gap=1
+                text #n23 "Marcus Williams" bold
+                text #n24 "Budget: $680K" size=xs shade=mid data
+                text #n25 "Family home, suburbs" size=xs shade=mid data
+              col #n26 border pad=2 gap=1
+                text #n27 "Jennifer Park" bold
+                text #n28 "Budget: $550K" size=xs shade=mid data
+                text #n29 "First-time buyer" size=xs shade=mid data
+          col #n30 w=250 gap=2 pad=2 border fill=light
+            text #n31 "Viewing" bold size=s shade=dark
+            col #n32 gap=2
+              col #n33 border pad=2 gap=1
+                text #n34 "David Lopez" bold
+                text #n35 "$725K approved" size=xs shade=mid data
+                text #n36 "Showed 3 properties" size=xs shade=mid data
+              col #n37 border pad=2 gap=1
+                text #n38 "Amy Thompson" bold
+                text #n39 "$400K approved" size=xs shade=mid data
+                text #n40 "Scheduled: Wed 2pm" size=xs shade=mid data
+          col #n41 w=250 gap=2 pad=2 border fill=light
+            text #n42 "Negotiating" bold size=s shade=dark
+            col #n43 gap=2
+              col #n44 border pad=2 gap=1
+                text #n45 "Robert Johnson" bold
+                text #n46 "Offer: $595K" size=xs shade=mid data
+                text #n47 "478 Oak Ave" size=xs shade=mid data
+              col #n48 border pad=2 gap=1
+                text #n49 "Lisa Gupta" bold
+                text #n50 "Offer: $920K" size=xs shade=mid data
+                text #n51 "Waiting on inspection" size=xs shade=mid data
+          col #n52 w=250 gap=2 pad=2 border fill=light
+            text #n53 "Closed" bold size=s shade=dark
+            col #n54 gap=2
+              col #n55 border pad=2 gap=1 fill=light
+                text #n56 "Thomas Walsh" bold
+                text #n57 "Closed: $545K" size=xs shade=mid data
+                text #n58 "12 Oak Ridge Lane" size=xs shade=mid data
+  screen #n59 "Buyer Detail"
+    row #n60 h=fill
+      col #n61 share=nav w=200 fill=light pad=3 gap=2
+        text #n62 "Pipeline" shade=mid
+        text #n63 "Showings" bold
+        text #n64 "Closed" shade=mid
+        text #n65 "Settings" shade=mid
+      col #n66 grow pad=4 gap=3
+        row #n67 align=center gap=3
+          shape #n68 circle w=48 h=48
+          col #n69 gap=1
+            text #n70 "Sarah Chen" size=l bold
+            text #n71 "Lead • Added Jan 15" size=s shade=mid
+        row #n72 gap=4 pad=3 border
+          col #n73 gap=2 w=300
+            text #n74 "Contact" size=s bold shade=dark
+            text #n75 "Phone" size=xs shade=mid
+            text #n76 "(555) 234-7891" mono
+            text #n77 "Email" size=xs shade=mid
+            text #n78 "sarah.chen@email.com" mono
+            text #n79 "Preferred: Call" size=xs shade=mid
+          col #n80 gap=2 w=300
+            text #n81 "Requirements" size=s bold shade=dark
+            text #n82 "Budget" size=xs shade=mid
+            text #n83 "$450,000" mono
+            text #n84 "Beds" size=xs shade=mid
+            text #n85 "2–3" mono
+            text #n86 "Area" size=xs shade=mid
+            text #n87 "Downtown, walkable" mono
+          col #n88 gap=2 grow
+            text #n89 "Timeline" size=s bold shade=dark
+            text #n90 "Ready to buy" size=xs shade=mid
+            text #n91 "60 days" mono
+            text #n92 "Next step" size=xs shade=mid
+            text #n93 "Schedule showing" mono
+        text #n94 "Activity" size=s bold
+        col #n95 gap=2
+          row #n96 gap=2 align=start
+            text #n97 "Jan 22, 10am" size=xs shade=mid w=80
+            col #n98 gap=1
+              text #n99 "Showing scheduled" bold size=s
+              text #n100 "478 Oak Ave" size=xs shade=mid
+          row #n101 gap=2 align=start
+            text #n102 "Jan 15, 2pm" size=xs shade=mid w=80
+            col #n103 gap=1
+              text #n104 "Lead created" bold size=s
+              text #n105 "Web form submission" size=xs shade=mid
+        row #n106 gap=2 pad=3 border
+          button #n107 "Schedule showing" primary
+          button #n108 "Send listing"
+          button #n109 "Call" ghost
+  screen #n110 "Showings"
+    row #n111 h=fill
+      col #n112 share=nav w=200 fill=light pad=3 gap=2
+        text #n113 "Pipeline" shade=mid
+        text #n114 "Showings" bold
+        text #n115 "Closed" shade=mid
+        text #n116 "Settings" shade=mid
+      col #n117 grow pad=4 gap=3
+        text #n118 "Upcoming showings" size=l bold
+        col #n119 gap=2
+          col #n120 border pad=3 gap=2
+            row #n121 justify=between align=center
+              col #n122 gap=1
+                text #n123 "Wednesday, Jan 22" bold
+                text #n124 "478 Oak Ave" size=s shade=mid
+              text #n125 "10:00 am" bold
+            row #n126 justify=between align=center
+              text #n127 "Sarah Chen" bold
+              text #n128 "2-bed, $450K" size=s shade=mid
+          col #n129 border pad=3 gap=2
+            row #n130 justify=between align=center
+              col #n131 gap=1
+                text #n132 "Thursday, Jan 23" bold
+                text #n133 "245 Maple Drive" size=s shade=mid
+              text #n134 "2:30 pm" bold
+            row #n135 justify=between align=center
+              text #n136 "Amy Thompson" bold
+              text #n137 "3-bed, $400K" size=s shade=mid
+          col #n138 border pad=3 gap=2
+            row #n139 justify=between align=center
+              col #n140 gap=1
+                text #n141 "Friday, Jan 24" bold
+                text #n142 "912 Elm Court" size=s shade=mid
+              text #n143 "4:00 pm" bold
+            row #n144 justify=between align=center
+              text #n145 "Marcus Williams" bold
+              text #n146 "4-bed, $680K" size=s shade=mid
+        text #n147 "Recent feedback" size=s bold
+        col #n148 gap=2
+          col #n149 border pad=3 gap=1
+            text #n150 "Sarah Chen • 478 Oak Ave" bold
+            text #n151 "Great bones. Needs kitchen update. Wants inspection Friday." size=s
+          col #n152 border pad=3 gap=1
+            text #n153 "David Lopez • 1547 Pine Street" bold
+            text #n154 "Too small. Not interested." size=s

@@ -213,6 +213,7 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
     screens: answers.screen?.probabilities ?? {},
     job: answers.job?.choice ?? null,
     jobConfidence: answers.job?.confidence ?? 0,
+    jobs: answers.job?.probabilities ?? {},
     whole: answers.whole?.noul ?? 0,
     points: answers.points?.noul ?? null,
     screen: answers.screen?.choice ?? null,

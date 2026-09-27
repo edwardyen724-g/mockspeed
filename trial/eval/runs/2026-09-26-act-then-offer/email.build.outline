@@ -1,0 +1,120 @@
+app #n1 "Mail" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Mail" bold size=l
+        line #n6
+        text #n7 "Inbox" bold
+        text #n8 "Drafts" shade=mid
+        text #n9 "Sent" shade=mid
+        text #n10 "Trash" shade=mid
+        line #n11
+        text #n12 "Folders" shade=mid size=s
+        text #n13 "Work" shade=mid
+        text #n14 "Personal" shade=mid
+        text #n15 "Archive" shade=mid
+      col #n16 grow pad=3 gap=3
+        row #n17 justify=between align=center
+          text #n18 "Inbox" bold size=l
+          row #n19 gap=2
+            input #n20 "Search" search w=200
+            button #n21 "Compose" primary
+        col #n22 gap=2 grow
+          row #n23 pad=2 gap=3 align=center border
+            input #n24 "" check
+            col #n25 grow
+              text #n26 "Sarah Chen" bold
+              text #n27 "Re: Q4 Budget Review"
+            text #n28 "2:34 PM" shade=mid size=s
+          row #n29 pad=2 gap=3 align=center border
+            input #n30 "" check
+            col #n31 grow
+              text #n32 "Alex Martinez" bold
+              text #n33 "Coffee tomorrow?"
+            text #n34 "1:12 PM" shade=mid size=s
+          row #n35 pad=2 gap=3 align=center border
+            input #n36 "" check
+            col #n37 grow
+              text #n38 "Design Team" bold
+              text #n39 "New branding mockups attached"
+            text #n40 "11:47 AM" shade=mid size=s
+          row #n41 pad=2 gap=3 align=center border
+            input #n42 "" check
+            col #n43 grow
+              text #n44 "Jordan Lee" bold
+              text #n45 "Meeting notes from standup"
+            text #n46 "9:23 AM" shade=mid size=s
+          row #n47 pad=2 gap=3 align=center border
+            input #n48 "" check
+            col #n49 grow
+              text #n50 "Finance" bold
+              text #n51 "Expense report submission deadline"
+            text #n52 "Yesterday" shade=mid size=s
+  screen #n53 "Message"
+    row #n54 h=fill
+      col #n55 share=nav w=200 fill=light pad=3 gap=2
+        text #n56 "Mail" bold size=l
+        line #n57
+        text #n58 "Inbox" shade=mid
+        text #n59 "Drafts" shade=mid
+        text #n60 "Sent" shade=mid
+        text #n61 "Trash" shade=mid
+        line #n62
+        text #n63 "Folders" shade=mid size=s
+        text #n64 "Work" shade=mid
+        text #n65 "Personal" shade=mid
+        text #n66 "Archive" shade=mid
+      col #n67 grow pad=3 gap=3
+        row #n68 justify=between align=center
+          col #n69 grow
+            text #n70 "Re: Q4 Budget Review" bold size=l
+            row #n71 gap=2
+              text #n72 "Sarah Chen" bold size=s
+              text #n73 "sarah@company.com" shade=mid size=s
+            text #n74 "Today at 2:34 PM" shade=mid size=s
+          button #n75 "Archive" ghost
+        line #n76
+        col #n77 gap=3 grow
+          col #n78 gap=2 pad=3 fill=light
+            text #n79 "Sarah Chen" bold
+            text #n80 "Thanks for sending over the initial estimates. I've reviewed them and have a few questions about the marketing allocation." size=m
+            text #n81 "2:34 PM" shade=mid size=s
+          col #n82 gap=2 pad=3 align=end
+            col #n83 gap=2 pad=3 fill=mid
+              text #n84 "Looks reasonable overall. Should we schedule a sync?" size=m
+            text #n85 "3:01 PM" shade=mid size=s
+          col #n86 gap=2 pad=3 fill=light
+            text #n87 "Sarah Chen" bold
+            text #n88 "Yes, I have time Thursday at 10am or Friday afternoon. Which works better?" size=m
+            text #n89 "3:15 PM" shade=mid size=s
+        row #n90 gap=2 pad=3 border
+          input #n91 "Reply..." area grow
+          button #n92 "Send" primary
+  screen #n93 "Compose"
+    row #n94 h=fill
+      col #n95 share=nav w=200 fill=light pad=3 gap=2
+        text #n96 "Mail" bold size=l
+        line #n97
+        text #n98 "Inbox" shade=mid
+        text #n99 "Drafts" shade=mid
+        text #n100 "Sent" shade=mid
+        text #n101 "Trash" shade=mid
+        line #n102
+        text #n103 "Folders" shade=mid size=s
+        text #n104 "Work" shade=mid
+        text #n105 "Personal" shade=mid
+        text #n106 "Archive" shade=mid
+      col #n107 grow pad=3 gap=2
+        row #n108 justify=between
+          text #n109 "New Message" bold size=l
+          text #n110 "Draft saved" shade=mid size=s
+        line #n111
+        col #n112 gap=2
+          input #n113 "To" value=alex@company.com
+          input #n114 "Cc"
+          input #n115 "Subject" value="Project kickoff"
+          line #n116
+          input #n117 "Message..." area h=300 grow
+        row #n118 justify=end gap=2
+          button #n119 "Discard" ghost
+          button #n120 "Send" primary

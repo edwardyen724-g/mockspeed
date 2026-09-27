@@ -12,6 +12,9 @@
 // for the answers a test needs — "yes, remove it", and "start a new app" from servers before
 // 2026-09-26 (a new app now replaces the canvas without asking, and offers the old one back) — and
 // records every other question ("which one?", "where should it go?") as asked, then leaves it.
+// Since act, then offer (phase 1b), the app mostly acts on Jev's top pick and offers the runner-up
+// as a swap beside the reply: the script records each step's swaps (`offers`) and takes none, so
+// the judges can say whether the first result, or one click on a swap, was what the person meant.
 //
 // Writes <out-dir>/results.json (every step with its slice of the app's log: Jev's route, job,
 // screen and gap decisions with confidences, questions, answers, what changed) and each app's
@@ -69,7 +72,9 @@ for (const key of Object.keys(prompts)) {
     const log = at >= 0 ? all.slice(at) : [];
     // Jev's decisions in the step: routes (and whether a split part waits), elements, places.
     const jev = log.filter((e) => ["route", "target", "place"].includes(e.op) && /^jev/.test(e.source ?? "")).length;
-    steps.push({ kind, sentence, marked, reply: r.note, ...(r.debug ? { debug: r.debug } : {}), changed: Boolean(r.changed), asked, human, jev, ms, log });
+    // The swaps offered beside the reply (not Undo or "Bring back"), taken by no one here.
+    const offers = (r.offer ?? []).filter((o) => o.post?.path === "/swap").map((o) => o.label);
+    steps.push({ kind, sentence, marked, reply: r.note, ...(r.debug ? { debug: r.debug } : {}), changed: Boolean(r.changed), asked, human, offers, jev, ms, log });
     return r;
   }
 
@@ -103,8 +108,17 @@ for (const key of Object.keys(prompts)) {
   const jevCalls = steps.reduce((s, x) => s + x.jev, 0);
   const humans = steps.reduce((s, x) => s + x.human.length, 0);
   results.push({ key, prompt: prompts[key], buildMs, jevCalls, humans, viewing, markedForStep4: button ? { key: button.key, line: button.text } : null, steps });
-  const sym = (x) => (x.asked.length && !x.human.length ? "?" : x.changed ? "✓" : "·");
+  // ? asked and left · ✓ changed · ≈ changed, with a swap offered · ~ nothing changed, a swap offered · · nothing
+  const sym = (x) => (x.asked.length && !x.human.length ? "?" : x.changed ? (x.offers.length ? "≈" : "✓") : x.offers.length ? "~" : "·");
   console.log(`${key.padEnd(14)} build ${(buildMs / 1000).toFixed(1)} s · ${jevCalls} Jev · ${humans} human · ${steps.map(sym).join("")}`);
   writeFileSync(join(OUT, "results.json"), JSON.stringify(results, null, 2));
 }
+// Phase 1b's counts: questions per follow-up — asked first, and nothing done with only offers
+// beside the reply (Jev does not see the thing named), which a person must also answer to get a
+// change — and swaps offered after acting.
+const follow = results.flatMap((r) => r.steps.filter((x) => x.kind !== "build"));
+const asked = follow.filter((x) => x.asked.length).length;
+const offeredOnly = follow.filter((x) => !x.asked.length && !x.changed && x.offers.length).length;
+const swaps = follow.filter((x) => x.changed && x.offers.length).length;
+console.log(`questions ${asked} asked + ${offeredOnly} offered without acting = ${((asked + offeredOnly) / follow.length).toFixed(2)} per sentence (${follow.length}) · ${swaps} changes with a swap offered`);
 console.log(`done · ${results.reduce((s, r) => s + r.jevCalls, 0)} Jev decisions · ${results.reduce((s, r) => s + r.humans, 0)} human decisions → ${OUT}`);

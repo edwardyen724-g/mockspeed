@@ -90,7 +90,11 @@ function score(group) {
     moves: [count((st) => st.kind.startsWith("move") && st.outcome === "changed"), count((st) => st.kind.startsWith("move"))],
     rewrites: [count((st) => st.kind.startsWith("rewrite") && st.outcome === "changed"), count((st) => st.kind.startsWith("rewrite"))],
     asked: count((st) => st.asked.length && !st.human.length),
-    right: judged.length ? [judged.filter((st) => /^(right|correctly_nothing|fair_ask)$/.test(st.verdict.call)).length, judged.length] : null,
+    // Right: the first result, or one click on the swap offered beside it (phase 1b), or rightly nothing.
+    right: judged.length ? [judged.filter((st) => /^(right|swap_right|correctly_nothing)$/.test(st.verdict.call)).length, judged.length] : null,
+    bySwap: judged.filter((st) => st.verdict.call === "swap_right").length,
+    fair: judged.filter((st) => st.verdict.call === "fair_ask").length,
+    swaps: count((st) => st.kind !== "build" && st.outcome === "changed" && (st.offers ?? []).length),
     needless: judged.filter((st) => st.verdict.call === "needless_ask").length,
     substance: subs.length ? (subs.reduce((a, b) => a + b, 0) / subs.length).toFixed(1) : null,
   };
@@ -109,7 +113,8 @@ function header(active) {
       ${stat(`${s.moves[0]} / ${s.moves[1]}`, "moves to a named place")}
       ${stat(`${s.rewrites[0]} / ${s.rewrites[1]}`, "rewrites of an element Jev chose")}
       ${stat(s.asked, "questions left for the person")}
-      ${s.right ? stat(`${s.right[0]} / ${s.right[1]}`, `follow-ups judged right (a fair question counts) · ${s.needless} needless questions`) : ""}
+      ${stat(s.swaps, "changes with a swap offered beside them")}
+      ${s.right ? stat(`${s.right[0]} / ${s.right[1]}`, `follow-ups judged right, ${s.bySwap} of them by the offered swap · ${s.fair} fair and ${s.needless} needless questions`) : ""}
       ${s.substance ? stat(`${s.substance} / 3`, "build substance, judged") : ""}
     </div>
     <nav>${D.runs.map((r) => `<a href="#/${r.group}" class="${active === r.group ? "on" : ""}">${esc(r.label)}</a>`).join("")}<a href="#/summary" class="${active === "summary" ? "on" : ""}">Summary</a></nav>`;
@@ -132,13 +137,14 @@ function stepsTable(i) {
   const rows = i.steps.map((st, n) => {
     const route = routeOf(st), right = route === expected(st.kind);
     const jev = st.jev.map((j) => `<div><b>${j.kind}</b>${j.said && j.said !== st.sentence ? ` <span class="muted">(${esc(j.said)})</span>` : ""}${j.kind === "where" || j.kind === "which" ? `: ${esc(j.text)}` : ""}<div class="muted">${esc(j.detail.replace(/^jev · /, ""))}</div></div>`).join("") || `<span class="muted">—</span>`;
-    const you = [...st.asked.map((a) => `<div>asked: <b>${esc(a.question)}</b><div class="muted">${a.options.map(esc).join(" · ")}</div></div>`), ...st.human.map((h) => `<div>answered: <b>${esc(h)}</b></div>`)].join("") || `<span class="muted">—</span>`;
+    const you = [...st.asked.map((a) => `<div>asked: <b>${esc(a.question)}</b><div class="muted">${a.options.map(esc).join(" · ")}</div></div>`), ...st.human.map((h) => `<div>answered: <b>${esc(h)}</b></div>`),
+      ...(st.offers ?? []).map((o) => `<div>offered: <b>${esc(o)}</b></div>`)].join("") || `<span class="muted">—</span>`;
     const bad = /not built|asked you|error/.test(st.outcome) || !right;
     const v = st.verdict ? `<span class="out${/wrong|needless|missed/.test(st.verdict.call) ? " bad" : ""}">${esc(st.verdict.call.replace(/_/g, " "))}</span><div class="muted">${esc(st.verdict.why)}</div>` : `<span class="muted">—</span>`;
     return `<tr><td class="num">${n + 1}</td><td><b>${esc(st.sentence)}</b>${st.marked ? `<div class="muted">marked #${esc(st.marked)}</div>` : ""}<div class="muted">${esc(st.kind)}</div>${right ? "" : `<div class="warn">routed ${esc(route ?? "?")}, expected ${expected(st.kind)}</div>`}</td>
       <td>${jev}</td><td>${you}</td><td><span class="out${bad ? " bad" : ""}">${esc(st.outcome)}</span><div class="muted">${esc(st.result)}</div></td>${judged ? `<td>${v}</td>` : ""}<td class="num">${(st.ms / 1000).toFixed(1)} s</td></tr>`;
   }).join("");
-  return `<table><tr><th>#</th><th>You said</th><th>Jev decided</th><th>You were asked</th><th>What happened</th>${judged ? "<th>Judged</th>" : ""}<th>Time</th></tr>${rows}</table>`;
+  return `<table><tr><th>#</th><th>You said</th><th>Jev decided</th><th>You were asked or offered</th><th>What happened</th>${judged ? "<th>Judged</th>" : ""}<th>Time</th></tr>${rows}</table>`;
 }
 
 function detail(key) {

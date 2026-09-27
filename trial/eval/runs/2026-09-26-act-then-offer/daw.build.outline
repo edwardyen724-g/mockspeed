@@ -1,0 +1,110 @@
+app #n1 "Tracks" web
+  screen #n2 "Timeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Tracks" bold size=l
+        line #n6
+        text #n7 "Projects" shade=mid size=s
+        text #n8 "Untitled" bold
+        text #n9 "Archive" shade=mid
+        line #n10
+        text #n11 "View" shade=mid size=s
+        text #n12 "Mixer" shade=mid
+        text #n13 "Piano Roll"
+      col #n14 grow pad=4 gap=3
+        row #n15 justify=between align=center
+          text #n16 "Untitled" size=l bold
+          row #n17 gap=2
+            button #n18 "Export" primary
+            button #n19 "⋯"
+        row #n20 gap=2 h=60 align=center
+          text #n21 "120 BPM" mono
+          text #n22 "4/4" mono
+          text #n23 "0:00" mono size=s shade=mid
+        col #n24 gap=0 grow fill=light pad=2 border
+          row #n25 h=40 align=center pad=2 gap=2 border divider
+            text #n26 "Drums" size=s bold w=120
+            shape #n27 "waveform" w=fill h=40
+            text #n28 "🔊" size=m
+          row #n29 h=40 align=center pad=2 gap=2 border divider
+            text #n30 "Bass" size=s bold w=120
+            shape #n31 "waveform" w=fill h=40
+            text #n32 "🔊" size=m
+          row #n33 h=40 align=center pad=2 gap=2 border divider
+            text #n34 "Synth" size=s bold w=120
+            shape #n35 "waveform" w=fill h=40
+            text #n36 "🔊" size=m
+          row #n37 h=40 align=center pad=2 gap=2 border divider
+            text #n38 "Vocal" size=s bold w=120
+            shape #n39 "waveform" w=fill h=40
+            text #n40 "🔊" size=m
+        row #n41 gap=2 justify=center pad=2
+          button #n42 "◀◀" ghost
+          button #n43 "▶" primary
+          button #n44 "⏹" ghost
+          text #n45 "0:00 / 3:24" mono size=s shade=mid
+  screen #n46 "Mixer"
+    row #n47 h=fill
+      col #n48 share=nav w=200 fill=light pad=3 gap=2
+        text #n49 "Tracks" bold size=l
+        line #n50
+        text #n51 "Projects" shade=mid size=s
+        text #n52 "Untitled" bold
+        text #n53 "Archive" shade=mid
+        line #n54
+        text #n55 "View" shade=mid size=s
+        text #n56 "Mixer" bold
+        text #n57 "Piano Roll"
+      col #n58 grow pad=4 gap=3
+        text #n59 "Mixer" size=l bold
+        row #n60 gap=4 grow
+          col #n61 gap=3 w=180
+            col #n62 gap=2 border pad=2
+              text #n63 "Drums" size=s bold
+              text #n64 "-6.2 dB" mono size=s
+              input #n65 "" w=fill
+              row #n66 gap=2
+                shape #n67 "meter" w=20 h=60 fill=light
+                col #n68 gap=1
+                  shape #n69 "dot" circle w=8 h=8
+                  shape #n70 "dot" circle w=8 h=8
+            col #n71 gap=2 border pad=2
+              text #n72 "Bass" size=s bold
+              text #n73 "-3.5 dB" mono size=s
+              input #n74 "" w=fill
+              row #n75 gap=2
+                shape #n76 "meter" w=20 h=60 fill=light
+                col #n77 gap=1
+                  shape #n78 "dot" circle w=8 h=8
+                  shape #n79 "dot" circle w=8 h=8
+            col #n80 gap=2 border pad=2
+              text #n81 "Synth" size=s bold
+              text #n82 "-1.2 dB" mono size=s
+              input #n83 "" w=fill
+              row #n84 gap=2
+                shape #n85 "meter" w=20 h=60 fill=light
+                col #n86 gap=1
+                  shape #n87 "dot" circle w=8 h=8
+                  shape #n88 "dot" circle w=8 h=8
+            col #n89 gap=2 border pad=2
+              text #n90 "Vocal" size=s bold
+              text #n91 "0 dB" mono size=s
+              input #n92 "" w=fill
+              row #n93 gap=2
+                shape #n94 "meter" w=20 h=60 fill=light
+                col #n95 gap=1
+                  shape #n96 "dot" circle w=8 h=8
+                  shape #n97 "dot" circle w=8 h=8
+          col #n98 grow gap=2
+            text #n99 "EQ" size=m bold
+            shape #n100 "graph" w=fill h=200
+            row #n101 gap=4
+              col #n102 grow
+                text #n103 "Low" size=s shade=mid
+                input #n104 "" value="-2 dB"
+              col #n105 grow
+                text #n106 "Mid" size=s shade=mid
+                input #n107 "" value="0 dB"
+              col #n108 grow
+                text #n109 "High" size=s shade=mid
+                input #n110 "" value="3 dB"

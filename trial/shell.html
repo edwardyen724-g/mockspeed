@@ -50,6 +50,8 @@
   .busy #go{opacity:.4}
   footer{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:6px}
   .ask button.offer{align-self:flex-start}
+  /* After acting: the swaps and Undo sit in a line under the reply, not stacked like a question. */
+  .ask.offers{flex-direction:row;flex-wrap:wrap}
   /* Scores, timings, model names, the file and the engine's own notes: only with ?debug=1. */
   body:not(.debug) .dbg{display:none}
 </style></head>
@@ -76,7 +78,7 @@
       <dt>make it wider / taller</dt><dd>only what has a set size</dd>
       <dt>move it up / left</dt><dd>before its neighbour; down / right goes after</dd>
       <dt>call it "Runs"</dt><dd>rename, in the words you typed</dd>
-      <dt>remove it · reset the canvas</dt><dd>asks first; undo brings it back</dd>
+      <dt>remove it · reset the canvas</dt><dd>done at once; Undo beside the reply brings it back</dd>
     </dl>
     <dl><dt>a plain edit</dt><dd>Jev alone — no model call</dd>
         <dt>this / it / that</dt><dd>whatever you clicked</dd>
@@ -239,6 +241,7 @@ function showChoices(list, pick = []) {
   choices = list;
   picked = pick;
   $("ask").innerHTML = list.map((c, i) => `<button data-i="${i}" class="${c.primary ? "go" : ""}${c.offer ? " offer" : ""}">${esc(c.label)}</button>`).join("");
+  $("ask").classList.toggle("offers", list.length > 0 && list.every((c) => c.offer));
   try { mock.contentWindow.postMessage({ type: "pick", keys: pick }, "*"); } catch {}
 }
 

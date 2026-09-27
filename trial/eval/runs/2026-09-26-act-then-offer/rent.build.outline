@@ -1,0 +1,95 @@
+app #n1 "SplitMate" phone
+  screen #n2 "Home"
+    row #n3 h=56 pad=2 border
+      text #n4 "SplitMate" bold size=l
+    col #n5 grow pad=3 gap=3
+      col #n6 border pad=3 gap=2 fill=light
+        text #n7 "Next payment due" shade=mid size=s
+        text #n8 "Mar 15" bold size=l
+        text #n9 "$340 from you" size=m
+      col #n10 gap=2
+        text #n11 "Active expenses" bold size=m
+        col #n12 gap=2
+          row #n13 justify=between
+            text #n14 "Rent" data="Mar 1"
+            text #n15 "$1200" bold data="4 people"
+          row #n16 justify=between
+            text #n17 "Utilities" data="Feb 28"
+            text #n18 "$84" bold data="3 people"
+          row #n19 justify=between
+            text #n20 "Groceries" data=Yesterday
+            text #n21 "$32.50" bold data="2 people"
+      button #n22 "Add expense" primary
+    row #n23 h=56 pad=3 justify=between border
+      text #n24 "Home" bold size=s
+      text #n25 "Expenses" shade=mid size=s
+      text #n26 "People" shade=mid size=s
+      text #n27 "Settings" shade=mid size=s
+  screen #n28 "Expenses"
+    row #n29 h=56 pad=2 border
+      text #n30 "Expenses" bold size=l
+    col #n31 grow pad=3 gap=2
+      row #n32 gap=2 align=center
+        input #n33 "Search" search
+        button #n34 "Filter" ghost
+      col #n35 gap=2
+        col #n36 border pad=2 gap=1
+          row #n37 justify=between
+            col #n38 gap=1
+              text #n39 "Rent" bold
+              text #n40 "Added by Alex" shade=mid size=xs
+            text #n41 "$1200" bold
+          text #n42 "You pay $300" size=s shade=dark
+        col #n43 border pad=2 gap=1
+          row #n44 justify=between
+            col #n45 gap=1
+              text #n46 "Groceries" bold
+              text #n47 "Added by Jordan" shade=mid size=xs
+            text #n48 "$32.50" bold
+          text #n49 "You're owed $5.83" size=s shade=dark
+        col #n50 border pad=2 gap=1
+          row #n51 justify=between
+            col #n52 gap=1
+              text #n53 "Coffee run" bold
+              text #n54 "Added by Sam" shade=mid size=xs
+            text #n55 "$12" bold
+          text #n56 "You pay $4" size=s shade=dark
+      button #n57 "Add expense" primary
+    row #n58 h=56 pad=3 justify=between border
+      text #n59 "Home" shade=mid size=s
+      text #n60 "Expenses" bold size=s
+      text #n61 "People" shade=mid size=s
+      text #n62 "Settings" shade=mid size=s
+  screen #n63 "People"
+    row #n64 h=56 pad=2 border
+      text #n65 "Roommates" bold size=l
+    col #n66 grow pad=3 gap=3
+      col #n67 gap=2
+        text #n68 "Total owed to you" shade=mid size=s
+        text #n69 "$8.17" bold size=xl
+      col #n70 gap=2
+        text #n71 "Balances" bold size=m
+        col #n72 gap=2
+          row #n73 justify=between align=center
+            col #n74 gap=1
+              text #n75 "Alex" bold
+              text #n76 "You owe $300" size=s shade=mid
+            text #n77 "$0" size=s
+          row #n78 justify=between align=center
+            col #n79 gap=1
+              text #n80 "Jordan" bold
+              text #n81 "You're owed $5.83" size=s shade=mid
+            text #n82 "$5.83" size=s
+          row #n83 justify=between align=center
+            col #n84 gap=1
+              text #n85 "Sam" bold
+              text #n86 "You're owed $2.34" size=s shade=mid
+            text #n87 "$2.34" size=s
+      col #n88 gap=2
+        button #n89 "Settle up" primary
+        button #n90 "Add roommate" ghost
+    row #n91 h=56 pad=3 justify=between border
+      text #n92 "Home" shade=mid size=s
+      text #n93 "Expenses" shade=mid size=s
+      text #n94 "People" bold size=s
+      text #n95 "Settings" shade=mid size=s

@@ -1,0 +1,81 @@
+app #n1 "Support" phone
+  screen #n2 "Conversations"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Support" bold size=l
+        line #n6
+        text #n7 "Active" bold
+        text #n8 "#4521 Sarah Chen" data
+        text #n9 "#4089 Michael Park" shade=mid data
+        text #n10 "#3847 Jordan Walsh" shade=mid data
+        text #n11 "Closed" shade=mid bold
+        text #n12 "#4412 Alex Rivera" shade=mid data
+      col #n13 grow pad=3 gap=3
+        row #n14 justify=between align=center
+          text #n15 "Inbox" bold size=l
+          text #n16 "12 unread" shade=mid size=s
+        col #n17 gap=2
+          row #n18 border pad=3 align=center gap=2
+            shape #n19 circle w=40 h=40
+            col #n20 grow gap=1
+              text #n21 "Sarah Chen" bold data
+              text #n22 "Can you help with my billing?" shade=mid size=s data
+            text #n23 "2m" shade=mid size=s data
+          row #n24 border pad=3 align=center gap=2
+            shape #n25 circle w=40 h=40
+            col #n26 grow gap=1
+              text #n27 "Michael Park" bold data
+              text #n28 "My password isn't working" shade=mid size=s data
+            text #n29 "14m" shade=mid size=s data
+          row #n30 border pad=3 align=center gap=2
+            shape #n31 circle w=40 h=40
+            col #n32 grow gap=1
+              text #n33 "Jordan Walsh" bold data
+              text #n34 "Order status?" shade=mid size=s data
+            text #n35 "1h" shade=mid size=s data
+  screen #n36 "Chat"
+    row #n37 h=fill
+      col #n38 share=nav w=200 fill=light pad=3 gap=2
+        text #n39 "Support" bold size=l
+        line #n40
+        text #n41 "Active" bold
+        text #n42 "#4521 Sarah Chen" bold data
+        text #n43 "#4089 Michael Park" shade=mid data
+        text #n44 "#3847 Jordan Walsh" shade=mid data
+        text #n45 "Closed" shade=mid bold
+        text #n46 "#4412 Alex Rivera" shade=mid data
+      col #n47 grow pad=3 gap=3
+        col #n48 w=400 gap=2 border pad=3 fill=light
+          text #n49 "Sarah Chen" bold size=m
+          line #n50
+          row #n51 gap=2 align=start
+            text #n52 "Email" size=s shade=mid
+            text #n53 "sarah.chen@example.com" size=s data
+          row #n54 gap=2 align=start
+            text #n55 "Customer since" size=s shade=mid
+            text #n56 "Mar 2022" size=s data
+          row #n57 gap=2 align=start
+            text #n58 "Account status" size=s shade=mid
+            text #n59 "Active" size=s data
+          row #n60 gap=2 align=start
+            text #n61 "Total spend" size=s shade=mid
+            text #n62 "$1,240" size=s data
+        col #n63 grow gap=2 pad=3
+          row #n64 align=start gap=2
+            shape #n65 circle w=32 h=32
+            col #n66 gap=1
+              text #n67 "Hi, I was charged twice for my renewal" shade=mid size=s data
+              text #n68 "10:42 AM" shade=mid size=xs data
+          row #n69 align=end gap=2 justify=end
+            col #n70 gap=1 align=end
+              text #n71 "I'll look into that right now" size=s data
+              text #n72 "10:44 AM" shade=mid size=xs data
+            shape #n73 circle w=32 h=32
+          row #n74 align=start gap=2
+            shape #n75 circle w=32 h=32
+            col #n76 gap=1
+              text #n77 "Thank you so much" shade=mid size=s data
+              text #n78 "10:45 AM" shade=mid size=xs data
+        row #n79 pad=3 gap=2 border
+          input #n80 "Type your message" area grow
+          button #n81 "Send" primary

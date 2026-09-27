@@ -1,0 +1,142 @@
+app #n1 "Agents" web
+  screen #n2 "Agents"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Agents" bold
+        text #n6 "Runs" shade=mid
+        text #n7 "Logs" shade=mid
+      col #n8 grow pad=4 gap=4
+        button #n162 "Clear filters" ghost
+        row #n93 gap=2 pad=2 border
+          input #n94 "Search agents" search grow
+          button #n95 "Filter" ghost
+        row #n9 justify=between align=center
+          text #n10 "Active Agents" size=xxl bold
+        col #n12 gap=1
+          tr #n154 "Agent | Status | Tasks | Queue"
+          text #n155 bold
+          text #n156 bold
+          text #n157 bold
+          text #n158 bold
+          tr #n159 "Email Classifier | Running | 3 active | 72%" data
+          tr #n160 "Data Validator | Idle | 0 tasks | 0%" data
+          tr #n161 "Report Generator | Running | 1 active | 45%" data
+  screen #n34 "Run Details"
+    row #n35 h=fill
+      col #n36 share=nav w=200 fill=mid pad=3 gap=2
+        text #n37 "Agents" shade=mid
+        text #n38 "Runs" bold
+        text #n39 "Logs" shade=mid
+      col #n40 grow pad=4 gap=4
+        row #n41 justify=between align=center
+          text #n42 "Run #4821" size=l bold
+          text #n43 "In Progress" size=s
+        row #n44 gap=6
+          col #n45 grow
+            text #n46 "Email Classifier → Data Validator → Report Generator" size=s shade=mid
+            graph #n47 dir=right h=200
+              node #n48 "Email Classifier" sub=2.3s
+              node #n49 "Data Validator" sub=1.1s
+              node #n50 "Report Generator" sub=pending
+              edge #n51 n1 -> n2 "145 items"
+              edge #n52 n2 -> n3 "142 items"
+          col #n53 w=300 border pad=3 gap=2 fill=light
+            text #n54 "Timeline" bold size=m
+            col #n55 gap=2
+              row #n56 justify=between
+                text #n57 "Email Classifier started" size=s
+                text #n58 "14:23:15" mono size=xs shade=mid
+              row #n59 justify=between
+                text #n60 "145 items processed" size=s
+                text #n61 "14:23:18" mono size=xs shade=mid
+              row #n62 justify=between
+                text #n63 "Data Validator started" size=s
+                text #n64 "14:23:18" mono size=xs shade=mid
+              row #n65 justify=between
+                text #n66 "142 items validated" size=s
+                text #n67 "14:23:19" mono size=xs shade=mid
+  screen #n68 "Logs"
+    row #n69 h=fill
+      col #n70 share=nav w=200 fill=mid pad=3 gap=2
+        text #n71 "Agents" shade=mid
+        text #n72 "Runs" shade=mid
+        text #n73 "Logs" bold
+      col #n74 grow pad=4 gap=3
+        row #n75 gap=2
+          input #n76 "Search logs" search grow
+          button #n77 "Filter" ghost
+        col #n78 gap=1
+          tr #n79 "Timestamp | Agent | Event | Status"
+          text #n80 bold
+          text #n81 bold
+          text #n82 bold
+          text #n83 bold
+          tr #n84 "14:23:19 | Report Generator | task_queued | pending" data
+          tr #n85 "14:23:18 | Data Validator | batch_complete | success" data
+          tr #n86 "14:23:18 | Data Validator | item_error | failed" data
+          text #n87 shade=light
+          text #n88 shade=light
+          text #n89 shade=light
+          text #n90 "1 error"
+          tr #n91 "14:23:17 | Email Classifier | batch_complete | success" data
+          tr #n92 "14:23:15 | Email Classifier | task_started | running" data
+  screen #n96 "Settings"
+    row #n97 h=fill
+      col #n98 share=nav w=200 fill=mid pad=3 gap=2
+        text #n99 "Agents" shade=mid
+        text #n100 "Runs" shade=mid
+        text #n101 "Logs" shade=mid
+        text #n102 "Settings" bold
+      col #n103 grow pad=4 gap=4
+        text #n104 "Settings" size=xl bold
+        col #n163 gap=2 border pad=3 fill=light
+          text #n164 "Note" size=s bold shade=dark
+          text #n165 "Settings changes take effect immediately. Some changes may require agents to restart." size=s shade=dark
+        col #n105 gap=4
+          col #n106 gap=2
+            text #n107 "Agent Configuration" size=m bold
+            col #n108 border pad=3 gap=3
+              row #n109 justify=between align=center
+                col #n110 grow
+                  text #n111 "Max Concurrent Tasks" bold
+                  text #n112 "Maximum number of tasks an agent can run simultaneously" size=s shade=mid
+                input #n113 value="5"
+              row #n114 justify=between align=center
+                col #n115 grow
+                  text #n116 "Task Timeout (seconds)" bold
+                  text #n117 "How long before a task is marked as failed" size=s shade=mid
+                input #n118 value="300"
+              row #n119 justify=between align=center
+                col #n120 grow
+                  text #n121 "Retry Failed Tasks" bold
+                  text #n122 "Automatically retry failed tasks" size=s shade=mid
+                input #n123 check on
+          col #n124 gap=2
+            text #n125 "Notifications" size=m bold
+            col #n126 border pad=3 gap=3
+              row #n127 justify=between align=center
+                col #n128 grow
+                  text #n129 "Email Alerts" bold
+                  text #n130 "Send notifications when runs complete or fail" size=s shade=mid
+                input #n131 toggle on
+              row #n132 justify=between align=center
+                col #n133 grow
+                  text #n134 "Log Retention (days)" bold
+                  text #n135 "How long to keep logs before automatic deletion" size=s shade=mid
+                input #n136 value="30"
+          col #n137 gap=2
+            text #n138 "System" size=m bold
+            col #n139 border pad=3 gap=3
+              row #n140 justify=between align=center
+                col #n141 grow
+                  text #n142 "API Key" bold
+                  text #n143 "Used for external integrations" size=s shade=mid
+                button #n144 "Regenerate" ghost
+              row #n145 justify-between align=center
+                col #n146 grow
+                  text #n147 "Debug Mode" bold
+                  text #n148 "Enable verbose logging for troubleshooting" size=s shade=mid
+                input #n149 toggle
+          row #n150 gap=2 pad=2
+            button #n151 "Save Changes" primary
+            button #n152 "Cancel" ghost

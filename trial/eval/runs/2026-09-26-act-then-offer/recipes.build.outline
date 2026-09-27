@@ -1,0 +1,95 @@
+app #n1 "Recipes" phone
+  screen #n2 "Meals"
+    row #n3 h=fill
+      col #n4 share=nav w=60 fill=light pad=2 gap=2 align=center
+        text #n5 "📅" size=l
+        text #n6 "🍳" size=l bold
+        text #n7 "📝" size=l shade=mid
+        text #n8 "⚙" size=l shade=mid
+      col #n9 grow pad=3 gap=3
+        row #n10 justify=between align=center
+          text #n11 "This Week" size=l bold
+          text #n12 "Plan" size=s shade=mid
+        col #n13 gap=2
+          row #n14 border pad=2 gap=2 align=center
+            text #n15 "Mon" size=s shade=mid w=40
+            text #n16 "Pasta Carbonara" bold
+            text #n17 "7pm" size=s shade=mid
+          row #n18 border pad=2 gap=2 align=center
+            text #n19 "Tue" size=s shade=mid w=40
+            text #n20 "Grilled Salmon" bold
+            text #n21 "6:30pm" size=s shade=mid
+          row #n22 border pad=2 gap=2 align=center
+            text #n23 "Wed" size=s shade=mid w=40
+            text #n24 "Thai Green Curry" bold
+            text #n25 "7pm" size=s shade=mid
+          row #n26 border pad=2 gap=2 align=center
+            text #n27 "Thu" size=s shade=mid w=40
+            text #n28 "empty" shade=light size=s
+            text #n29 "" size=s
+          row #n30 border pad=2 gap=2 align=center
+            text #n31 "Fri" size=s shade=mid w=40
+            text #n32 "Beef Tacos" bold
+            text #n33 "6pm" size=s shade=mid
+  screen #n34 "Recipe"
+    row #n35 h=fill
+      col #n36 share=nav w=60 fill=light pad=2 gap=2 align=center
+        text #n37 "📅" size=l shade=mid
+        text #n38 "🍳" size=l bold
+        text #n39 "📝" size=l shade=mid
+        text #n40 "⚙" size=l shade=mid
+      col #n41 grow pad=3 gap=2
+        text #n42 "Pasta Carbonara" size=xl bold
+        text #n43 "4 servings  •  25 min" size=s shade=mid
+        row #n44 gap=1 pad=1
+          text #n45 "⭐" size=s
+          text #n46 "⭐" size=s
+          text #n47 "⭐" size=s
+          text #n48 "⭐" size=s
+        text #n49 "Ingredients" size=m bold
+        col #n50 gap=1
+          text #n51 "400g spaghetti"
+          text #n52 "200g pancetta"
+          text #n53 "4 eggs"
+          text #n54 "100g Pecorino Romano"
+          text #n55 "Black pepper"
+        text #n56 "Instructions" size=m bold
+        col #n57 gap=1
+          text #n58 "1. Cook spaghetti until al dente" size=s
+          text #n59 "2. Fry pancetta until crispy" size=s
+          text #n60 "3. Beat eggs with cheese" size=s
+          text #n61 "4. Toss pasta with pancetta fat" size=s
+          text #n62 "5. Add eggs off heat, stir quickly" size=s
+        button #n63 "Add to Plan" primary
+  screen #n64 "Grocery"
+    row #n65 h=fill
+      col #n66 share=nav w=60 fill=light pad=2 gap=2 align=center
+        text #n67 "📅" size=l shade=mid
+        text #n68 "🍳" size=l shade=mid
+        text #n69 "📝" size=l bold
+        text #n70 "⚙" size=l shade=mid
+      col #n71 grow pad=3 gap=2
+        text #n72 "Shopping List" size=l bold
+        col #n73 gap=2
+          col #n74 border pad=2 gap=1
+            row #n75 justify=between
+              text #n76 "Produce" bold
+              text #n77 "5 items" size=s shade=mid
+            text #n78 "Salmon fillet" size=s
+            text #n79 "Green curry paste" size=s
+            text #n80 "Bell peppers" size=s
+            text #n81 "Onions" size=s
+            text #n82 "Fresh basil" size=s
+          col #n83 border pad=2 gap=1
+            row #n84 justify=between
+              text #n85 "Pantry" bold
+              text #n86 "3 items" size=s shade=mid
+            text #n87 "Pasta" size=s
+            text #n88 "Olive oil" size=s
+            text #n89 "Eggs" size=s
+          col #n90 border pad=2 gap=1
+            row #n91 justify=between
+              text #n92 "Dairy" bold
+              text #n93 "2 items" size=s shade=mid
+            text #n94 "Pecorino Romano" size=s
+            text #n95 "Butter" size=s

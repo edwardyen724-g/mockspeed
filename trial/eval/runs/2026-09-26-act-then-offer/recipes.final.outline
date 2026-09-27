@@ -1,0 +1,129 @@
+app #n1 "Recipes" phone
+  screen #n2 "Meals"
+    row #n3 h=fill
+      col #n4 share=nav w=60 fill=mid pad=2 gap=2 align=center
+        text #n5 "📅" size=l bold
+        text #n6 "🍳" size=l bold
+        text #n7 "📝" size=l shade=mid
+        text #n8 "⚙" size=l shade=mid
+      col #n9 grow pad=3 gap=3
+        button #n145 "All" primary size=s
+        input #n96 "Search meals..." size=s w=fill
+        row #n142 justify=between align=center gap=2 pad=2 fill=light
+          text #n143 "Filter" size=s shade=mid
+          row #n144 gap=1
+            button #n146 "Breakfast" ghost size=s
+            button #n147 "Lunch" ghost size=s
+            button #n148 "Dinner" ghost size=s
+        row #n10 justify=between align=center
+          text #n11 "This Week" size=l bold
+          text #n12 "Plan" size=s shade=mid
+        col #n13 gap=2
+          table #n135
+            tr #n136 "Day | Meal | Time"
+            tr #n137 "Mon | Pasta Carbonara | 7pm" data
+            tr #n138 "Tue | Grilled Salmon | 6:30pm" data
+            tr #n139 "Wed | Thai Green Curry | 7pm" data
+            tr #n140 "Thu | empty | " shade=light data
+            tr #n141 "Fri | Beef Tacos | 6pm" data
+  screen #n34 "Recipe"
+    row #n35 h=fill
+      col #n36 share=nav w=60 fill=mid pad=2 gap=2 align=center
+        text #n37 "📅" size=l shade=mid bold
+        text #n38 "🍳" size=l bold
+        text #n39 "📝" size=l shade=mid
+        text #n40 "⚙" size=l shade=mid
+      col #n41 grow pad=3 gap=2
+        text #n42 "Pasta Carbonara" size=xxl bold
+        text #n43 "4 servings  •  25 min" size=s shade=mid
+        row #n44 gap=1 pad=1
+          text #n45 "⭐" size=s
+          text #n46 "⭐" size=s
+          text #n47 "⭐" size=s
+          text #n48 "⭐" size=s
+        text #n49 "Ingredients" size=m bold
+        col #n50 gap=1
+          text #n51 "400g spaghetti"
+          text #n52 "200g pancetta"
+          text #n53 "4 eggs"
+          text #n54 "100g Pecorino Romano"
+          text #n55 "Black pepper"
+        text #n56 "Instructions" size=m bold
+        col #n57 gap=1
+          text #n58 "1. Cook spaghetti until al dente" size=s
+          text #n59 "2. Fry pancetta until crispy" size=s
+          text #n60 "3. Beat eggs with cheese" size=s
+          text #n61 "4. Toss pasta with pancetta fat" size=s
+          text #n62 "5. Add eggs off heat, stir quickly" size=s
+  screen #n64 "Grocery"
+    row #n65 h=fill
+      col #n66 share=nav w=60 fill=mid pad=2 gap=2 align=center
+        text #n67 "📅" size=l shade=mid bold
+        text #n68 "🍳" size=l shade=mid
+        text #n69 "📝" size=l bold
+        text #n70 "⚙" size=l shade=mid
+      col #n71 grow pad=3 gap=2
+        text #n72 "Shopping List" size=l bold
+        col #n73 gap=2
+          col #n74 border pad=2 gap=1
+            row #n75 justify=between
+              text #n76 "Produce" bold
+              text #n77 "5 items" size=s shade=mid
+            text #n78 "Salmon fillet" size=s
+            text #n79 "Green curry paste" size=s
+            text #n80 "Bell peppers" size=s
+            text #n81 "Onions" size=s
+            text #n82 "Fresh basil" size=s
+          col #n83 border pad=2 gap=1
+            row #n84 justify=between
+              text #n85 "Pantry" bold
+              text #n86 "3 items" size=s shade=mid
+            text #n87 "Pasta" size=s
+            text #n88 "Olive oil" size=s
+            text #n89 "Eggs" size=s
+          col #n90 border pad=2 gap=1
+            row #n91 justify=between
+              text #n92 "Dairy" bold
+              text #n93 "2 items" size=s shade=mid
+            text #n94 "Pecorino Romano" size=s
+            text #n95 "Butter" size=s
+  screen #n97 "Settings"
+    row #n98 h=fill
+      col #n99 share=nav w=60 fill=mid pad=2 gap=2 align=center
+        text #n100 "📅" size=l shade=mid bold
+        text #n101 "🍳" size=l shade=mid
+        text #n102 "📝" size=l shade=mid
+        text #n103 "⚙" size=l bold
+      col #n104 grow pad=3 gap=3
+        text #n105 "Settings" size=l bold
+        col #n149 gap=1 pad=2 fill=light border
+          text #n150 "Note" size=s shade=mid
+          text #n151 "Your recipes and meal plans are saved locally on your device." size=s shade=mid
+        col #n106 gap=2
+          col #n107 gap=1
+            text #n108 "Preferences" size=m bold
+            row #n109 justify=between align=center pad=2 border
+              text #n110 "Dark mode" size=s
+              text #n111 "off" size=s shade=mid
+            row #n112 justify=between align=center pad=2 border
+              text #n113 "Notifications" size=s
+              text #n114 "on" size=s shade=mid
+            row #n115 justify=between align=center pad=2 border
+              text #n116 "Default servings" size=s
+              text #n117 "4" size=s shade=mid
+          col #n118 gap=1
+            text #n119 "Account" size=m bold
+            row #n120 justify=between align=center pad=2 border
+              text #n121 "Email" size=s
+              text #n122 "alex@example.com" size=s shade=mid
+            row #n123 justify=between align=center pad=2 border
+              text #n124 "Dietary restrictions" size=s
+              text #n125 "None" size=s shade=mid
+          col #n126 gap=1
+            text #n127 "About" size=m bold
+            row #n128 justify=between align=center pad=2 border
+              text #n129 "Version" size=s
+              text #n130 "1.2.0" size=s shade=mid
+            row #n131 justify=between align=center pad=2 border
+              text #n132 "Feedback" size=s
+              text #n133 "Contact us" size=s shade=mid under

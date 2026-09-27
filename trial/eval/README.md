@@ -27,7 +27,73 @@ Chrome for the screenshots.
 What the script plays: it answers "start a new app" and "yes, remove it" as the person would, and
 leaves every other question ("which one?", "where should it go?") unanswered, recording it. So a
 "?" in its output is a question the app put to the person, not a failure — the judges say whether
-each question was fair or needless.
+each question was fair or needless. Since act, then offer, the app mostly acts instead and offers
+the runner-up as a swap beside its reply. The script records each step's swaps (`offers`) and
+clicks none. "≈" is a change with a swap offered and "~" is nothing changed with a swap offered.
+The judges say `swap_right` when the change was not what was meant but one click on a swap is.
+
+## Act, then offer — `runs/2026-09-26-act-then-offer`
+
+Phase 1b of `docs/plan-web-2026-09-26.md` (§3A). The app no longer asks before it acts. Where Jev
+is unsure, its top pick is done, and the runner-up is offered beside the reply as a one-click swap,
+with Undo: *"Removed the “New Agent” button · [The “Filter” button on the “Logs” page instead]
+[Undo]"*. A wrong guess costs one click. A question cost a read, a decision and a click every time,
+even when Jev was right.
+
+1. **Every former question acts.** Which element, which page, where a new piece goes (at each
+   level of the top-down placement), a new page or on a page, what kind of change, and "remove
+   it?". Each keeps its old answer as the swap, so a swap runs the same code an answer did.
+   `trial/turn.mjs` keeps the sentence's record: per part, the canvas before it, its changes (each
+   as a `redo` that makes the same change on another canvas), its doubts, and the piece it wrote. A
+   swap goes back to its part's canvas and does the alternative. A new piece is put at the new
+   place without being written again: it is the same piece. The later parts of a split sentence are
+   then made again on top. The offer is the alternatives to the decision Jev was least sure of, one
+   per part. The Undo beside the reply takes back the whole sentence; the Undo button, one change.
+2. **Two questions stay.** Before a new app when Jev's likeliest kind of change is a new app by
+   less than 0.2 over the next (a full build replaces everything), and before clearing on an unsure
+   answer. Neither fired here.
+3. **When Jev says the thing named is not there** (`exists` < 0.3: "make the navigation darker" on
+   an app with no navigation), nothing is done to a stand-in. The reply says so, and the likeliest
+   three are offered as the edit itself ("Make the “Title” card darker"). The counts below treat
+   that as a question, and so a reply that changed nothing but offered a swap ("already there ·
+   [at the top of the part with “Filter…” instead]").
+
+372 Jev decisions, builds 10/10, no errors. Against `2026-09-26-plain-words`, same sentences (119:
+one app had no button left to move):
+
+| | plain words | act, then offer |
+|---|---|---|
+| questions asked first | 33 | **0** |
+| nothing changed, swaps offered (counted as questions) | — | 2 |
+| questions per sentence | 0.28 | **0.02** |
+| follow-ups that changed the mock | 77 | **100** |
+| changes with a swap offered beside them | — | 33 (9 edits, 5 rewrites, 4 adds, 6 moves, 11 split) |
+| answers the script gave | 5 | 0 |
+| median time per follow-up | 0.4 s | 0.9 s (more sentences run to the end) |
+
+Judged by five agents: **104 of 119 follow-ups right**: 78 right the first time, 7 right by the
+offered swap, 19 correctly nothing. Then 13 partly, 2 wrong, no questions at all. Build substance
+2.0 / 3. The jev-fixes run's 90/120 counted 11 fair questions as right; there is none here.
+
+| sentence | judged |
+|---|---|
+| make the title bigger | 8 right, 2 by the swap |
+| remove the last button | 8 right, 1 by the swap, 1 correctly nothing |
+| turn the main list into a table | 6 right, 1 by the swap, 2 partly, 1 wrong |
+| add a filter and make the title bigger | 2 right, 2 by the swap, 6 partly |
+| add a note to the "…" screen | 9 right, 1 by the swap |
+| move the … button to the top of the screen | 7 right, 2 partly |
+
+Still weak, from the judges (writer 36 issues, Jev 18, render 7, edit 6):
+
+- **"Add a filter" lands at the end of the main area**, under a table, on four apps. It is an open
+  sentence, so it goes to the end of the part. The swap fixed two of them.
+- **"The title" in a split part went to a sure wrong pick**: a nav item, or the title on another
+  page, at 0.96. A sure pick offers no swap.
+- **"Remove the last button"** picks by the page being looked at, not by order ("last").
+- **The writer**: tables written as a column of rows with empty cells; a second header added for
+  "add a search field"; "add a filter" written as a "Clear filters" button; a new page's nav item
+  missing from the other pages' copies of a shared nav.
 
 ## Plain words — `runs/2026-09-26-plain-words`
 

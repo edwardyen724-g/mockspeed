@@ -1,0 +1,66 @@
+app #n1 "Page Summary" panel
+  screen #n2 "Summary"
+    col #n3 pad=3 gap=3
+      text #n69 "Filter:" size=s shade=mid bold
+      button #n28 "Copy Summary" ghost size=l
+      input #n30 "Search pages" search size=m w=fill
+      row #n68 gap=2 pad=0 align=center
+        input #n70 select value="All Pages"
+      text #n4 "Page Summary" size=l bold
+      col #n5 gap=2 fill=light pad=3 border
+        text #n6 "Title" size=s shade=mid
+        text #n7 "The Complete Guide to Machine Learning" bold size=xl
+        line #n8
+        text #n9 "Source" size=s shade=mid
+        text #n10 "example.com/ml-guide" mono size=s shade=mid
+        line #n11
+        text #n12 "Length" size=s shade=mid
+        text #n13 "12 min read · 8,500 words" size=s
+      col #n14 gap=2 fill=light pad=3 border
+        text #n61 "Key Points" size=s bold shade=mid
+        table #n62
+          tr #n63 "Point | Details"
+          tr #n64 "Learning from Data" data
+          tr #n65 "Supervised vs Unsupervised" data
+          tr #n66 "Neural Networks" data
+          tr #n67 "Model Evaluation" data
+      col #n20 gap=2 fill=light pad=3 border
+        text #n21 "Topics" size=s bold shade=mid
+        row #n22 gap=2 wrap
+          text #n23 "AI" pill size=xs shade=mid
+          text #n24 "Neural Networks" pill size=xs shade=mid
+          text #n25 "Data Science" pill size=xs shade=mid
+          text #n26 "Algorithms" pill size=xs shade=mid
+      row #n27 gap=2 pad=3
+  screen #n31 "Settings"
+    col #n32 pad=3 gap=3
+      text #n33 "Settings" size=l bold
+      col #n34 gap=2 fill=light pad=3 border
+        text #n35 "Display" size=s bold shade=mid
+        row #n36 gap=2 align=center justify=between
+          text #n37 "Dark Mode" size=s
+          input #n38 toggle
+        row #n39 gap=2 align=center justify=between
+          text #n40 "Font Size" size=s
+          input #n41 select value=Medium
+      col #n42 gap=2 fill=light pad=3 border
+        text #n43 "Preferences" size=s bold shade=mid
+        row #n44 gap=2 align=center justify=between
+          text #n45 "Auto-save Summaries" size=s
+          input #n46 toggle
+        row #n47 gap=2 align=center justify=between
+          text #n48 "Show Key Points" size=s
+          input #n49 toggle
+        row #n50 gap=2 align=center justify=between
+          text #n51 "Export Format" size=s
+          input #n52 select value=PDF
+      col #n53 gap=2 fill=light pad=3 border
+        text #n54 "About" size=s bold shade=mid
+        text #n55 "Page Summary" size=s bold
+        text #n56 "Version 1.2.0" size=xs shade=mid
+        text #n57 "© 2024 Page Summary. All rights reserved." size=xs shade=mid
+      row #n58 gap=2 pad=0
+        button #n59 "Save Settings" primary
+      col #n71 gap=2 fill=light pad=3 border
+        text #n72 "Note" size=s bold shade=mid
+        text #n73 "Changes to display settings apply immediately." size=s shade=mid

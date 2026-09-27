@@ -1,0 +1,29 @@
+app #n1 "Page Summary" panel
+  screen #n2 "Summary"
+    col #n3 pad=3 gap=3
+      text #n4 "Page Summary" size=l bold
+      col #n5 gap=2 fill=light pad=3 border
+        text #n6 "Title" size=s shade=mid
+        text #n7 "The Complete Guide to Machine Learning" bold size=m
+        line #n8
+        text #n9 "Source" size=s shade=mid
+        text #n10 "example.com/ml-guide" mono size=s shade=mid
+        line #n11
+        text #n12 "Length" size=s shade=mid
+        text #n13 "12 min read · 8,500 words" size=s
+      col #n14 gap=2 fill=light pad=3 border
+        text #n15 "Key Points" size=s bold shade=mid
+        text #n16 "Machine learning enables systems to learn from data without explicit programming" size=s
+        text #n17 "Supervised learning uses labeled data; unsupervised finds patterns in unlabeled data" size=s
+        text #n18 "Neural networks power modern deep learning applications" size=s
+        text #n19 "Training, validation, and testing splits are essential for model evaluation" size=s
+      col #n20 gap=2 fill=light pad=3 border
+        text #n21 "Topics" size=s bold shade=mid
+        row #n22 gap=2 wrap
+          text #n23 "AI" pill size=xs shade=mid
+          text #n24 "Neural Networks" pill size=xs shade=mid
+          text #n25 "Data Science" pill size=xs shade=mid
+          text #n26 "Algorithms" pill size=xs shade=mid
+      row #n27 gap=2 pad=3
+        button #n28 "Copy Summary" ghost
+        button #n29 "Read Full" primary

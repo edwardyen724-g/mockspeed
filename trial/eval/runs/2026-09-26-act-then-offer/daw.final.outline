@@ -1,0 +1,154 @@
+app #n1 "Tracks" web
+  screen #n2 "Timeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Tracks" bold size=l
+        line #n6
+        text #n7 "Projects" shade=mid size=s
+        text #n8 "Untitled" bold
+        text #n9 "Archive" shade=mid
+        line #n10
+        text #n11 "View" shade=mid size=s
+        text #n12 "Mixer" shade=mid
+        text #n13 "Piano Roll"
+      row #n160 gap=2 align=center pad=2
+        button #n184 "◯" ghost
+        input #n161 "Search tracks" search w=fill
+        row #n182 gap=2 align=center pad=2
+          input #n183 "Filter tracks" search w=fill
+      row #n162 justify=between align=center
+        text #n163 "Untitled" size=xxl bold
+        row #n164 gap=2
+          button #n165 "Export" primary size=l
+          button #n166 "⋯"
+      row #n167 gap=2 h=60 align=center
+        text #n168 "120 BPM" mono
+        text #n169 "4/4" mono
+        text #n170 "0:00" mono size=s shade=mid
+      col #n171 gap=0 grow fill=light pad=2 border
+        table #n172
+          tr #n173 "Track | Duration | Level"
+          tr #n174 "Drums | 3:24 | -6.2 dB" data
+          tr #n175 "Bass | 3:24 | -3.5 dB" data
+          tr #n176 "Synth | 3:24 | -1.2 dB" data
+          tr #n177 "Vocal | 3:24 | 0 dB" data
+      row #n178 gap=2 justify=center pad=2
+        button #n179 "◀◀" ghost
+        button #n180 "▶" primary
+        text #n181 "0:00 / 3:24" mono size=s shade=mid
+  screen #n46 "Mixer"
+    row #n47 h=fill
+      col #n48 share=nav w=200 fill=mid pad=3 gap=2
+        text #n49 "Tracks" bold size=l
+        line #n50
+        text #n51 "Projects" shade=mid size=s
+        text #n52 "Untitled" bold
+        text #n53 "Archive" shade=mid
+        line #n54
+        text #n55 "View" shade=mid size=s
+        text #n56 "Mixer" bold
+        text #n57 "Piano Roll"
+      col #n58 grow pad=4 gap=3
+        text #n59 "Mixer" size=l bold
+        row #n60 gap=4 grow
+          col #n61 gap=3 w=180
+            col #n62 gap=2 border pad=2
+              text #n63 "Drums" size=s bold
+              text #n64 "-6.2 dB" mono size=s
+              input #n65 "" w=fill
+              row #n66 gap=2
+                shape #n67 "meter" w=20 h=60 fill=light
+                col #n68 gap=1
+                  shape #n69 "dot" circle w=8 h=8
+                  shape #n70 "dot" circle w=8 h=8
+            col #n71 gap=2 border pad=2
+              text #n72 "Bass" size=s bold
+              text #n73 "-3.5 dB" mono size=s
+              input #n74 "" w=fill
+              row #n75 gap=2
+                shape #n76 "meter" w=20 h=60 fill=light
+                col #n77 gap=1
+                  shape #n78 "dot" circle w=8 h=8
+                  shape #n79 "dot" circle w=8 h=8
+            col #n80 gap=2 border pad=2
+              text #n81 "Synth" size=s bold
+              text #n82 "-1.2 dB" mono size=s
+              input #n83 "" w=fill
+              row #n84 gap=2
+                shape #n85 "meter" w=20 h=60 fill=light
+                col #n86 gap=1
+                  shape #n87 "dot" circle w=8 h=8
+                  shape #n88 "dot" circle w=8 h=8
+            col #n89 gap=2 border pad=2
+              text #n90 "Vocal" size=s bold
+              text #n91 "0 dB" mono size=s
+              input #n92 "" w=fill
+              row #n93 gap=2
+                shape #n94 "meter" w=20 h=60 fill=light
+                col #n95 gap=1
+                  shape #n96 "dot" circle w=8 h=8
+                  shape #n97 "dot" circle w=8 h=8
+          col #n98 grow gap=2
+            text #n99 "EQ" size=m bold
+            shape #n100 "graph" w=fill h=200
+            row #n101 gap=4
+              col #n102 grow
+                text #n103 "Low" size=s shade=mid
+                input #n104 "" value="-2 dB"
+              col #n105 grow
+                text #n106 "Mid" size=s shade=mid
+                input #n107 "" value="0 dB"
+              col #n108 grow
+                text #n109 "High" size=s shade=mid
+                input #n110 "" value="3 dB"
+  screen #n113 "Settings"
+    row #n114 h=fill
+      col #n115 share=nav w=200 fill=mid pad=3 gap=2
+        text #n116 "Tracks" bold size=l
+        line #n117
+        text #n118 "Projects" shade=mid size=s
+        text #n119 "Untitled" bold
+        text #n120 "Archive" shade=mid
+        line #n121
+        text #n122 "View" shade=mid size=s
+        text #n123 "Mixer" shade=mid
+        text #n124 "Piano Roll"
+      col #n125 grow pad=4 gap=4
+        text #n126 "Settings" size=l bold
+        col #n185 gap=2
+          text #n186 "Note" size=m bold
+          text #n187 "Changes to settings take effect immediately." shade=mid size=s
+        line #n188
+        col #n127 gap=3
+          col #n128 gap=2
+            text #n129 "Audio" size=m bold
+            row #n130 gap=2 align=center
+              text #n131 "Sample Rate" w=140
+              input #n132 "" value="44100 Hz" w=fill
+            row #n133 gap=2 align=center
+              text #n134 "Buffer Size" w=140
+              input #n135 "" value="256 samples" w=fill
+            row #n136 gap=2 align=center
+              text #n137 "Output Device" w=140
+              input #n138 "" select w=fill value="Built-in Output"
+          line #n139
+          col #n140 gap=2
+            text #n141 "Appearance" size=m bold
+            row #n142 gap=2 align=center
+              text #n143 "Theme" w=140
+              input #n144 "" select w=fill value=Light
+            row #n145 gap=2 align=center
+              text #n146 "Track Height" w=140
+              input #n147 "" value="40 px" w=fill
+          line #n148
+          col #n149 gap=2
+            text #n150 "General" size=m bold
+            row #n151 gap=2 align=center
+              text #n152 "Auto-save" w=140
+              input #n153 "" toggle on
+            row #n154 gap=2 align=center
+              text #n155 "Snap to Grid" w=140
+              input #n156 "" toggle on
+            row #n157 gap=2 align=center
+              text #n158 "Show Tooltips" w=140
+              input #n159 "" toggle

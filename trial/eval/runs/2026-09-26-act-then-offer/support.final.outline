@@ -1,0 +1,111 @@
+app #n1 "Support" phone
+  screen #n2 "Conversations"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Support" bold size=xxl
+        line #n6
+        text #n7 "Active" bold
+        text #n8 "#4521 Sarah Chen" data
+        text #n9 "#4089 Michael Park" shade=mid data
+        text #n10 "#3847 Jordan Walsh" shade=mid data
+        text #n11 "Closed" shade=mid bold
+        text #n12 "#4412 Alex Rivera" shade=mid data
+      col #n13 grow pad=3 gap=3
+        row #n82 pad=3 border
+          input #n83 "Search conversations" search
+        row #n14 justify=between align=center
+          text #n15 "Inbox" bold size=l
+          text #n16 "12 unread" shade=mid size=s
+        col #n17
+          table #n121
+            tr #n122 "Name | Message | Time"
+            tr #n123 "Sarah Chen | Can you help with my billing? | 2m" data
+            tr #n124 "Michael Park | My password isn't working | 14m" data
+            tr #n125 "Jordan Walsh | Order status? | 1h" data
+        row #n126 pad=3 gap=2 align=center
+          text #n127 "Filter:" shade=mid size=s
+          input #n128 "All statuses" select
+  screen #n36 "Chat"
+    row #n37 h=fill
+      col #n38 share=nav w=200 fill=mid pad=3 gap=2
+        text #n39 "Support" bold size=xxl
+        line #n40
+        text #n41 "Active" bold
+        text #n42 "#4521 Sarah Chen" bold data
+        text #n43 "#4089 Michael Park" shade=mid data
+        text #n44 "#3847 Jordan Walsh" shade=mid data
+        text #n45 "Closed" shade=mid bold
+        text #n46 "#4412 Alex Rivera" shade=mid data
+      col #n47 grow pad=3 gap=3
+        col #n48 w=400 gap=2 border pad=3 fill=light
+          text #n49 "Sarah Chen" bold size=m
+          line #n50
+          row #n51 gap=2 align=start
+            text #n52 "Email" size=s shade=mid
+            text #n53 "sarah.chen@example.com" size=s data
+          row #n54 gap=2 align=start
+            text #n55 "Customer since" size=s shade=mid
+            text #n56 "Mar 2022" size=s data
+          row #n57 gap=2 align=start
+            text #n58 "Account status" size=s shade=mid
+            text #n59 "Active" size=s data
+          row #n60 gap=2 align=start
+            text #n61 "Total spend" size=s shade=mid
+            text #n62 "$1,240" size=s data
+        col #n63 grow gap=2 pad=3
+          row #n64 align=start gap=2
+            shape #n65 circle w=32 h=32
+            col #n66 gap=1
+              text #n67 "Hi, I was charged twice for my renewal" shade=mid size=s data
+              text #n68 "10:42 AM" shade=mid size=xs data
+          row #n69 align=end gap=2 justify=end
+            col #n70 gap=1 align=end
+              text #n71 "I'll look into that right now" size=s data
+              text #n72 "10:44 AM" shade=mid size=xs data
+            shape #n73 circle w=32 h=32
+          row #n74 align=start gap=2
+            shape #n75 circle w=32 h=32
+            col #n76 gap=1
+              text #n77 "Thank you so much" shade=mid size=s data
+              text #n78 "10:45 AM" shade=mid size=xs data
+        row #n79 pad=3 gap=2 border
+          input #n80 "Type your message" area grow
+  screen #n84 "Settings"
+    row #n85 h=fill
+      col #n86 share=nav w=200 fill=mid pad=3 gap=2
+        text #n87 "Support" bold size=xxl
+        line #n88
+        text #n89 "Active" bold
+        text #n90 "#4521 Sarah Chen" shade=mid data
+        text #n91 "#4089 Michael Park" shade=mid data
+        text #n92 "#3847 Jordan Walsh" shade=mid data
+        text #n93 "Closed" shade=mid bold
+        text #n94 "#4412 Alex Rivera" shade=mid data
+      col #n95 grow pad=3 gap=3
+        button #n118 "Change password" ghost w=fill
+        text #n96 "Settings" bold size=l
+        col #n129 gap=2 border pad=3 fill=light
+          text #n130 "Note" bold size=s shade=mid
+          text #n131 "Changes to notification settings take effect immediately." size=s shade=mid
+        col #n97 gap=3
+          col #n98 gap=2
+            text #n99 "Notifications" bold size=m
+            row #n100 justify=between align=center
+              text #n101 "Email alerts" size=s
+              input #n102 check on
+            row #n103 justify=between align=center
+              text #n104 "Message preview" size=s
+              input #n105 check on
+            row #n106 justify=between align=center
+              text #n107 "Sound" size=s
+              input #n108 check
+          line #n109
+          col #n110 gap=2
+            text #n111 "Appearance" bold size=m
+            row #n112 justify=between align=center
+              text #n113 "Dark mode" size=s
+              input #n114 toggle
+          line #n115
+          col #n116 gap=2
+            text #n117 "Account" bold size=m
+            button #n119 "Sign out" ghost w=fill

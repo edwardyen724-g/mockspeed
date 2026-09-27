@@ -57,16 +57,16 @@ function strings(root) {
     const nm = W.name(root, id);
     say(`name ${id}`, nm);
     say(`selected ${id}`, W.selected(root, id));
-    say(`remove ${id}`, W.ask.remove(root, id));
     say(`jobChange ${id}`, W.ask.jobChange(root, id));
-    say(`pointed ${id}`, W.ask.pointedChoice(root, id));
-    say(`named ${id}`, W.ask.namedChoice(root, id));
-    say(`which ${id}`, W.ask.whichChoice(root, id, 0, [all.find((n) => n.id === id).screen].filter(Boolean)));
-    say(`which shared ${id}`, W.ask.whichChoice(root, id, 2, screens.map((s) => s.text)));
+    say(`job rewrite ${id}`, W.offer.job(root, "rewrite", id));
+    say(`instead ${id}`, W.offer.target(root, id, nm, [all.find((n) => n.id === id).screen].filter(Boolean)));
+    say(`instead shared ${id}`, W.offer.target(root, id, nm, screens.map((s) => s.text)));
     for (const op of W.OPS) {
       for (const copies of [0, 2]) say(`edited ${op} ${id}`, W.reply.edited(root, op, nm, { copies, across: copies > 0, to: "New words" }));
       say(`limit ${op} ${id}`, W.reply.limit(op, nm));
+      say(`doIt ${op} ${id}`, W.offer.doIt(root, op, id, nm, screens.slice(0, 2).map((s) => s.text)));
     }
+    say(`doIt rewrite ${id}`, W.offer.doIt(root, null, id));
     say(`changed ${id}`, W.reply.changed(root, nm, 1));
     say(`already ${id}`, W.reply.alreadyThere(nm));
   }
@@ -97,7 +97,7 @@ function strings(root) {
   places.forEach(({ g, skip }, i) => {
     const p = W.place(root, g, skip);
     say(`place ${g.into ?? `${g.anchor} ${g.position}`}`, p);
-    say(`whereChoice ${i}`, W.ask.whereChoice(root, g, i % 3, skip));
+    say(`place instead ${i}`, W.offer.place(root, g, skip));
     say(`added ${i}`, W.reply.added(root, "a “Call us” button", p, i % 2));
     say(`moved ${i}`, W.reply.moved("the “Order now” button", p));
   });
@@ -108,22 +108,17 @@ function strings(root) {
     say(`piece ${piece.split("\n")[0]}`, W.pieceName(root, piece));
   }
 
-  // Everything else: the questions and replies that name no one thing, and the page's own words.
-  for (const op of W.OPS) {
-    say(`which ${op}`, W.ask.which(op));
-    say(`which unseen ${op}`, W.ask.which(op, { seen: false }));
-    say(`pointedOrNamed ${op}`, W.ask.pointedOrNamed(op));
-  }
+  // Everything else: the questions, offers and replies that name no one thing, and the page's own words.
   for (const s of screens) {
-    say(`wholeOn ${s.text}`, W.ask.wholeOn(root, s.text));
-    say(`pageChoice ${s.text}`, W.ask.pageChoice(root, s.text, screens[0].text));
+    say(`page instead ${s.text}`, W.offer.page(root, s.text));
     say(`noPlace ${s.text}`, W.reply.noPlace(root, s.text));
     say(`working ${s.text}`, W.working(root, "a bakery website", s.text));
   }
   for (const k of Object.keys(KINDS)) say(`noSuch ${k}`, W.reply.noSuch(k));
   for (const n of [1, 3]) { say(`built ${n}`, W.reply.built(root, n)); say(`more ${n}`, W.reply.more(n)); }
   const fixed = {
-    whole: W.ask.whole(root), wholeNew: W.ask.wholeNew(root), wholeOnNone: W.ask.wholeOn(root, null), page: W.ask.page(root),
+    wholeNew: W.offer.whole(root, true), wholeOn: W.offer.whole(root, false), jobAdd: W.offer.job(root, "add"),
+    jobRewriteNone: W.offer.job(root, "rewrite"), jobSeveral: W.offer.job(root, "several"), jobNewApp: W.offer.job(root, "new_app"),
     jobChangeNone: W.ask.jobChange(root, null), replaced: W.reply.replaced(title), bringBack: W.reply.bringBack(title),
     started: W.reply.started(title), startedEmpty: W.reply.started(null), busy: W.reply.busy("make the title bigger"),
     busyAnswer: W.reply.busyAnswer("make the title bigger"), working: W.working(root, "make the title bigger"),
@@ -133,6 +128,7 @@ function strings(root) {
   for (const [k, v] of Object.entries(fixed)) say(k, v);
   for (const [k, v] of Object.entries(W.ask)) if (typeof v === "string") say(`ask.${k}`, v);
   for (const [k, v] of Object.entries(W.reply)) if (typeof v === "string") say(`reply.${k}`, v);
+  for (const [k, v] of Object.entries(W.offer)) if (typeof v === "string") say(`offer.${k}`, v);
   for (const [k, v] of Object.entries(W.ui)) say(`ui.${k}`, v);
   say("LEAVE", W.LEAVE);
   return out;
@@ -263,10 +259,17 @@ group("replies", () => {
     const twins = parse('app "R" web\n  screen "Runs"\n    col pad=3\n      row #a\n        text "Parser"\n        button #e1 "Edit"\n      row #b\n        text "Validator"\n        button #e2 "Edit"').root;
     assert.deepEqual(W.distinct(twins, ["e1", "e2", "a"]), ["the “Edit” button right of “Parser”", "the “Edit” button right of “Validator”", "the part with “Parser · Edit”"]);
   });
-  test("questions", () => {
-    assert.equal(W.ask.which("bigger"), "Which one should I make bigger?");
-    assert.equal(W.ask.which("remove", { seen: false }), "I don't see that here. Remove one of these?");
-    assert.equal(W.ask.whichChoice(BAKERY, "price", 0, ["Home"]), "1 · “$6.50” · on the “Home” page");
+  test("offers, after acting", () => {
+    assert.equal(W.offer.target(BAKERY, "price"), "“$6.50” instead");
+    assert.equal(W.offer.target(BAKERY, "order", undefined, ["Home"]), "The “Order now” button on the “Home” page instead");
+    assert.equal(W.offer.place(BAKERY, { anchor: "addr", position: "after" }), "Between “Address” and “427 Maple Street” instead");
+    assert.equal(W.offer.place(BAKERY, { into: "menu" }), "Somewhere in the cards “Sourdough · Rye · Baguette” instead");
+    assert.equal(W.offer.place(BAKERY, { anchor: "addr", position: "after" }, new Set(["street"])), "Between “Address” and a dot (where it was) instead");
+    assert.equal(W.offer.page(BAKERY, "Visit us"), "On the “Visit us” page instead");
+    assert.equal(W.offer.whole(BAKERY, true), "As a new page instead");
+    assert.equal(W.offer.job(BAKERY, "rewrite", "menu"), "Change the cards “Sourdough · Rye · Baguette” instead");
+    assert.equal(W.offer.doIt(BAKERY, "darker", "bar"), "Make the “Crumb · Order now” bar darker");
+    assert.equal(W.offer.doIt(BAKERY, null, "menu"), "Change the cards “Sourdough · Rye · Baguette”");
   });
 });
 
@@ -276,9 +279,9 @@ group("one module owns the words", () => {
   const server = readFileSync(join(HERE, "../server.mjs"), "utf8");
   test("every question, choice and reply in server.mjs comes from words.mjs", () => {
     const loose = [];
-    // asking(<question>, …) and answer(<label>, …): the first argument is words.mjs's.
-    for (const m of server.matchAll(/\b(asking|answer)\(([^,)]+)/g)) {
-      if (/^(text|label)$/.test(m[2].trim()) || m[2].trim().startsWith("W.")) continue;
+    // asking(<question>, …), answer(<label>, …) and swapFor(<label>, …): the first argument is words.mjs's.
+    for (const m of server.matchAll(/\b(asking|answer|swapFor)\(([^,)]+)/g)) {
+      if (/^(text|label)$/.test(m[2].trim()) || /^label\(/.test(m[2].trim()) || m[2].trim().startsWith("W.")) continue;
       loose.push(m[0]);
     }
     // A reply's `note` is words.mjs's too, or passed along from one that was.

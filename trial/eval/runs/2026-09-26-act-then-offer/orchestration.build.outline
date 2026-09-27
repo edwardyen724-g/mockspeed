@@ -1,0 +1,92 @@
+app #n1 "Agents" web
+  screen #n2 "Agents"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Agents" bold
+        text #n6 "Runs" shade=mid
+        text #n7 "Logs" shade=mid
+      col #n8 grow pad=4 gap=4
+        row #n9 justify=between align=center
+          text #n10 "Active Agents" size=l bold
+          button #n11 "New Agent" primary
+        grid #n12 cols=3 gap=3
+          col #n13 border pad=3 gap=2
+            text #n14 "Email Classifier" bold
+            text #n15 "Running" size=s shade=mid
+            row #n16 gap=2
+              shape #n17 circle w=8 h=8 fill=dark
+              text #n18 "3 tasks active" size=s
+            progress #n19 "Queue" value=72
+          col #n20 border pad=3 gap=2
+            text #n21 "Data Validator" bold
+            text #n22 "Idle" size=s shade=mid
+            row #n23 gap=2
+              shape #n24 circle w=8 h=8 fill=light
+              text #n25 "0 tasks" size=s
+            progress #n26 "Queue" value=0
+          col #n27 border pad=3 gap=2
+            text #n28 "Report Generator" bold
+            text #n29 "Running" size=s shade=mid
+            row #n30 gap=2
+              shape #n31 circle w=8 h=8 fill=dark
+              text #n32 "1 task active" size=s
+            progress #n33 "Queue" value=45
+  screen #n34 "Run Details"
+    row #n35 h=fill
+      col #n36 share=nav w=200 fill=light pad=3 gap=2
+        text #n37 "Agents" shade=mid
+        text #n38 "Runs" bold
+        text #n39 "Logs" shade=mid
+      col #n40 grow pad=4 gap=4
+        row #n41 justify=between align=center
+          text #n42 "Run #4821" size=l bold
+          text #n43 "In Progress" size=s
+        row #n44 gap=6
+          col #n45 grow
+            text #n46 "Email Classifier → Data Validator → Report Generator" size=s shade=mid
+            graph #n47 dir=right h=200
+              node #n48 "Email Classifier" sub=2.3s
+              node #n49 "Data Validator" sub=1.1s
+              node #n50 "Report Generator" sub=pending
+              edge #n51 n1 -> n2 "145 items"
+              edge #n52 n2 -> n3 "142 items"
+          col #n53 w=300 border pad=3 gap=2 fill=light
+            text #n54 "Timeline" bold size=m
+            col #n55 gap=2
+              row #n56 justify=between
+                text #n57 "Email Classifier started" size=s
+                text #n58 "14:23:15" mono size=xs shade=mid
+              row #n59 justify=between
+                text #n60 "145 items processed" size=s
+                text #n61 "14:23:18" mono size=xs shade=mid
+              row #n62 justify=between
+                text #n63 "Data Validator started" size=s
+                text #n64 "14:23:18" mono size=xs shade=mid
+              row #n65 justify=between
+                text #n66 "142 items validated" size=s
+                text #n67 "14:23:19" mono size=xs shade=mid
+  screen #n68 "Logs"
+    row #n69 h=fill
+      col #n70 share=nav w=200 fill=light pad=3 gap=2
+        text #n71 "Agents" shade=mid
+        text #n72 "Runs" shade=mid
+        text #n73 "Logs" bold
+      col #n74 grow pad=4 gap=3
+        row #n75 gap=2
+          input #n76 "Search logs" search grow
+          button #n77 "Filter" ghost
+        col #n78 gap=1
+          tr #n79 "Timestamp | Agent | Event | Status"
+          text #n80 bold
+          text #n81 bold
+          text #n82 bold
+          text #n83 bold
+          tr #n84 "14:23:19 | Report Generator | task_queued | pending" data
+          tr #n85 "14:23:18 | Data Validator | batch_complete | success" data
+          tr #n86 "14:23:18 | Data Validator | item_error | failed" data
+          text #n87 shade=light
+          text #n88 shade=light
+          text #n89 shade=light
+          text #n90 "1 error"
+          tr #n91 "14:23:17 | Email Classifier | batch_complete | success" data
+          tr #n92 "14:23:15 | Email Classifier | task_started | running" data

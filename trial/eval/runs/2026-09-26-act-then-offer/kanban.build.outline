@@ -1,0 +1,136 @@
+app #n1 "Studio Board" web
+  screen #n2 "Backlog"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Studio Board" bold
+        text #n6 "Backlog" bold
+        text #n7 "Active" shade=mid
+        text #n8 "Done" shade=mid
+      col #n9 grow pad=4 gap=3
+        row #n10 justify=between align=center
+          text #n11 "Backlog" size=l bold
+          button #n12 "＋ New" primary
+        row #n13 gap=4 h=fill
+          col #n14 w=280 gap=2
+            col #n15 border pad=3 gap=2
+              text #n16 "Homepage Redesign" bold size=m
+              text #n17 "Client: Acme Corp" size=s shade=mid data
+              row #n18 gap=1
+                shape #n19 circle w=24 h=24
+                text #n20 "Maya Chen" size=s data
+              text #n21 "Due Jan 15" size=xs shade=mid data
+            col #n22 border pad=3 gap=2
+              text #n23 "Logo Concepts" bold size=m
+              text #n24 "Internal" size=s shade=mid data
+              row #n25 gap=1
+                shape #n26 circle w=24 h=24
+                text #n27 "Jordan Lee" size=s data
+          col #n28 w=280 gap=2
+            col #n29 border pad=3 gap=2
+              text #n30 "Brand Guidelines" bold size=m
+              text #n31 "Client: Stellar Inc" size=s shade=mid data
+              row #n32 gap=1
+                shape #n33 circle w=24 h=24
+                text #n34 "Alex Rivera" size=s data
+              text #n35 "Due Feb 3" size=xs shade=mid data
+            col #n36 border pad=3 gap=2
+              text #n37 "Email Templates" bold size=m
+              text #n38 "Internal" size=s shade=mid data
+          col #n39 w=280 gap=2
+            col #n40 border pad=3 gap=2
+              text #n41 "Packaging Design" bold size=m
+              text #n42 "Client: Fresh Foods" size=s shade=mid data
+              row #n43 gap=1
+                shape #n44 circle w=24 h=24
+                text #n45 "Maya Chen" size=s data
+              text #n46 "Due Jan 22" size=xs shade=mid data
+  screen #n47 "Active"
+    row #n48 h=fill
+      col #n49 share=nav w=200 fill=light pad=3 gap=2
+        text #n50 "Studio Board" bold
+        text #n51 "Backlog" shade=mid
+        text #n52 "Active" bold
+        text #n53 "Done" shade=mid
+      col #n54 grow pad=4 gap=3
+        text #n55 "In Progress" size=l bold
+        row #n56 gap=4 h=fill
+          col #n57 w=280 gap=2 fill=light pad=3 border
+            text #n58 "In Progress" size=s bold shade=mid
+            col #n59 border pad=3 gap=2 fill=dark
+              text #n60 "Homepage Redesign" bold size=m
+              text #n61 "Client: Acme Corp" size=s shade=light data
+              row #n62 gap=1
+                shape #n63 circle w=24 h=24
+                text #n64 "Maya Chen" size=s shade=light data
+              progress #n65 value=60
+          col #n66 w=280 gap=2
+            col #n67 border pad=3 gap=2
+              text #n68 "Logo Concepts" bold size=m
+              text #n69 "Internal" size=s shade=mid data
+              row #n70 gap=1
+                shape #n71 circle w=24 h=24
+                text #n72 "Jordan Lee" size=s data
+              text #n73 "Started Jan 8" size=xs shade=mid data
+            col #n74 border pad=3 gap=2
+              text #n75 "Brand Guidelines" bold size=m
+              text #n76 "Client: Stellar Inc" size=s shade=mid data
+              row #n77 gap=1
+                shape #n78 circle w=24 h=24
+                text #n79 "Alex Rivera" size=s data
+              text #n80 "Review pending" size=xs shade=mid data
+          col #n81 w=280 gap=2
+            col #n82 border pad=3 gap=2
+              text #n83 "Packaging Design" bold size=m
+              text #n84 "Client: Fresh Foods" size=s shade=mid data
+              row #n85 gap=1
+                shape #n86 circle w=24 h=24
+                text #n87 "Maya Chen" size=s data
+              text #n88 "Blocked" size=xs shade=mid data
+  screen #n89 "Done"
+    row #n90 h=fill
+      col #n91 share=nav w=200 fill=light pad=3 gap=2
+        text #n92 "Studio Board" bold
+        text #n93 "Backlog" shade=mid
+        text #n94 "Active" shade=mid
+        text #n95 "Done" bold
+      col #n96 grow pad=4 gap=3
+        text #n97 "Completed" size=l bold
+        row #n98 gap=4 h=fill
+          col #n99 w=280 gap=2
+            col #n100 border pad=3 gap=2
+              text #n101 "Social Media Kit" bold size=m
+              text #n102 "Client: Luna Wellness" size=s shade=mid data
+              row #n103 gap=1
+                shape #n104 circle w=24 h=24
+                text #n105 "Jordan Lee" size=s data
+              text #n106 "Finished Dec 18" size=xs shade=mid data
+            col #n107 border pad=3 gap=2
+              text #n108 "Event Poster Series" bold size=m
+              text #n109 "Internal" size=s shade=mid data
+              row #n110 gap=1
+                shape #n111 circle w=24 h=24
+                text #n112 "Alex Rivera" size=s data
+              text #n113 "Finished Dec 22" size=xs shade=mid data
+          col #n114 w=280 gap=2
+            col #n115 border pad=3 gap=2
+              text #n116 "Website Mockups" bold size=m
+              text #n117 "Client: Acme Corp" size=s shade=mid data
+              row #n118 gap=1
+                shape #n119 circle w=24 h=24
+                text #n120 "Maya Chen" size=s data
+              text #n121 "Finished Jan 5" size=xs shade=mid data
+            col #n122 border pad=3 gap=2
+              text #n123 "Presentation Deck" bold size=m
+              text #n124 "Client: Stellar Inc" size=s shade=mid data
+              row #n125 gap=1
+                shape #n126 circle w=24 h=24
+                text #n127 "Alex Rivera" size=s data
+              text #n128 "Finished Jan 10" size=xs shade=mid data
+          col #n129 w=280 gap=2
+            col #n130 border pad=3 gap=2
+              text #n131 "Typography Study" bold size=m
+              text #n132 "Internal" size=s shade=mid data
+              row #n133 gap=1
+                shape #n134 circle w=24 h=24
+                text #n135 "Jordan Lee" size=s data
+              text #n136 "Finished Jan 12" size=xs shade=mid data

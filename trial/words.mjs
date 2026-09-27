@@ -183,8 +183,9 @@ function where(root, h) {
 // ---- naming a place ----------------------------------------------------------------------------
 // A place a new piece can go, or a moved thing can go to, from its structure alone: { anchor,
 // position } for a spot, { into } for somewhere inside. The same shapes tree.mjs gives Jev, with
-// the words a person reads. `skip` holds a thing being moved, which is not its own neighbour.
-export function place(root, g, skip = new Set()) {
+// the words a person reads. `skip` holds a thing being moved, which is not its own neighbour;
+// `now` names the place it is in, which an offer made after the move calls "where it was".
+export function place(root, g, skip = new Set(), now = "where it is now") {
   if (g.into != null) return `somewhere in ${name(root, g.into)}`;
   const h = find(root, g.anchor);
   if (!h) return "there";
@@ -195,8 +196,8 @@ export function place(root, g, skip = new Set()) {
     return `after ${pageName(root, n.text)}${last ? ", at the end" : ""}`;
   }
   const kids = (c) => (c.children ?? []).filter((k) => !skip.has(k.id));
-  const now = nowAt(root, skip);
-  const here = now && now.anchor === g.anchor && now.position === g.position ? " (where it is now)" : "";
+  const at = nowAt(root, skip);
+  const here = at && at.anchor === g.anchor && at.position === g.position ? ` (${now})` : "";
   if (g.position === "inside_start" || g.position === "inside_end") {
     const across = n.type === "row";
     if (n.type === "graph") return `in ${name(root, n.id)}${here}`;
@@ -263,31 +264,40 @@ const LIMIT = {
 const KIND = { text: "words like that", button: "button", input: "field", picture: "picture or shape", group: "part like that", table: "table", chart: "chart", screen: "page" };
 
 // ---- questions ------------------------------------------------------------------------------
-// Each is { text, choices } in words only; the server attaches what each choice does.
+// Each is { text, choices } in words only; the server attaches what each choice does. Since act,
+// then offer (below), the app asks first only before clearing on an unsure answer and before a new
+// app when Jev is torn between that and another kind of change.
 export const LEAVE = "Leave it";
 export const ask = {
-  which: (op, { seen = true } = {}) => (seen ? `Which one should I ${doing(op, "")}?` : `I don't see that here. ${cap(doing(op, "one of these"))}?`),
-  // `named`: the name to show, from distinct() when several are offered together.
-  whichChoice: (root, id, i, pages = [], named = name(root, id)) => `${i + 1} · ${cap(named)}${pages.length && find(root, id)?.node.type !== "screen" ? ` · ${onPages(root, pages)}` : ""}`,
-  pointedOrNamed: (op) => `${cap(doing(op, "the one you selected"))}, or the one you named?`,
-  pointedChoice: (root, id) => `The one you selected: ${name(root, id)}`,
-  namedChoice: (root, id) => cap(name(root, id)),
-  remove: (root, id) => `Remove ${name(root, id)}?`,
-  removeYes: "Yes, remove it",
   clear: "Clear everything? Undo brings it back.",
   clearYes: "Yes, clear it",
-  whole: (root) => `A new ${pageWord(root)}, or on a ${pageWord(root)} that's there?`,
-  wholeNew: (root) => `A new ${pageWord(root)}`,
-  wholeOn: (root, viewing) => `On ${viewing ? pageName(root, viewing) : `a ${pageWord(root)} that's there`}${viewing ? " (the one you're looking at)" : ""}`,
-  page: (root) => `Which ${pageWord(root)}?`,
-  pageChoice: (root, screen, viewing) => `${cap(pageName(root, screen))}${screen === viewing ? " (the one you're looking at)" : ""}`,
-  where: "Where should it go?",
-  whereChoice: (root, g, i, skip) => `${i + 1} · ${cap(place(root, g, skip))}`,
   job: "What kind of change is it?",
   jobAdd: "Add something new",
   jobChange: (root, id) => (id ? `Change ${name(root, id)}` : "Change something that's there"),
   jobSeveral: "Several changes at once",
   jobNewApp: "Start a new app",
+};
+
+// ---- offers, after acting ---------------------------------------------------------------------
+// Where Jev was unsure, the app does its top pick and offers the runner-up beside the reply, one
+// click each (docs/plan-web-2026-09-26.md §3A): "Between “Address” and “Hours” instead", "The
+// “Cancel” button instead". `named`: the name to show, from distinct() when two could read the
+// same; `pages`: the pages a thing is on, said when the app has several.
+export const offer = {
+  target: (root, id, named = name(root, id), pages = []) => `${cap(named)}${pages.length && find(root, id)?.node.type !== "screen" ? ` ${onPages(root, pages)}` : ""} instead`,
+  place: (root, g, skip) => `${cap(place(root, g, skip, "where it was"))} instead`,
+  page: (root, screen) => `On ${pageName(root, screen)} instead`,
+  whole: (root, whole) => (whole ? `As a new ${pageWord(root)} instead` : `On a ${pageWord(root)} that's there instead`),
+  job: (root, job, id = null) => ({
+    add: "Add it as something new instead",
+    rewrite: id ? `Change ${name(root, id)} instead` : "Change what's there instead",
+    several: "As several changes instead",
+    new_app: "As a new app instead",
+  })[job] ?? "Another way instead",
+  // Nothing was done — Jev doesn't see the thing named — and these are the likeliest: the edit
+  // itself, on each ("Make the “Home · Add” bar darker"). `op` null is a rewrite.
+  doIt: (root, op, id, named = name(root, id), pages = []) => `${cap(doing(op ?? "change", named))}${pages.length && find(root, id)?.node.type !== "screen" ? ` ${onPages(root, pages)}` : ""}`,
+  undo: "Undo",
 };
 
 // Names for several things offered together, told apart where two would read the same: two
@@ -331,6 +341,7 @@ export const reply = {
   alreadyThere: (what) => `${cap(what)} is already there.`,
   notAChange: "Nothing changed: that reads as a question or a comment.",
   noSuch: (kind) => `I don't see a ${KIND[kind] ?? "thing like that"} here, so nothing changed.`,
+  notSeen: "I don't see that here, so nothing changed.",
   gone: "That's no longer there. Say it again?",
   noPlace: (root, screen) => `I couldn't find a place for it on ${pageName(root, screen)}. Say where?`,
   missed: "That didn't come out right, so nothing changed. Try saying it again.",
@@ -342,6 +353,7 @@ export const reply = {
   busy: (u) => `Still working on ${q(u)}. One thing at a time.`,
   busyAnswer: (u) => `Still working on ${q(u)}. Answer when it's done.`,
   stale: "That question has gone. Say it again?",
+  offerGone: "That's no longer on offer. Say it again?",
   left: "Left as it is.",
   undone: "Undone.",
   nothingToUndo: "Nothing to undo.",

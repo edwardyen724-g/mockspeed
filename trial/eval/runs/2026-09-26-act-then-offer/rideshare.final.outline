@@ -1,0 +1,187 @@
+app #n1 "RideShare Driver" phone
+  screen #n2 "Active"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n182 "Filter" size=s bold shade=mid
+        button #n184 "All" primary size=s
+        table #n154
+          tr #n155 "Screen | Status"
+          tr #n156 "Active | " data
+          tr #n157 "History | " data
+          tr #n158 "Earnings | " data
+          tr #n159 "Profile | " data
+        col #n181 gap=2
+          row #n183 gap=1
+            button #n185 "Pending" ghost size=s
+            button #n186 "Completed" ghost size=s
+      col #n9 grow pad=4 gap=3
+        row #n105 pad=3 gap=2
+          input #n106 "Search rides" search w=fill
+        row #n10 justify=between align=center
+          text #n11 "RideShare" size=xxl bold
+          shape #n12 circle w=32 h=32
+        text #n13 "Online · 4.87 ★" size=s shade=mid
+        col #n14 gap=3 grow
+          col #n15 border pad=3 gap=2 fill=light
+            row #n16 justify=between
+              col #n17 gap=1
+                text #n18 "Sarah Chen" bold
+                text #n19 "5 min away" size=s shade=mid
+              text #n20 "$12.40" size=s shade=mid
+            text #n21 "Maple Ave → Downtown Station" size=s
+            row #n22 gap=2
+              shape #n23 circle w=24 h=24
+              text #n24 "4.92 ★ · 23 rides" size=s shade=mid
+          col #n25 border pad=3 gap=2 fill=light
+            row #n26 justify=between
+              col #n27 gap=1
+                text #n28 "Marcus T." bold
+                text #n29 "8 min away" size=s shade=mid
+              text #n30 "$8.60" size=s shade=mid
+            text #n31 "Oak Park → City Center" size=s
+            row #n32 gap=2
+              shape #n33 circle w=24 h=24
+              text #n34 "4.88 ★ · 156 rides" size=s shade=mid
+        row #n35 gap=2 pad=3 border fill=light
+          shape #n36 pill w=80 h=80
+          col #n37 grow gap=1
+            text #n38 "Go Offline" size=m bold
+            text #n39 "Taking a break? Tap to pause requests" size=s shade=mid
+  screen #n40 "History"
+    row #n41 h=fill
+      col #n42 share=nav w=200 fill=mid pad=3 gap=2
+        table #n161
+          tr #n162 "Screen | Status"
+          tr #n163 "Active | " data
+          tr #n164 "History | " data
+          tr #n165 "Earnings | " data
+          tr #n166 "Profile | " data
+        col #n187 gap=2
+          text #n188 "Filter" size=s bold shade=mid
+          row #n189 gap=1
+            button #n190 "All" primary size=s
+            button #n191 "Pending" ghost size=s
+            button #n192 "Completed" ghost size=s
+      col #n47 grow pad=4 gap=3
+        text #n48 "Today" size=m bold
+        col #n49 gap=2
+          col #n50 border pad=3 gap=2
+            row #n51 justify=between
+              text #n52 "Emily Rodriguez" bold
+              text #n53 "2:45 PM" size=s shade=mid
+            text #n54 "Central Ave → Airport" size=s shade=mid
+            row #n55 justify=between
+              text #n56 "$14.80" size=s bold
+              text #n57 "12 min" size=s shade=mid
+          col #n58 border pad=3 gap=2
+            row #n59 justify=between
+              text #n60 "James Wilson" bold
+              text #n61 "1:20 PM" size=s shade=mid
+            text #n62 "Downtown → Riverside Mall" size=s shade=mid
+            row #n63 justify=between
+              text #n64 "$9.25" size=s bold
+              text #n65 "8 min" size=s shade=mid
+        text #n66 "Yesterday" size=m bold pad=3 gap=0
+        col #n67 gap=2
+          col #n68 border pad=3 gap=2
+            row #n69 justify=between
+              text #n70 "Priya Patel" bold
+              text #n71 "6:10 PM" size=s shade=mid
+            text #n72 "Station Plaza → Hillcrest" size=s shade=mid
+            row #n73 justify=between
+              text #n74 "$11.50" size=s bold
+              text #n75 "9 min" size=s shade=mid
+  screen #n76 "Earnings"
+    row #n77 h=fill
+      col #n78 share=nav w=200 fill=mid pad=3 gap=2
+        table #n168
+          tr #n169 "Screen | Status"
+          tr #n170 "Active | " data
+          tr #n171 "History | " data
+          tr #n172 "Earnings | " data
+          tr #n173 "Profile | " data
+        col #n193 gap=2
+          text #n194 "Filter" size=s bold shade=mid
+          row #n195 gap=1
+            button #n196 "All" primary size=s
+            button #n197 "Pending" ghost size=s
+            button #n198 "Completed" ghost size=s
+      col #n83 grow pad=4 gap=4
+        col #n84 gap=1
+          text #n85 "Today" size=m bold
+          text #n86 "$127.50" size=xl bold
+          text #n87 "18 rides · 3h 24m" size=s shade=mid
+        row #n88 gap=3
+          col #n89 grow border pad=3 gap=2 fill=light
+            text #n90 "This Week" size=s shade=mid
+            text #n91 "$612.30" size=l bold
+          col #n92 grow border pad=3 gap=2 fill=light
+            text #n93 "This Month" size=s shade=mid
+            text #n94 "$2,485.60" size=l bold
+        text #n95 "Weekly Breakdown" size=m bold
+        chart #n96 "Earnings" line values=142,156,189,203,167,212,195 h=150
+        col #n97 gap=2
+          text #n98 "Breakdown" size=s bold
+          row #n99 justify=between
+            text #n100 "Ride Fares" size=s
+            text #n101 "$2,340.50" size=s bold
+          row #n102 justify=between
+            text #n103 "Bonuses & Surges" size=s shade=mid
+            text #n104 "$145.10" size=s bold
+  screen #n107 "Profile"
+    row #n108 h=fill
+      col #n109 share=nav w=200 fill=mid pad=3 gap=2
+        table #n175
+          tr #n176 "Screen | Status"
+          tr #n177 "Active | " data
+          tr #n178 "History | " data
+          tr #n179 "Earnings | " data
+          tr #n180 "Profile | " data
+        col #n199 gap=2
+          text #n200 "Filter" size=s bold shade=mid
+          row #n201 gap=1
+            button #n202 "All" primary size=s
+            button #n203 "Pending" ghost size=s
+            button #n204 "Completed" ghost size=s
+      col #n114 grow pad=4 gap=4
+        col #n115 border pad=3 gap=3
+          row #n116 gap=3 align=center
+            shape #n117 circle w=64 h=64
+            col #n118 gap=1
+              text #n119 "Marcus Thompson" size=m bold
+              text #n120 "Driver since 2021" size=s shade=mid
+              text #n121 "4.89 ★ · 892 rides" size=s shade=mid
+          row #n122 pad=3 border fill=light justify=between align=center
+            col #n123 gap=1
+              text #n124 "Rating" size=s bold
+              text #n125 "4.89 ★" size=l bold
+            col #n126 gap=1
+              text #n127 "Acceptance" size=s bold
+              text #n128 "98%" size=l bold
+            col #n129 gap=1
+              text #n130 "Cancellation" size=s bold
+              text #n131 "2%" size=l bold
+        text #n132 "Account Settings" size=m bold
+        col #n133 gap=2
+          row #n134 justify=between align=center pad=3 border
+            text #n135 "Email" size=s
+            text #n136 "marcus@email.com" size=s shade=mid
+          row #n137 justify=between align=center pad=3 border
+            text #n138 "Phone" size=s
+            text #n139 "+1 (555) 234-5678" size=s shade=mid
+          row #n140 justify=between align=center pad=3 border
+            text #n141 "Vehicle" size=s
+            text #n142 "2022 Honda Civic" size=s shade=mid
+        text #n143 "Preferences" size=m bold
+        col #n144 gap=2
+          row #n145 justify=between align=center pad=3 border
+            text #n146 "Notifications" size=s
+            shape #n147 circle w=12 h=12 fill=dark
+          row #n148 justify-between align=center pad=3 border
+            text #n149 "Dark Mode" size=s
+            shape #n150 circle w=12 h=12 fill=light
+        col #n151 gap=2 pad=3 border fill=light
+          button #n152 "Log Out" ghost w=fill
+        col #n205 gap=2 pad=3 border fill=light
+          text #n206 "About" size=s bold shade=mid
+          text #n207 "Experienced driver committed to safety and excellent service. Fluent in English and Spanish. Always on time." size=s shade=mid

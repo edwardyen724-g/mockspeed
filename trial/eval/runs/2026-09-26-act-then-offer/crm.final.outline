@@ -1,0 +1,180 @@
+app #n1 "Prospect Flow" web
+  screen #n2 "Pipeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Pipeline" bold size=xl
+        text #n6 "Showings" shade=mid
+        text #n7 "Closed" shade=mid
+        text #n8 "Settings" shade=mid
+      col #n9 grow pad=4 gap=3
+        button #n213 "New buyer" primary size=l
+        row #n208 gap=3 pad=2 border
+          input #n209 "Search buyers..." search w=300
+        text #n210 "Buyers" size=l bold
+        row #n211 gap=3 justify=between align=center
+          text #n212 "24 active" size=s shade=mid
+        table #n214
+          tr #n215 "Name | Budget | Status | Next step"
+          tr #n216 "Sarah Chen | $450K | Lead | Schedule showing" data
+          tr #n217 "Marcus Williams | $680K | Lead | Initial showing" data
+          tr #n218 "Jennifer Park | $550K | Lead | Send details" data
+          tr #n219 "David Lopez | $725K | Viewing | Follow up" data
+          tr #n220 "Amy Thompson | $400K | Viewing | Wed 2pm showing" data
+          tr #n221 "Robert Johnson | $595K | Negotiating | 478 Oak Ave" data
+          tr #n222 "Lisa Gupta | $920K | Negotiating | Inspection" data
+          tr #n223 "Thomas Walsh | $545K | Closed | 12 Oak Ridge Lane" data
+        row #n224 gap=2 align=center
+          text #n225 "Filter by:" size=s shade=mid
+          button #n226 "Status" ghost size=s
+          button #n227 "Budget" ghost size=s
+          button #n228 "Timeline" ghost size=s
+  screen #n59 "Buyer Detail"
+    row #n60 h=fill
+      col #n61 share=nav w=200 fill=mid pad=3 gap=2
+        text #n62 "Pipeline" shade=mid size=xl
+        text #n63 "Showings" bold
+        text #n64 "Closed" shade=mid
+        text #n65 "Settings" shade=mid
+      col #n66 grow pad=4 gap=3
+        row #n67 align=center gap=3
+          shape #n68 circle w=48 h=48
+          col #n69 gap=1
+            text #n70 "Sarah Chen" size=l bold
+            text #n71 "Lead • Added Jan 15" size=s shade=mid
+        row #n72 gap=4 pad=3 border
+          col #n73 gap=2 w=300
+            text #n74 "Contact" size=s bold shade=dark
+            text #n75 "Phone" size=xs shade=mid
+            text #n76 "(555) 234-7891" mono
+            text #n77 "Email" size=xs shade=mid
+            text #n78 "sarah.chen@email.com" mono
+            text #n79 "Preferred: Call" size=xs shade=mid
+          col #n80 gap=2 w=300
+            text #n81 "Requirements" size=s bold shade=dark
+            text #n82 "Budget" size=xs shade=mid
+            text #n83 "$450,000" mono
+            text #n84 "Beds" size=xs shade=mid
+            text #n85 "2–3" mono
+            text #n86 "Area" size=xs shade=mid
+            text #n87 "Downtown, walkable" mono
+          col #n88 gap=2 grow
+            text #n89 "Timeline" size=s bold shade=dark
+            text #n90 "Ready to buy" size=xs shade=mid
+            text #n91 "60 days" mono
+            text #n92 "Next step" size=xs shade=mid
+            text #n93 "Schedule showing" mono
+        text #n94 "Activity" size=s bold
+        col #n95 gap=2
+          row #n96 gap=2 align=start
+            text #n97 "Jan 22, 10am" size=xs shade=mid w=80
+            col #n98 gap=1
+              text #n99 "Showing scheduled" bold size=s
+              text #n100 "478 Oak Ave" size=xs shade=mid
+          row #n101 gap=2 align=start
+            text #n102 "Jan 15, 2pm" size=xs shade=mid w=80
+            col #n103 gap=1
+              text #n104 "Lead created" bold size=s
+              text #n105 "Web form submission" size=xs shade=mid
+        row #n106 gap=2 pad=3 border
+          button #n107 "Schedule showing" primary
+          button #n108 "Send listing"
+  screen #n110 "Showings"
+    row #n111 h=fill
+      col #n112 share=nav w=200 fill=mid pad=3 gap=2
+        text #n113 "Pipeline" shade=mid size=xl
+        text #n114 "Showings" bold
+        text #n115 "Closed" shade=mid
+        text #n116 "Settings" shade=mid
+      col #n117 grow pad=4 gap=3
+        text #n118 "Upcoming showings" size=l bold
+        col #n119 gap=2
+          col #n120 border pad=3 gap=2
+            row #n121 justify=between align=center
+              col #n122 gap=1
+                text #n123 "Wednesday, Jan 22" bold
+                text #n124 "478 Oak Ave" size=s shade=mid
+              text #n125 "10:00 am" bold
+            row #n126 justify=between align=center
+              text #n127 "Sarah Chen" bold
+              text #n128 "2-bed, $450K" size=s shade=mid
+          col #n129 border pad=3 gap=2
+            row #n130 justify=between align=center
+              col #n131 gap=1
+                text #n132 "Thursday, Jan 23" bold
+                text #n133 "245 Maple Drive" size=s shade=mid
+              text #n134 "2:30 pm" bold
+            row #n135 justify=between align=center
+              text #n136 "Amy Thompson" bold
+              text #n137 "3-bed, $400K" size=s shade=mid
+          col #n138 border pad=3 gap=2
+            row #n139 justify=between align=center
+              col #n140 gap=1
+                text #n141 "Friday, Jan 24" bold
+                text #n142 "912 Elm Court" size=s shade=mid
+              text #n143 "4:00 pm" bold
+            row #n144 justify=between align=center
+              text #n145 "Marcus Williams" bold
+              text #n146 "4-bed, $680K" size=s shade=mid
+        text #n147 "Recent feedback" size=s bold
+        col #n148 gap=2
+          col #n149 border pad=3 gap=1
+            text #n150 "Sarah Chen • 478 Oak Ave" bold
+            text #n151 "Great bones. Needs kitchen update. Wants inspection Friday." size=s
+          col #n152 border pad=3 gap=1
+            text #n153 "David Lopez • 1547 Pine Street" bold
+            text #n154 "Too small. Not interested." size=s
+  screen #n157 "Settings"
+    row #n158 h=fill
+      col #n159 share=nav w=200 fill=mid pad=3 gap=2
+        text #n160 "Pipeline" shade=mid size=xl
+        text #n161 "Showings" shade=mid
+        text #n162 "Closed" shade=mid
+        text #n163 "Settings" bold
+      col #n164 grow pad=4 gap=3
+        text #n165 "Settings" size=l bold
+        col #n229 gap=2
+          text #n230 "Notes" size=s bold shade=dark
+          col #n231 border pad=3 gap=2
+            text #n232 "Keep track of important reminders and preferences here." size=s shade=mid
+            input #n233 area value="Add a note..." h=120
+        col #n166 gap=4
+          col #n167 gap=2
+            text #n168 "Account" size=s bold shade=dark
+            col #n169 border pad=3 gap=2
+              row #n170 justify=between align=center
+                text #n171 "Email" shade=mid
+                text #n172 "agent@prospectflow.com" mono
+              row #n173 justify=between align=center
+                text #n174 "Name" shade=mid
+                text #n175 "Alex Rivera" mono
+              row #n176 justify=between align=center
+                text #n177 "Phone" shade=mid
+                text #n178 "(555) 867-5309" mono
+          col #n179 gap=2
+            text #n180 "Preferences" size=s bold shade=dark
+            col #n181 border pad=3 gap=2
+              row #n182 justify=between align=center
+                text #n183 "Email notifications" shade=mid
+                input #n184 toggle on
+              row #n185 justify=between align=center
+                text #n186 "SMS reminders" shade=mid
+                input #n187 toggle
+              row #n188 justify=between align=center
+                text #n189 "Dark mode" shade=mid
+                input #n190 toggle
+          col #n191 gap=2
+            text #n192 "Integrations" size=s bold shade=dark
+            col #n193 border pad=3 gap=2
+              row #n194 justify=between align=center
+                col #n195 gap=1
+                  text #n196 "MLS Sync" bold
+                  text #n197 "Last updated Jan 20" size=xs shade=mid
+                button #n198 "Reconnect" ghost
+              row #n199 justify=between align=center
+                col #n200 gap=1
+                  text #n201 "Calendar Sync" bold
+                  text #n202 "Connected" size=xs shade=mid
+                button #n203 "Manage" ghost
+          row #n204 gap=2 pad=3 border
+            button #n205 "Change password"
+            button #n206 "Sign out" ghost
