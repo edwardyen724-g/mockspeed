@@ -245,6 +245,30 @@ two pages. Where a writer put `share=` on an element and again on something insi
 copies are the shared element. `trial/test/export.test.mjs` checks every word on 24 mocks, and the
 same plain-words rule as `words.mjs`.
 
+### `trial/engine.mjs` — one project's canvas (plan phase 3)
+
+```js
+export function project({ root, apiKey, llmKey, model })   // → a project; root defaults to an empty canvas
+export const blank                                          // () → the empty canvas's tree
+
+p.ask({ utterance, marked, viewing, chip })   // → reply (async): Jev decides, the writer writes, code applies
+p.answer(body)  p.swap(body)                  // → reply (async): a question answered, an offered swap taken
+p.edit({ op, target, all, text })             // → reply: the toolbar and double-click rename, no model
+p.undo({ on })  p.startAgain()                // → reply: one change, or the whole sentence with `on`; empty the canvas
+p.tools(id)  p.state()                        // → what the toolbar and the page read
+p.root  p.version                             // the tree as it is now; { rev, seq }
+p.subscribe(fn)                               // fn({ rev, seq }) after every change → a function that stops it
+```
+
+Everything a canvas holds — the tree, the undo stack, the question waiting on the person, the
+offers, the next steps, the log, whether it is busy — lives inside the project, so two projects in
+one process never touch each other and each can be busy at once. The keys and the model are the
+process's, passed in; the engine reads no files and no environment. `trial/server.mjs` is the http
+shell over a map of projects: the one at `/` opens the outline on its command line and is the one
+`trial/eval` drives, and `/p/new` makes another at `/p/<id>/`, where the same page and every route
+are that project's. `trial/test/engine.test.mjs` runs two projects side by side;
+`trial/test/server.test.mjs` starts the real server and checks the routing.
+
 ## Tests
 
 `node --test trial/test/*.test.mjs` from the repo root (Node 25 does not accept a bare directory).

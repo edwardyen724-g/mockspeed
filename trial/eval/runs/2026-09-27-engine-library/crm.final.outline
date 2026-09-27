@@ -1,0 +1,160 @@
+app #n1 "Pipeline" phone
+  screen #n2 "Pipeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Pipeline" bold size=xl
+        text #n6 "Active" bold
+        text #n7 "Leads" shade=mid
+        text #n8 "Viewing" shade=mid
+        text #n9 "Offer" shade=mid
+        text #n10 "Closed" shade=mid
+      col #n11 grow pad=3 gap=3
+        button #n175 "Status" ghost size=s
+        row #n118 pad=3 border
+          input #n119 "Search leads..." search grow
+        row #n12 justify=between align=center
+          text #n13 "Active" size=l bold
+          text #n14 "12" size=l bold
+        col #n15 gap=2
+          table #n168
+            tr #n169 "Name | Property | Status | Last Contact"
+            tr #n170 "Sarah Chen | 3-bed Victorian | Interested | Yesterday" data
+            tr #n171 "Marcus Johnson | 2-bed modern | Viewing confirmed | Today" data
+            tr #n172 "Elena Rodriguez | 4-bed townhouse | Offer pending | 2 days ago" data
+        row #n173 gap=2 pad=3
+          text #n174 "Filter" size=s shade=mid
+          button #n176 "Budget" ghost size=s
+          button #n177 "Type" ghost size=s
+  screen #n40 "Lead Detail"
+    row #n41 h=fill
+      col #n42 share=nav w=200 fill=mid pad=3 gap=2
+        text #n43 "Pipeline" bold size=xl
+        text #n44 "Active" bold
+        text #n45 "Leads" shade=mid
+        text #n46 "Viewing" shade=mid
+        text #n47 "Offer" shade=mid
+        text #n48 "Closed" shade=mid
+      col #n49 grow pad=3 gap=3
+        col #n50 gap=2
+          row #n51 justify=between align=center
+            col #n52 gap=1
+              text #n53 "Sarah Chen" size=l bold
+              text #n54 "Interested" size=s shade=mid
+            button #n55 "Move" ghost size=l
+          col #n56 gap=3 pad=3 fill=light
+            row #n57 gap=2
+              text #n58 "Status" size=s bold w=80
+              text #n59 "Active" size=s
+            row #n60 gap=2
+              text #n61 "Budget" size=s bold w=80
+              text #n62 "$350–450k" size=s
+            row #n63 gap=2
+              text #n64 "Type" size=s bold w=80
+              text #n65 "3+ bed house" size=s
+            row #n66 gap=2
+              text #n67 "Location" size=s bold w=80
+              text #n68 "Westside" size=s
+            row #n69 gap=2
+              text #n70 "Timeline" size=s bold w=80
+              text #n71 "3–6 months" size=s
+        text #n72 "Activity" size=m bold
+        col #n73 gap=2
+          text #n74 "Today 2:15 pm" size=xs shade=mid
+          text #n75 "You: Sent 442 Oak St listing" size=s
+          text #n76 "Yesterday 10:30 am" size=xs shade=mid
+          text #n77 "Sarah: Asked about schools" size=s
+          text #n78 "3 days ago" size=xs shade=mid
+          text #n79 "You: Initial call — 15 min" size=s
+        row #n80 gap=2 pad=3 border
+          input #n81 "Add note" area value="" grow
+  screen #n83 "Viewing Schedule"
+    row #n84 h=fill
+      col #n85 share=nav w=200 fill=mid pad=3 gap=2
+        text #n86 "Pipeline" bold size=xl
+        text #n87 "Active" bold
+        text #n88 "Leads" shade=mid
+        text #n89 "Viewing" bold shade=dark
+        text #n90 "Offer" shade=mid
+        text #n91 "Closed" shade=mid
+      col #n92 grow pad=3 gap=3
+        text #n93 "This week" size=m bold
+        col #n94 gap=2
+          col #n95 border pad=3 gap=2
+            row #n96 justify=between
+              text #n97 "Saturday 2:00 pm" bold
+              shape #n98 circle w=12 h=12 fill=mid
+            text #n99 "Marcus Johnson" size=s
+            text #n100 "442 Oak St" size=s shade=mid
+            text #n101 "3-bed Victorian • $425k" size=xs shade=mid
+          col #n102 border pad=3 gap=2
+            row #n103 justify=between
+              text #n104 "Sunday 11:00 am" bold
+              shape #n105 circle w=12 h=12 fill=dark
+            text #n106 "David & Lisa Park" size=s
+            text #n107 "218 Maple Ave" size=s shade=mid
+            text #n108 "4-bed colonial • $550k" size=xs shade=mid
+        text #n109 "Next week" size=m bold shade=mid
+        col #n110 gap=2
+          col #n111 border pad=3 gap=2
+            row #n112 justify=between
+              text #n113 "Tuesday 3:30 pm" bold
+              shape #n114 circle w=12 h=12 fill=light
+            text #n115 "James Walsh" size=s
+            text #n116 "105 Pine Rd" size=s shade=mid
+            text #n117 "2-bed condo • $280k" size=xs shade=mid
+  screen #n120 "Settings"
+    row #n121 h=fill
+      col #n122 share=nav w=200 fill=mid pad=3 gap=2
+        text #n123 "Pipeline" bold size=xl
+        text #n124 "Active" shade=mid
+        text #n125 "Leads" shade=mid
+        text #n126 "Viewing" shade=mid
+        text #n127 "Offer" shade=mid
+        text #n128 "Closed" shade=mid
+      col #n129 grow pad=3 gap=3
+        text #n130 "Settings" size=l bold
+        col #n178 gap=2
+          text #n179 "About" size=m bold
+          col #n180 gap=2
+            row #n181 justify-between align=center
+              text #n182 "App version" size=s
+              text #n183 "2.4.1" size=s shade=mid
+            row #n184 justify-between align=center
+              text #n185 "Last sync" size=s
+              text #n186 "2 minutes ago" size=s shade=mid
+        col #n131 gap=3
+          col #n132 gap=2
+            text #n133 "Account" size=m bold
+            col #n134 gap=2
+              row #n135 justify=between align=center
+                text #n136 "Email" size=s
+                text #n137 "alex@realty.com" size=s shade=mid
+              row #n138 justify=between align=center
+                text #n139 "Name" size=s
+                text #n140 "Alex Morgan" size=s shade=mid
+              row #n141 justify=between align=center
+                text #n142 "Role" size=s
+                text #n143 "Agent" size=s shade=mid
+          col #n144 gap=2
+            text #n145 "Notifications" size=m bold
+            col #n146 gap=2
+              row #n147 justify=between align=center
+                text #n148 "New leads" size=s
+                shape #n149 circle w=12 h=12 fill=dark
+              row #n150 justify=between align=center
+                text #n151 "Viewing reminders" size=s
+                shape #n152 circle w=12 h=12 fill=dark
+              row #n153 justify=between align=center
+                text #n154 "Offer updates" size=s
+                shape #n155 circle w=12 h=12 fill=dark
+          col #n156 gap=2
+            text #n157 "Preferences" size=m bold
+            col #n158 gap=2
+              row #n159 justify=between align=center
+                text #n160 "Currency" size=s
+                text #n161 "USD" size=s shade=mid
+              row #n162 justify=between align=center
+                text #n163 "Default timeline" size=s
+                text #n164 "3–6 months" size=s shade=mid
+          row #n165 gap=2 pad=3 border
+            button #n166 "Log out" ghost

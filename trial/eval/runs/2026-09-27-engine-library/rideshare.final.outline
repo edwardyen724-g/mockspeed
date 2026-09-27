@@ -1,0 +1,120 @@
+app #n1 "Driver" phone
+  screen #n2 "Home"
+    row #n3 h=60 pad=3 fill=dark align=center
+      text #n4 "Driver" bold size=xxl
+      row #n138 gap=2 pad=3 align=center
+        text #n139 "Today" size=s shade=mid
+    col #n5 grow gap=3 pad=3
+      button #n140 "⋮" ghost
+      row #n6 gap=2 align=center justify=between
+        col #n7 gap=1
+          text #n8 "Online" bold size=m
+          text #n9 "4.92" bold size=l
+          text #n10 "★★★★☆" shade=mid size=s
+        col #n11 gap=1 align=end
+          text #n12 "Tonight" size=s shade=mid
+          text #n13 "3 hrs 24 min" bold size=m
+      row #n14 gap=3 pad=3 border fill=light
+        col #n15 grow
+          text #n16 "Status" size=s shade=mid
+          text #n17 "Accepting rides" bold size=m
+          text #n18 "3 min away" size=s data
+      col #n20 gap=2
+        text #n21 "Next pickup" size=s shade=mid bold
+        row #n22 gap=3 pad=3 border
+          shape #n23 circle w=50 h=50
+          col #n24 grow gap=1
+            text #n25 "Marcus T." bold
+            text #n26 "📍 620 Market St" size=s data
+            text #n27 "★★★★★ · 4.8 mi" size=s data
+        row #n28 gap=2 pad=3 border fill=light
+          shape #n29 circle w=12 h=12 fill=dark
+          text #n30 "Pool ride · 2 stops" size=s
+      col #n31 gap=2 pad=3 border fill=light
+        text #n32 "Earnings today" size=s shade=mid bold
+        text #n33 "$127.43" bold size=xl
+        text #n34 "21 rides" size=s data
+  screen #n35 "Active Ride"
+    row #n36 h=60 pad=3 fill=dark align=center justify=between
+      text #n37 "Driver" bold size=l
+      button #n38 "☰" ghost
+    col #n39 grow gap=3 pad=3
+      shape #n40 w=fill h=280
+      col #n41 gap=2 pad=3 border
+        text #n42 "Marcus T." bold size=m
+        row #n43 gap=2
+          text #n44 "★★★★★ 4.8" size=s
+          text #n45 "47 rides" size=s shade=mid
+      col #n46 gap=2 pad=3 border fill=light
+        row #n47 justify=between
+          col #n48
+            text #n49 "Pickup" size=s shade=mid
+            text #n50 "620 Market St" bold size=s data
+          text #n51 "2 min" bold size=m
+        line #n52
+        row #n53 justify=between
+          col #n54
+            text #n55 "Dropoff" size=s shade=mid
+            text #n56 "1847 Van Ness Ave" bold size=s data
+          text #n57 "12 min" bold size=m
+      row #n58 gap=2 pad=3 border justify=between align=center
+        col #n59
+          text #n60 "Fare" size=s shade=mid
+          text #n61 "$18.50" bold size=m
+        button #n62 "Arrived" primary w=140
+  screen #n63 "History"
+    row #n64 h=60 pad=3 fill=dark align=center
+      text #n65 "Driver" bold size=l
+    col #n66 grow gap=2 pad=3
+      text #n67 "This week" size=s shade=mid bold
+      col #n68 gap=2
+        table #n133
+          tr #n134 "Passenger | Distance | Rating | Fare | Time"
+          tr #n135 "Sarah M. | 4.2 mi | ★★★★☆ | $12.75 | Fri 8:42 PM" data
+          tr #n136 "James K. | 7.8 mi | ★★★★★ | $24.30 | Fri 6:15 PM" data
+          tr #n137 "Priya N. | 2.1 mi | ★★★★★ | $8.95 | Thu 11:03 PM" data
+      text #n90 "Last week" size=s shade=mid bold
+      col #n91 gap=2
+        row #n92 pad=3 border gap=2
+          col #n93 gap=1 grow
+            text #n94 "Total rides" bold size=s
+            text #n95 "28 completed" size=xs shade=mid data
+          col #n96 align=end
+            text #n97 "$412.60" bold size=s
+  screen #n98 "Settings"
+    row #n99 h=60 pad=3 fill=dark align=center
+      text #n100 "Driver" bold size=l
+    col #n101 grow gap=3 pad=3
+      text #n102 "Account" size=s shade=mid bold
+      col #n103 gap=2
+        row #n104 pad=3 border justify=between align=center
+          text #n105 "Full name" size=s
+          text #n106 "Marcus Torres" size=s shade=mid
+        row #n107 pad=3 border justify=between align=center
+          text #n108 "Phone" size=s
+          text #n109 "+1 (415) 555-0142" size=s shade=mid data
+        row #n110 pad=3 border justify=between align=center
+          text #n111 "Email" size=s
+          text #n112 "marcus.t@email.com" size=s shade=mid data
+      text #n113 "Preferences" size=s shade=mid bold
+      col #n114 gap=2
+        row #n115 pad=3 border justify=between align=center
+          text #n116 "Pool rides" size=s
+          button #n117 "" toggle on
+        row #n118 pad=3 border justify=between align=center
+          text #n119 "Notifications" size=s
+          button #n120 "" toggle on
+        row #n121 pad=3 border justify=between align=center
+          text #n122 "Dark mode" size=s
+          button #n123 "" toggle
+      text #n124 "Support" size=s shade=mid bold
+      col #n125 gap=2
+        row #n126 pad=3 border justify=between align=center
+          text #n127 "Help & FAQ" size=s
+        row #n128 pad=3 border justify=between align=center
+          text #n129 "Report issue" size=s
+      col #n130 gap=2 pad=3 border fill=light
+        button #n131 "Sign out" ghost w=fill
+      col #n141 gap=2 pad=3 border fill=light
+        text #n142 "Account note" size=s shade=mid
+        text #n143 "Verified driver since Jan 2022" size=s data

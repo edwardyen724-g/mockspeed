@@ -1,0 +1,96 @@
+app #n1 "Support Chat" web
+  screen #n2 "Conversations"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Support" bold size=l
+        text #n6 "#urgent-api-down" bold data
+        text #n7 "#billing-error" shade=mid data
+        text #n8 "#feature-request" shade=mid data
+        text #n9 "#account-locked" shade=mid data
+      col #n10 grow pad=4 gap=3
+        row #n11 gap=2 align=center
+          text #n12 "Conversations" size=m bold
+          shape #n13 circle w=6 h=6 fill=dark
+          text #n14 "4 active" shade=mid size=s
+        col #n15 gap=2
+          row #n16 gap=3 pad=2 border
+            shape #n17 circle w=40 h=40
+            col #n18 grow
+              text #n19 "Sarah Chen" bold
+              text #n20 "API integration failing since deploy" shade=mid size=s
+            text #n21 "2m" shade=mid size=s
+          row #n22 gap=3 pad=2 border
+            shape #n23 circle w=40 h=40
+            col #n24 grow
+              text #n25 "Marcus Webb" bold
+              text #n26 "Can't access my account" shade=mid size=s
+            text #n27 "5m" shade=mid size=s
+          row #n28 gap=3 pad=2 border
+            shape #n29 circle w=40 h=40
+            col #n30 grow
+              text #n31 "Elena Rossi" bold
+              text #n32 "Refund status?" shade=mid size=s
+            text #n33 "1h" shade=mid size=s
+          row #n34 gap=3 pad=2 border
+            shape #n35 circle w=40 h=40
+            col #n36 grow
+              text #n37 "James Liu" bold
+              text #n38 "Feature request: dark mode" shade=mid size=s
+            text #n39 "3h" shade=mid size=s
+  screen #n40 "Active Chat"
+    row #n41 h=fill
+      col #n42 share=nav w=200 fill=light pad=3 gap=2
+        text #n43 "Support" bold size=l
+        text #n44 "#urgent-api-down" bold data
+        text #n45 "#billing-error" shade=mid data
+        text #n46 "#feature-request" shade=mid data
+        text #n47 "#account-locked" shade=mid data
+      col #n48 grow pad=4 gap=3
+        row #n49 gap=2 align=center justify=between
+          row #n50 gap=2 align=center
+            text #n51 "Sarah Chen" bold size=m
+            shape #n52 circle w=8 h=8 fill=dark
+            text #n53 "Online" size=s
+          text #n54 "×" shade=mid size=l
+        col #n55 grow gap=2 pad=2 fill=light
+          row #n56 gap=2
+            shape #n57 circle w=32 h=32
+            col #n58
+              text #n59 "Sarah Chen" bold size=s
+              text #n60 "My API calls started timing out after your 3pm deploy. I've got 50k in flight." size=s shade=dark
+              text #n61 "2:14 PM" shade=mid size=xs
+          row #n62 gap=2 justify=end
+            col #n63 align=end
+              text #n64 "Have you checked the status page? We're investigating." size=s shade=dark
+              text #n65 "2:16 PM" shade=mid size=xs
+          row #n66 gap=2
+            shape #n67 circle w=32 h=32
+            col #n68
+              text #n69 "Sarah Chen" bold size=s
+              text #n70 "Yes, it says investigating. How long?" size=s shade=dark
+              text #n71 "2:18 PM" shade=mid size=xs
+        row #n72 gap=2 pad=2 border
+          input #n73 "Reply..." grow
+          button #n74 "Send" primary
+      col #n75 w=280 fill=light pad=3 gap=3 border
+        text #n76 "Customer" bold size=m
+        col #n77 gap=1
+          text #n78 "Name" shade=mid size=s
+          text #n79 "Sarah Chen" bold data
+        col #n80 gap=1
+          text #n81 "Email" shade=mid size=s
+          text #n82 "sarah@techcorp.io" mono size=s data
+        col #n83 gap=1
+          text #n84 "Account" shade=mid size=s
+          text #n85 "Enterprise Plan" bold data
+          text #n86 "Since Jan 2024" shade=mid size=s data
+        col #n87 gap=1
+          text #n88 "Status" shade=mid size=s
+          row #n89 gap=2 align=center
+            shape #n90 circle w=6 h=6 fill=dark
+            text #n91 "Active" data
+        line #n92
+        col #n93 gap=2
+          button #n94 "View full history" ghost w=fill
+          button #n95 "Send canned response" ghost w=fill
+          button #n96 "Escalate to eng" ghost w=fill

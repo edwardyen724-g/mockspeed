@@ -1,0 +1,112 @@
+app #n1 "Design Studio" web
+  screen #n2 "Kanban Board"
+    row #n3 h=fill gap=4 pad=3
+      col #n4 w=280 gap=2
+        text #n118 "Filter" shade=mid size=xs bold
+        button #n120 "All" primary size=s
+        col #n57 w=fill gap=2
+          input #n58 "Search tasks" search
+          col #n117 gap=2
+            row #n119 gap=1
+              button #n121 "In Progress" ghost size=s
+              button #n122 "Blocked" ghost size=s
+          text #n59 "Backlog" bold shade=dark size=xl
+        text #n5 "Backlog" bold shade=dark size=l
+        col #n6 gap=2
+          table #n112
+            tr #n113 "Task | Client | Status"
+            tr #n114 "Website redesign | TechCorp | Not started" data
+            tr #n115 "Logo variations | Internal | Not started" data
+            tr #n116 "Brand guidelines update | Internal | Planning" data
+      col #n19 w=280 gap=2
+        text #n20 "In Progress" bold shade=dark
+        col #n21 gap=2
+          col #n22 border pad=2 gap=1 fill=light
+            text #n23 "Mobile app UI" bold size=s
+            text #n24 "Alex — 60%" shade=mid size=xs
+            progress #n25 value=60
+            shape #n26 circle w=6 h=6 fill=dark
+          col #n27 border pad=2 gap=1 fill=light
+            text #n28 "Marketing deck" bold size=s
+            text #n29 "Jordan — due tomorrow" shade=mid size=xs
+            shape #n30 circle w=6 h=6 fill=mid
+      col #n31 w=280 gap=2
+        text #n32 "Review" bold shade=dark
+        col #n33 gap=2
+          col #n34 border pad=2 gap=1 fill=light
+            text #n35 "Annual report design" bold size=s
+            text #n36 "Awaiting client feedback" shade=mid size=xs
+            shape #n37 circle w=6 h=6 fill=dark
+          col #n38 border pad=2 gap=1 fill=light
+            text #n39 "Poster series final" bold size=s
+            text #n40 "Print house approved" shade=mid size=xs
+            shape #n41 circle w=6 h=6 fill=dark
+      col #n42 w=280 gap=2
+        text #n43 "Done" bold shade=dark
+        col #n44 gap=2
+          col #n45 border pad=2 gap=1 fill=light
+            text #n46 "Newsletter template" bold size=s
+            text #n47 "Delivered Sept 8" shade=mid size=xs
+            shape #n48 circle w=6 h=6 fill=dark
+          col #n49 border pad=2 gap=1 fill=light
+            text #n50 "Social media kit" bold size=s
+            text #n51 "Delivered Aug 30" shade=mid size=xs
+            shape #n52 circle w=6 h=6 fill=dark
+          col #n53 border pad=2 gap=1 fill=light
+            text #n54 "Business cards v2" bold size=s
+            text #n55 "Delivered Aug 15" shade=mid size=xs
+            shape #n56 circle w=6 h=6 fill=dark
+  screen #n60 "Settings"
+    col #n61 h=fill gap=4 pad=3
+      text #n62 "Settings" bold shade=dark size=l
+      col #n123 gap=2 pad=3 fill=light border
+        text #n124 "Note" shade=mid size=xs
+        text #n125 "Changes to workspace settings affect all team members." size=s
+      col #n63 gap=3
+        col #n64 gap=2
+          text #n65 "Workspace" bold shade=dark size=m
+          col #n66 gap=1
+            row #n67 justify=between align=center
+              text #n68 "Workspace name"
+              text #n69 "Design Studio" shade=mid size=s
+            row #n70 justify=between align=center
+              text #n71 "Default view"
+              text #n72 "Kanban" shade=mid size=s
+        col #n73 gap=2
+          text #n74 "Notifications" bold shade=dark size=m
+          col #n75 gap=1
+            row #n76 justify=between align=center
+              text #n77 "Task assignments"
+              input #n78 check on
+            row #n79 justify=between align=center
+              text #n80 "Due date reminders"
+              input #n81 check on
+            row #n82 justify=between align=center
+              text #n83 "Weekly digest"
+              input #n84 check
+        col #n85 gap=2
+          text #n86 "Team" bold shade=dark size=m
+          col #n87 gap=1
+            text #n88 "Members" shade=dark size=s
+            col #n89 gap=1
+              row #n90 justify=between align=center
+                text #n91 "Alex Chen"
+                text #n92 "Editor" shade=mid size=xs
+              row #n93 justify=between align=center
+                text #n94 "Jordan Park"
+                text #n95 "Editor" shade=mid size=xs
+              row #n96 justify=between align=center
+                text #n97 "Casey Morgan"
+                text #n98 "Viewer" shade=mid size=xs
+        col #n99 gap=2
+          text #n100 "Preferences" bold shade=dark size=m
+          col #n101 gap=1
+            row #n102 justify=between align=center
+              text #n103 "Theme"
+              text #n104 "Light" shade=mid size=s
+            row #n105 justify=between align=center
+              text #n106 "Font size"
+              text #n107 "Medium" shade=mid size=s
+      row #n108 gap=2 justify=start
+        button #n109 "Save changes" primary
+        button #n110 "Cancel" ghost

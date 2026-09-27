@@ -32,6 +32,26 @@ the runner-up as a swap beside its reply. The script records each step's swaps (
 clicks none. "≈" is a change with a swap offered and "~" is nothing changed with a swap offered.
 The judges say `swap_right` when the change was not what was meant but one click on a swap is.
 
+## Engine as a library — `runs/2026-09-27-engine-library`
+
+Phase 3 of `docs/plan-web-2026-09-26.md`. The canvas moved out of `trial/server.mjs` into
+`trial/engine.mjs`, one `project()` per canvas, with its logic line for line as it was. The server
+routes `/` to the project it opened (the one this script drives, at the paths it always used) and
+`/p/<id>/` to the others. This run checks that the move changed nothing the app does. It is not a
+new measurement, and the judges were not re-run.
+
+364 Jev decisions, builds 10/10, 130 steps, no errors, **0 questions asked first**. 97 of 120
+follow-ups changed the mock, 49 of them with a swap offered. 8 changed nothing, each with a swap
+offered, and each is from phases 1c–1d or the writer's builds, not the move:
+- 3× "make this bold and move it to the top" on a marked element already bold and at the top.
+- 2× "add a search field at the top" where the build already had one, so it was shown with "Add
+  another" (check before adding).
+- 2× "make the navigation darker" with no navigation.
+- 1× the writer answering in words.
+
+The last full run before this, `2026-09-26-act-then-offer`, came before phases 1c–1d: 100 of 119
+changed and 2 changed nothing.
+
 ## Export — `runs/2026-09-27-export-probe`
 
 Phase 2 of `docs/plan-web-2026-09-26.md` (§6). The footer's Export menu offers three things. **Download the

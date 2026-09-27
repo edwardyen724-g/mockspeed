@@ -1,0 +1,28 @@
+app #n1 "Page Summarizer" panel
+  screen #n2 "Summary"
+    col #n3 pad=4 gap=3 h=fill
+      text #n4 "Page Summary" bold size=l
+      col #n5 gap=2 grow
+        text #n6 "Analyzing..." shade=mid size=s
+      row #n7 gap=2 pad=3 fill=light border
+        shape #n8 circle w=20 h=20
+        col #n9 gap=1 grow
+          text #n10 "Copy summary" size=s bold
+          text #n11 "Saved to clipboard" shade=mid size=xs
+      row #n12 gap=2 pad=2
+        button #n13 "Share" ghost size=s
+        button #n14 "Save" ghost size=s
+  screen #n15 "Summary"
+    col #n16 pad=4 gap=3 h=fill
+      text #n17 "How AI works" bold size=l
+      col #n18 gap=3 grow
+        text #n19 "Artificial intelligence uses neural networks to process data. Machine learning enables systems to improve through experience. Deep learning powers modern applications like image recognition and language models. Training requires large datasets and computational resources. AI applications span healthcare, finance, transportation, and creative fields." size=s
+        text #n20 "Key concepts: neural networks, training data, algorithms, computational models." shade=mid size=xs
+      row #n21 gap=2 pad=3 fill=light border
+        shape #n22 circle w=20 h=20
+        col #n23 gap=1 grow
+          text #n24 "Simplified for you" size=s shade=mid
+          text #n25 "~90 seconds to read" size=xs shade=mid
+      row #n26 gap=2 pad=2
+        button #n27 "Share" ghost size=s
+        button #n28 "Save" ghost size=s

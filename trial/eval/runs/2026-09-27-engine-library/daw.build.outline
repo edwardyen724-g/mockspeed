@@ -1,0 +1,119 @@
+app #n1 "Studio" web
+  screen #n2 "Mixer"
+    row #n3 h=fill gap=4 pad=3
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Mixer" bold
+        text #n6 "Timeline" shade=mid
+        text #n7 "Library" shade=mid
+        text #n8 "Settings" shade=mid
+      col #n9 grow
+        row #n10 align=center gap=3 pad=3 border
+          text #n11 "Untitled Project" bold size=l
+          text #n12 "120 BPM" shade=mid size=s
+          text #n13 "4/4" shade=mid size=s
+        row #n14 h=fill gap=3 pad=3
+          col #n15 w=180 gap=2 fill=light pad=2 border
+            text #n16 "Tracks" bold size=m
+            col #n17 gap=2
+              row #n18 align=center gap=2 pad=2 border
+                shape #n19 circle w=12 h=12 fill=dark
+                col #n20 grow
+                  text #n21 "Drums" bold size=s
+                  text #n22 "-6dB" shade=mid size=xs
+              row #n23 align=center gap=2 pad=2 border
+                shape #n24 circle w=12 h=12 fill=dark
+                col #n25 grow
+                  text #n26 "Bass" bold size=s
+                  text #n27 "0dB" shade=mid size=xs
+              row #n28 align=center gap=2 pad=2 border
+                shape #n29 circle w=12 h=12 fill=dark
+                col #n30 grow
+                  text #n31 "Keys" bold size=s
+                  text #n32 "+3dB" shade=mid size=xs
+              row #n33 align=center gap=2 pad=2 border
+                shape #n34 circle w=12 h=12 fill=dark
+                col #n35 grow
+                  text #n36 "Vocal" bold size=s
+                  text #n37 "+1dB" shade=mid size=xs
+          col #n38 grow gap=3
+            row #n39 h=60 fill=light border gap=2 pad=2
+              text #n40 "0:00" shade=mid size=xs mono
+              row #n41 grow gap=1
+                shape #n42 "Drum kick" w=40 h=20
+                shape #n43 "Drum hat" w=20 h=20
+                shape #n44 "Drum kick" w=35 h=20
+                shape #n45 "Drum hat" w=25 h=20
+              text #n46 "0:08" shade=mid size=xs mono
+            row #n47 h=60 fill=light border gap=2 pad=2
+              text #n48 "0:00" shade=mid size=xs mono
+              row #n49 grow gap=1
+                shape #n50 "Bass low" w=60 h=20
+                shape #n51 "Bass high" w=45 h=20
+              text #n52 "0:08" shade=mid size=xs mono
+            row #n53 h=60 fill=light border gap=2 pad=2
+              text #n54 "0:00" shade=mid size=xs mono
+              row #n55 grow gap=1
+                shape #n56 "Keys" w=80 h=20
+              text #n57 "0:08" shade=mid size=xs mono
+            row #n58 h=60 fill=light border gap=2 pad=2
+              text #n59 "0:00" shade=mid size=xs mono
+              row #n60 grow gap=1
+              text #n61 "0:08" shade=mid size=xs mono
+  screen #n62 "Timeline"
+    row #n63 h=fill gap=4 pad=3
+      col #n64 share=nav w=200 fill=light pad=3 gap=2
+        text #n65 "Mixer" shade=mid
+        text #n66 "Timeline" bold
+        text #n67 "Library" shade=mid
+        text #n68 "Settings" shade=mid
+      col #n69 grow
+        row #n70 align=center gap=3 pad=3 border
+          text #n71 "Untitled Project" bold size=l
+          button #n72 "Play" primary
+          button #n73 "Stop" ghost
+          text #n74 "0:00 / 2:04" shade=mid size=s mono
+        col #n75 grow gap=2 pad=3 fill=light border
+          row #n76 h=40 align=center gap=2 pad=2 border
+            text #n77 "Drums" bold size=s w=100
+            row #n78 grow gap=1
+              shape #n79 "0:00" w=60 h=24 fill=mid
+              shape #n80 "0:08" w=55 h=24 fill=mid
+              shape #n81 "0:16" w=50 h=24 fill=mid
+          row #n82 h=40 align=center gap=2 pad=2 border
+            text #n83 "Bass" bold size=s w=100
+            row #n84 grow gap=1
+              shape #n85 "0:00" w=100 h=24 fill=mid
+              shape #n86 "0:16" w=90 h=24 fill=mid
+          row #n87 h=40 align=center gap=2 pad=2 border
+            text #n88 "Keys" bold size=s w=100
+            row #n89 grow gap=1
+              shape #n90 "0:08" w=120 h=24 fill=mid
+          row #n91 h=40 align=center gap=2 pad=2 border
+            text #n92 "Vocal" bold size=s w=100
+            row #n93 grow gap=1
+              shape #n94 "0:32" w=110 h=24 fill=mid
+  screen #n95 "Library"
+    row #n96 h=fill gap=4 pad=3
+      col #n97 share=nav w=200 fill=light pad=3 gap=2
+        text #n98 "Mixer" shade=mid
+        text #n99 "Timeline" shade=mid
+        text #n100 "Library" bold
+        text #n101 "Settings" shade=mid
+      col #n102 grow pad=3 gap=3
+        input #n103 "Search" search
+        col #n104 gap=2
+          text #n105 "Drums" bold size=m
+          row #n106 gap=2
+            col #n107 w=120 border pad=2 gap=1
+              shape #n108 circle w=80 h=80
+              text #n109 "Kick 808" size=s
+          text #n110 "Synths" bold size=m
+          row #n111 gap=2
+            col #n112 w=120 border pad=2 gap=1
+              shape #n113 circle w=80 h=80
+              text #n114 "Pad Warm" size=s
+          text #n115 "Samples" bold size=m
+          row #n116 gap=2
+            col #n117 w=120 border pad=2 gap=1
+              shape #n118 circle w=80 h=80
+              text #n119 "Vocal Loop" size=s

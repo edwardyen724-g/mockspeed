@@ -1,0 +1,56 @@
+app #n1 "Design Studio" web
+  screen #n2 "Kanban Board"
+    row #n3 h=fill gap=4 pad=3
+      col #n4 w=280 gap=2
+        text #n5 "Backlog" bold shade=dark
+        col #n6 gap=2
+          col #n7 border pad=2 gap=1 fill=light
+            text #n8 "Website redesign" bold size=s
+            text #n9 "Client: TechCorp" shade=mid size=xs
+            shape #n10 circle w=6 h=6 fill=dark
+          col #n11 border pad=2 gap=1 fill=light
+            text #n12 "Logo variations" bold size=s
+            text #n13 "3 concepts" shade=mid size=xs
+            shape #n14 circle w=6 h=6 fill=mid
+          col #n15 border pad=2 gap=1 fill=light
+            text #n16 "Brand guidelines update" bold size=s
+            text #n17 "Q2 planning" shade=mid size=xs
+            shape #n18 circle w=6 h=6 fill=light
+      col #n19 w=280 gap=2
+        text #n20 "In Progress" bold shade=dark
+        col #n21 gap=2
+          col #n22 border pad=2 gap=1 fill=light
+            text #n23 "Mobile app UI" bold size=s
+            text #n24 "Alex — 60%" shade=mid size=xs
+            progress #n25 value=60
+            shape #n26 circle w=6 h=6 fill=dark
+          col #n27 border pad=2 gap=1 fill=light
+            text #n28 "Marketing deck" bold size=s
+            text #n29 "Jordan — due tomorrow" shade=mid size=xs
+            shape #n30 circle w=6 h=6 fill=mid
+      col #n31 w=280 gap=2
+        text #n32 "Review" bold shade=dark
+        col #n33 gap=2
+          col #n34 border pad=2 gap=1 fill=light
+            text #n35 "Annual report design" bold size=s
+            text #n36 "Awaiting client feedback" shade=mid size=xs
+            shape #n37 circle w=6 h=6 fill=dark
+          col #n38 border pad=2 gap=1 fill=light
+            text #n39 "Poster series final" bold size=s
+            text #n40 "Print house approved" shade=mid size=xs
+            shape #n41 circle w=6 h=6 fill=dark
+      col #n42 w=280 gap=2
+        text #n43 "Done" bold shade=dark
+        col #n44 gap=2
+          col #n45 border pad=2 gap=1 fill=light
+            text #n46 "Newsletter template" bold size=s
+            text #n47 "Delivered Sept 8" shade=mid size=xs
+            shape #n48 circle w=6 h=6 fill=dark
+          col #n49 border pad=2 gap=1 fill=light
+            text #n50 "Social media kit" bold size=s
+            text #n51 "Delivered Aug 30" shade=mid size=xs
+            shape #n52 circle w=6 h=6 fill=dark
+          col #n53 border pad=2 gap=1 fill=light
+            text #n54 "Business cards v2" bold size=s
+            text #n55 "Delivered Aug 15" shade=mid size=xs
+            shape #n56 circle w=6 h=6 fill=dark

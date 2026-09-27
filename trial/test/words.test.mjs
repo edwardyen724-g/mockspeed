@@ -321,11 +321,13 @@ group("replies", () => {
 // ---- nothing else writes to the person -------------------------------------------------------------
 
 group("one module owns the words", () => {
-  const server = readFileSync(join(HERE, "../server.mjs"), "utf8");
-  test("every question, choice and reply in server.mjs comes from words.mjs", () => {
+  // The engine says everything a canvas says; the server only says it saved, or failed.
+  const server = ["../engine.mjs", "../server.mjs"].map((f) => readFileSync(join(HERE, f), "utf8")).join("\n");
+  test("every question, choice and reply in engine.mjs and server.mjs comes from words.mjs", () => {
     const loose = [];
     // asking(<question>, …), answer(<label>, …) and swapFor(<label>, …): the first argument is words.mjs's.
-    for (const m of server.matchAll(/\b(asking|answer|swapFor)\(([^,)]+)/g)) {
+    // (Not a project's own method, as the server calls it: p.answer(await body(req)).)
+    for (const m of server.matchAll(/(?<![.\w])(asking|answer|swapFor)\(([^,)]+)/g)) {
       if (/^(text|label)$/.test(m[2].trim()) || /^label\(/.test(m[2].trim()) || m[2].trim().startsWith("W.")) continue;
       loose.push(m[0]);
     }

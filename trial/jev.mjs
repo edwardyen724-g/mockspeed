@@ -33,7 +33,7 @@ async function ask(body, signal) {
 export { unquoted };
 
 // Handlers for what the person typed (docs.typesafe.ai/patterns/intent-routing). A new handler —
-// the research route — is a new label here and a branch in server.mjs.
+// the research route — is a new label here and a branch in engine.mjs.
 export const ROUTES = {
   none: "not a request: a question about whether the current design is good, a remark, or an approval",
   direct: "exactly one visible change to something already on the mockup that needs no new words written: make its text bigger or smaller, bold or regular, darker or lighter; make it wider, narrower, taller or shorter; move it earlier or later; remove it; rename it to words the sentence gives; or clear the whole canvas. this, it or that means the marked element",

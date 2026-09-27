@@ -1,0 +1,119 @@
+app #n1 "Mail" phone
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=60 fill=mid pad=2 gap=3 align=center
+        text #n5 "✉" size=xl bold
+        text #n6 "Inbox" size=m bold
+        text #n7 "Drafts" size=xs shade=mid
+        text #n8 "Sent" size=xs shade=mid
+        text #n9 "Trash" size=xs shade=mid
+      col #n10 grow pad=3 gap=2
+        button #n144 "Unread" ghost size=s
+        input #n11 "Search" search
+        col #n141 gap=2 pad=2
+          text #n142 "Filter" size=xs bold shade=mid
+          row #n143 gap=2
+            button #n145 "Flagged" ghost size=s
+            button #n146 "Attachments" ghost size=s
+        col #n12 gap=0 grow
+          table #n135
+            tr #n136 "From | Subject | Time"
+            tr #n137 "Sarah Chen | Project kickoff tomorrow | 10:45 AM" data
+            tr #n138 "Acme Corp | Invoice #2847 attached | 9:30 AM" data
+            tr #n139 "Marcus Liu | Re: budget review feedback | 8:15 AM" data
+            tr #n140 "Elena Rodriguez | Team lunch next Thursday? | Yesterday" data
+  screen #n41 "Message"
+    row #n42 h=fill
+      col #n43 share=nav w=60 fill=mid pad=2 gap=3 align=center
+        text #n44 "✉" size=xl bold
+        text #n45 "Inbox" size=m shade=mid
+        text #n46 "Drafts" size=xs shade=mid
+        text #n47 "Sent" size=xs shade=mid
+        text #n48 "Trash" size=xs shade=mid
+      col #n49 grow pad=3 gap=3
+        row #n50 justify=between align=center
+          col #n51 grow
+            text #n52 "Sarah Chen" bold size=l
+            text #n53 "sarah@acmecorp.io" size=s shade=mid
+          text #n54 "⋯" size=l
+        text #n55 "10:45 AM • Today" size=xs shade=mid
+        line #n56
+        col #n57 gap=3 grow
+          text #n58 "Hi there! Just wanted to confirm our kickoff meeting is still on for tomorrow at 2pm. Let me know if you need to reschedule." size=m
+          row #n59 gap=2
+            shape #n60 w=120 h=80 pill
+            col #n61 gap=1
+              text #n62 "schedule.pdf" bold size=s
+              text #n63 "2.4 MB" size=xs shade=mid
+          text #n64 "Looking forward to getting started!" size=m
+        line #n65
+        row #n66 gap=2 pad=2 fill=light
+          input #n67 placeholder=Reply… area h=60
+        row #n68 justify=between pad=2 gap=2
+          button #n69 "Delete" ghost size=l
+          button #n70 "Reply" primary
+  screen #n71 "Compose"
+    row #n72 h=fill
+      col #n73 share=nav w=60 fill=mid pad=2 gap=3 align=center
+        text #n74 "✉" size=xl bold
+        text #n75 "Inbox" size=m shade=mid
+        text #n76 "Drafts" size=xs shade=mid
+        text #n77 "Sent" size=xs bold
+        text #n78 "Trash" size=xs shade=mid
+      col #n79 grow pad=3 gap=2
+        row #n80 justify=between align=center
+          text #n81 "New Message" bold size=l
+          text #n82 "✕" size=l
+        input #n83 "To:" value=jessica@design.co
+        input #n84 "Subject:" value="Design feedback on homepage mockups"
+        input #n85 placeholder="Message body…" area h=200
+        row #n86 gap=2 pad=2
+          button #n87 "Attach" ghost
+          button #n88 "Schedule" ghost
+        row #n89 justify=end gap=2
+          button #n90 "Save Draft" ghost
+  screen #n92 "Settings"
+    row #n93 h=fill
+      col #n94 share=nav w=60 fill=mid pad=2 gap=3 align=center
+        text #n95 "✉" size=xl bold
+        text #n96 "Inbox" size=m shade=mid
+        text #n97 "Drafts" size=xs shade=mid
+        text #n98 "Sent" size=xs shade=mid
+        text #n99 "Trash" size=xs shade=mid
+      col #n100 grow pad=3 gap=3
+        text #n101 "Settings" bold size=l
+        col #n147 gap=2 pad=3 fill=light border
+          text #n148 "Tip" bold size=s
+          text #n149 "Changes to your settings take effect immediately across all your devices." size=s shade=mid
+        line #n102
+        col #n103 gap=3
+          col #n104 gap=1
+            text #n105 "Account" bold size=s
+            row #n106 justify=between align=center pad=2 border
+              text #n107 "Email address" size=m
+              text #n108 "james.morrison@company.com" size=s shade=mid
+            row #n109 justify=between align=center pad=2 border
+              text #n110 "Password" size=m
+              text #n111 "••••••••" size=s shade=mid
+          col #n112 gap=1
+            text #n113 "Notifications" bold size=s
+            row #n114 justify=between align=center pad=2 border
+              text #n115 "Email notifications" size=m
+              input #n116 toggle on
+            row #n117 justify=between align=center pad=2 border
+              text #n118 "Desktop alerts" size=m
+              input #n119 toggle
+            row #n120 justify=between align=center pad=2 border
+              text #n121 "Digest frequency" size=m
+              text #n122 "Daily" size=s shade=mid
+          col #n123 gap=1
+            text #n124 "Display" bold size=s
+            row #n125 justify=between align=center pad=2 border
+              text #n126 "Theme" size=m
+              text #n127 "Light" size=s shade=mid
+            row #n128 justify=between align=center pad=2 border
+              text #n129 "Text size" size=m
+              text #n130 "Medium" size=s shade=mid
+        line #n131
+        row #n132 justify=end gap=2 pad=2
+          button #n133 "Log out" ghost

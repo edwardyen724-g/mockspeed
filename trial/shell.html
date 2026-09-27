@@ -75,7 +75,7 @@
   #export .menu a:hover,#export .menu button:hover{background:#f0f0f0}
 </style></head>
 <body>
-<iframe id="mock" src="/mock"></iframe>
+<iframe id="mock" src="mock"></iframe>
 <aside>
   <header><h1 id="title">{{title}}</h1><div class="sub" id="status">…</div></header>
   <div class="marked" id="markedBox"><span class="none">{{selectHint}}</span></div>
@@ -112,9 +112,9 @@
     <button id="save" class="dbg">{{save}}</button>
     <details id="export" class="off"><summary>{{export}}</summary>
       <div class="menu">
-        <a id="exHtml" href="/export.html" download>{{exportHtml}}</a>
+        <a id="exHtml" href="export.html" download>{{exportHtml}}</a>
         <button id="exPrompt" type="button" data-done="{{copied}}" data-failed="{{copyFailed}}">{{exportPrompt}}</button>
-        <a id="exMd" href="/export.md" download>{{exportMd}}</a>
+        <a id="exMd" href="export.md" download>{{exportMd}}</a>
       </div>
     </details>
   </footer>
@@ -134,7 +134,9 @@ const DEBUG = new URLSearchParams(location.search).has("debug");
 document.body.classList.toggle("debug", DEBUG);
 const HINT = $("markedBox").textContent;
 
-const post = (path, body) => fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }).then((r) => r.json());
+// Every path is relative, so the page talks to its own project: /state at /, /p/<id>/state at
+// /p/<id>/. The paths the canvas sends back with its offers ("/answer") are read the same way.
+const post = (path, body) => fetch(path.replace(/^\//, ""), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }).then((r) => r.json());
 
 // Keep your place: an edit to the fourth screen should not scroll you back to the first. The
 // position is read only from a mock that has finished loading — two edits landing back to back
@@ -156,7 +158,7 @@ addEventListener("resize", fitMock);
 function redraw() {
   if (!loading) { try { keepY = mock.contentWindow.scrollY; } catch {} }
   loading = true;
-  mock.src = "/mock?" + Date.now();
+  mock.src = "mock?" + Date.now();
   mock.onload = () => {
     loading = false;
     fitMock();
@@ -171,7 +173,7 @@ function redraw() {
 }
 
 async function load() {
-  const s = await fetch("/state").then((r) => r.json());
+  const s = await fetch("state").then((r) => r.json());
   els = s.elements;
   $("title").textContent = s.heading;
   $("status").textContent = DEBUG
@@ -245,7 +247,7 @@ function setMark(key) {
 // The toolbar on the marked element (plan §3C): which edits would change it, from the server, drawn
 // in the mock beside it. Its buttons and a double-clicked name come back here as edits.
 async function tools(key) {
-  const t = await fetch("/tools?id=" + encodeURIComponent(key)).then((r) => r.json());
+  const t = await fetch("tools?id=" + encodeURIComponent(key)).then((r) => r.json());
   if (key === marked) try { mock.contentWindow.postMessage({ type: "tools", tools: t, allOn: allFor === key }, "*"); } catch {}
 }
 
@@ -253,8 +255,8 @@ addEventListener("message", async (e) => {
   const m = e.data || {};
   if (m.type === "mark") setMark(m.key);
   if (m.type === "all") allFor = m.on ? m.key : null;
-  if (m.type === "tool") handle(await post("/edit", { op: m.op, target: m.key, all: m.all }));
-  if (m.type === "rename") handle(await post("/edit", { op: "rename", target: m.key, text: m.text }));
+  if (m.type === "tool") handle(await post("edit", { op: m.op, target: m.key, all: m.all }));
+  if (m.type === "rename") handle(await post("edit", { op: "rename", target: m.key, text: m.text }));
   // A numbered thing or line in the mock, clicked: the offer with that number.
   if (m.type === "take") $("ask").querySelector(`button[data-i="${m.n - 1}"]`)?.click();
 });
@@ -303,7 +305,7 @@ async function send(utterance, chip = false) {
   $("note").textContent = "…";
   $("utterance").value = "";
   marked = currentMark() ?? marked;
-  handle(await post("/ask", { utterance, marked, viewing: viewingScreen(), chip }));
+  handle(await post("ask", { utterance, marked, viewing: viewingScreen(), chip }));
 }
 
 // Every decision the canvas leaves to the person comes back as choices: buttons under the text
@@ -346,15 +348,15 @@ function say(r) {
   if (r.changed) redraw(); else load();
 }
 
-$("undo").onclick = async () => handle(await post("/undo"));
-$("new").onclick = async () => { setMark(null); handle(await post("/new")); };
-$("save").onclick = async () => say(await post("/save"));
+$("undo").onclick = async () => handle(await post("undo"));
+$("new").onclick = async () => { setMark(null); handle(await post("new")); };
+$("save").onclick = async () => say(await post("save"));
 $("unselect").onclick = () => setMark(null);
 
 // Export (plan §6): the mock as one file, the prompt for an AI site builder copied, or that prompt
 // as a file. The downloads are plain links; the copy fetches the prompt as the mock is now.
 $("exPrompt").onclick = async () => {
-  const text = await fetch("/prompt").then((r) => r.text());
+  const text = await fetch("prompt").then((r) => r.text());
   let ok = false;
   try { await navigator.clipboard.writeText(text); ok = true; } catch {}
   if (!ok) {
@@ -364,7 +366,7 @@ $("exPrompt").onclick = async () => {
     try { ok = document.execCommand("copy"); } catch {}
     t.remove();
   }
-  if (!ok) window.open("/prompt", "_blank");
+  if (!ok) window.open("prompt", "_blank");
   $("export").open = false;
   $("note").className = "note";
   $("note").textContent = ok ? $("exPrompt").dataset.done : $("exPrompt").dataset.failed;
@@ -392,7 +394,7 @@ mock.onload = () => { fitMock(); showPicks(); if (marked) { mock.contentWindow.p
 
 // Changes can arrive from outside this page — Claude appending a screen, an element at a time.
 let seen = null;
-new EventSource("/events").onmessage = (e) => {
+new EventSource("events").onmessage = (e) => {
   const now = JSON.parse(e.data);
   if (seen && now.rev !== seen.rev) redraw();
   else if (seen && now.seq !== seen.seq) load();

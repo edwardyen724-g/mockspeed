@@ -1,0 +1,137 @@
+app #n1 "Agent Orchestration" web
+  screen #n2 "Agents & Runs"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Agents" bold
+        text #n6 "Runs" shade=mid
+        text #n7 "Workflows" shade=mid
+        text #n8 "Logs" shade=mid
+      col #n9 grow pad=4 gap=4
+        button #n159 "Clear" ghost
+        row #n145 pad=2 gap=2
+          input #n146 "Search agents..." search
+        row #n147 justify=between align=center
+          text #n148 "Running Agents" size=xxl bold
+        table #n149
+          tr #n150 "Agent | Status | Activity | Last Run"
+          tr #n151 "DataValidator | Running | Processing 847 items | 0m ago" data
+          tr #n152 "EmailSender | Idle | — | 4m ago" data
+          tr #n153 "ImageResizer | Waiting | Waiting for input | 12m ago" data
+          tr #n154 "ReportBuilder | Stopped | — | 2h ago" data
+        row #n155 pad=2 gap=2 align=center
+          text #n156 "Filter:" shade=mid size=s
+          input #n157 "Status" select
+          input #n158 "Activity" select
+  screen #n37 "Workflow Editor"
+    row #n38 h=fill
+      col #n39 share=nav w=200 fill=mid pad=3 gap=2
+        text #n40 "Agents" shade=mid
+        text #n41 "Runs" shade=mid
+        text #n42 "Workflows" bold
+        text #n43 "Logs" shade=mid
+      col #n44 grow pad=4 gap=4
+        row #n45 justify=between align=center
+          text #n46 "Email Pipeline" size=l bold
+          button #n47 "Run" primary
+        graph #n48 dir=down h=500
+          node #ingest "Ingest CSV"
+          node #validate "Validate Email"
+          node #dedupe "Deduplicate"
+          node #send "Send Campaign"
+          node #track "Track Opens"
+          edge #n49 ingest -> validate "12,400 rows"
+          edge #n50 validate -> dedupe "11,890 valid"
+          edge #n51 dedupe -> send "10,240 unique"
+          edge #n52 send -> track "sent"
+  screen #n53 "Run Details"
+    row #n54 h=fill
+      col #n55 share=nav w=200 fill=mid pad=3 gap=2
+        text #n56 "Agents" shade=mid
+        text #n57 "Runs" bold
+        text #n58 "Workflows" shade=mid
+        text #n59 "Logs" shade=mid
+      col #n60 grow pad=4 gap=4
+        row #n61 justify=between align=center
+          text #n62 "Run #5847" size=l bold
+          text #n63 "Started 23m ago" shade=mid size=s
+        row #n64 gap=4 grow
+          col #n65 grow border pad=3 gap=2
+            text #n66 "Execution Timeline" bold size=m
+            col #n67 gap=2 pad=2
+              row #n68 align=center gap=2
+                shape #n69 circle w=10 h=10 fill=dark
+                text #n70 "Ingest CSV" bold size=s
+                text #n71 "2m 14s" shade=mid size=xs
+              row #n72 align=center gap=2
+                shape #n73 circle w=10 h=10 fill=dark
+                text #n74 "Validate Email" bold size=s
+                text #n75 "4m 38s" shade=mid size=xs
+              row #n76 align=center gap=2
+                shape #n77 circle w=10 h=10 fill=dark
+                text #n78 "Deduplicate" bold size=s
+                text #n79 "1m 2s" shade=mid size=xs
+              row #n80 align=center gap=2
+                shape #n81 circle w=10 h=10 fill=mid
+                text #n82 "Send Campaign" bold size=s
+                text #n83 "7m remaining" shade=mid size=xs
+          col #n84 grow border pad=3 gap=3
+            text #n85 "Step Metrics" bold size=m
+            col #n86 gap=1
+              row #n87 justify=between pad=1
+                text #n88 "Items processed" size=s
+                text #n89 "10,240" bold
+              row #n90 justify=between pad=1
+                text #n91 "Errors" size=s
+                text #n92 "0" bold
+              row #n93 justify=between pad=1
+                text #n94 "Success rate" size=s
+                text #n95 "100%" bold shade=dark
+              row #n96 justify=between pad=1
+                text #n97 "Avg latency" size=s
+                text #n98 "284ms" mono
+  screen #n101 "Settings"
+    row #n102 h=fill
+      col #n103 share=nav w=200 fill=mid pad=3 gap=2
+        text #n104 "Agents" shade=mid
+        text #n105 "Runs" shade=mid
+        text #n106 "Workflows" shade=mid
+        text #n107 "Logs" shade=mid
+      col #n108 grow pad=4 gap=4
+        text #n109 "Settings" size=xl bold
+        col #n160 grow border pad=3 gap=2 fill=light
+          text #n161 "Pro Tip" bold size=s shade=dark
+          text #n162 "Changes to agent defaults apply to new runs only. Active runs use their original settings." size=xs shade=mid
+        col #n110 grow gap=4
+          col #n111 border pad=3 gap=3
+            text #n112 "Agent Defaults" bold size=m
+            row #n113 justify=between align=center pad=2
+              text #n114 "Timeout (seconds)" size=s
+              input #n115 value="300"
+            row #n116 justify=between align=center pad=2
+              text #n117 "Retry on failure" size=s
+              input #n118 check on
+            row #n119 justify=between align=center pad=2
+              text #n120 "Max concurrent runs" size=s
+              input #n121 value="5"
+          col #n122 border pad=3 gap=3
+            text #n123 "Notifications" bold size=m
+            row #n124 justify=between align=center pad=2
+              text #n125 "Email on run failure" size=s
+              input #n126 toggle on
+            row #n127 justify=between align=center pad=2
+              text #n128 "Slack alerts" size=s
+              input #n129 toggle
+            row #n130 justify=between align=center pad=2
+              text #n131 "Alert threshold (%)" size=s
+              input #n132 value="50"
+          col #n133 border pad=3 gap=3
+            text #n134 "Storage & Logs" bold size=m
+            row #n135 justify=between align=center pad=2
+              text #n136 "Log retention (days)" size=s
+              input #n137 value="30"
+            row #n138 justify=between align=center pad=2
+              text #n139 "Archive old runs" size=s
+              input #n140 toggle
+          row #n141 gap=2 pad=2
+            button #n142 "Save Changes" primary
+            button #n143 "Reset to Defaults" ghost

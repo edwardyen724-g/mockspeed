@@ -1,0 +1,128 @@
+app #n1 "Support Chat" web
+  screen #n2 "Conversations"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Support" bold size=l
+        text #n6 "#urgent-api-down" bold data
+        text #n7 "#billing-error" shade=mid data
+        text #n8 "#feature-request" shade=mid data
+        text #n9 "#account-locked" shade=mid data
+      col #n10 grow pad=4 gap=3
+        row #n97 gap=2 pad=2 border align=center
+          input #n98 "Search conversations..." grow search
+        row #n11 gap=2 align=center
+          text #n12 "Conversations" size=xl bold
+          shape #n13 circle w=6 h=6 fill=dark
+          text #n14 "4 active" shade=mid size=s
+        col #n15 gap=2
+          table #n146
+            tr #n147 "Name | Issue | Time"
+            tr #n148 "Sarah Chen | API integration failing since deploy | 2m" data
+            tr #n149 "Marcus Webb | Can't access my account | 5m" data
+            tr #n150 "Elena Rossi | Refund status? | 1h" data
+            tr #n151 "James Liu | Feature request: dark mode | 3h" data
+  screen #n40 "Active Chat"
+    row #n41 h=fill
+      col #n42 share=nav w=200 fill=mid pad=3 gap=2
+        text #n43 "Support" bold size=l
+        text #n44 "#urgent-api-down" bold data
+        text #n45 "#billing-error" shade=mid data
+        text #n46 "#feature-request" shade=mid data
+        text #n47 "#account-locked" shade=mid data
+      col #n48 grow pad=4 gap=3
+        button #n74 "Send" primary size=l
+        row #n49 gap=2 align=center justify=between
+          row #n50 gap=2 align=center
+            text #n51 "Sarah Chen" bold size=m
+            shape #n52 circle w=8 h=8 fill=dark
+            text #n53 "Online" size=s
+          text #n54 "×" shade=mid size=l
+        col #n55 grow gap=2 pad=2 fill=light
+          row #n56 gap=2
+            shape #n57 circle w=32 h=32
+            col #n58
+              text #n59 "Sarah Chen" bold size=s
+              text #n60 "My API calls started timing out after your 3pm deploy. I've got 50k in flight." size=s shade=dark
+              text #n61 "2:14 PM" shade=mid size=xs
+          row #n62 gap=2 justify=end
+            col #n63 align=end
+              text #n64 "Have you checked the status page? We're investigating." size=s shade=dark
+              text #n65 "2:16 PM" shade=mid size=xs
+          row #n66 gap=2
+            shape #n67 circle w=32 h=32
+            col #n68
+              text #n69 "Sarah Chen" bold size=s
+              text #n70 "Yes, it says investigating. How long?" size=s shade=dark
+              text #n71 "2:18 PM" shade=mid size=xs
+        row #n72 gap=2 pad=2 border
+          input #n73 "Reply..." grow
+      col #n75 w=280 fill=light pad=3 gap=3 border
+        text #n76 "Customer" bold size=m
+        col #n77 gap=1
+          text #n78 "Name" shade=mid size=s
+          text #n79 "Sarah Chen" bold data
+        col #n80 gap=1
+          text #n81 "Email" shade=mid size=s
+          text #n82 "sarah@techcorp.io" mono size=s data
+        col #n83 gap=1
+          text #n84 "Account" shade=mid size=s
+          text #n85 "Enterprise Plan" bold data
+          text #n86 "Since Jan 2024" shade=mid size=s data
+        col #n87 gap=1
+          text #n88 "Status" shade=mid size=s
+          row #n89 gap=2 align=center
+            shape #n90 circle w=6 h=6 fill=dark
+            text #n91 "Active" data
+        line #n92
+        col #n93 gap=2
+          button #n94 "View full history" ghost w=fill
+          button #n95 "Send canned response" ghost w=fill
+  screen #n99 "Settings"
+    row #n100 h=fill
+      col #n101 share=nav w=200 fill=mid pad=3 gap=2
+        text #n102 "Support" bold size=l
+        text #n103 "#urgent-api-down" bold data
+        text #n104 "#billing-error" shade=mid data
+        text #n105 "#feature-request" shade=mid data
+        text #n106 "#account-locked" shade=mid data
+      col #n107 grow pad=4 gap=4
+        text #n108 "Settings" bold size=l
+        col #n152 gap=2 pad=3 fill=light border
+          text #n153 "Tip" bold size=s
+          text #n154 "Adjust your availability and notifications to manage your workload effectively." size=s shade=mid
+        col #n109 gap=3
+          col #n110 gap=2
+            text #n111 "Notifications" bold size=m
+            row #n112 gap=2 align=center justify=between
+              text #n113 "Desktop alerts" size=s
+              input #n114 toggle on
+            row #n115 gap=2 align=center justify=between
+              text #n116 "Email digest" size=s
+              input #n117 toggle on
+            row #n118 gap=2 align=center justify=between
+              text #n119 "Sound on new message" size=s
+              input #n120 toggle
+          line #n121
+          col #n122 gap=2
+            text #n123 "Availability" bold size=m
+            row #n124 gap=2 align=center justify=between
+              text #n125 "Status" size=s
+              input #n126 select value=Available
+            col #n127 gap=1
+              text #n128 "Away message" shade=mid size=s
+              input #n129 "Set your away message..." area
+          line #n130
+          col #n131 gap=2
+            text #n132 "Account" bold size=m
+            row #n133 gap=2 justify=between align=center
+              text #n134 "Agent name" size=s
+              text #n135 "Jordan Price" bold data
+            row #n136 gap=2 justify=between align=center
+              text #n137 "Team" size=s
+              text #n138 "Support Level 2" bold data
+            row #n139 gap=2 justify=between align=center
+              text #n140 "Member since" size=s
+              text #n141 "Mar 2023" shade=mid size=s data
+          line #n142
+          col #n143 gap=2
+            button #n144 "Sign out" ghost w=fill

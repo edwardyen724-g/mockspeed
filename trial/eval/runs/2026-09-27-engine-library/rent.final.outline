@@ -1,0 +1,109 @@
+app #n1 "Splitwise" phone
+  screen #n2 "Home"
+    row #n3 h=60 pad=3 gap=2 fill=mid align=center
+    col #n5 grow pad=3 gap=3
+      text #n4 "Splitwise" bold size=xxl
+      button #n31 "Add expense" primary w=fill size=l
+      col #n72 pad=3 gap=2 border
+        input #n73 "Search expenses" search on
+        col #n119 gap=2
+          row #n120 gap=2 justify=between align=center
+            text #n121 "Filter" size=s shade=mid
+            text #n122 "All" size=s on
+            text #n123 "You owe" size=s on
+            text #n124 "Owed to you" size=s on
+      col #n6 gap=1
+        text #n7 "You are owed" size=s shade=mid
+        text #n8 "$340.50" bold size=xl
+      col #n9 gap=1
+        text #n10 "You owe" size=s shade=mid
+        text #n11 "$125.00" bold size=xl
+      line #n12
+      col #n13 gap=2
+        table #n114
+          tr #n115 "Description | Date | Amount"
+          tr #n116 "Alex paid $800 rent | Nov 10 | You owe $200" data
+          tr #n117 "You paid $85 utilities | Nov 8 | Jamie owes you $42.50" data
+          tr #n118 "Sam paid $120 groceries | Nov 5 | You owe $40" data
+      col #n29 grow
+      row #n30 gap=2 pad=3 border
+        button #n32 "Settle up" w=fill
+  screen #n33 "Add Expense"
+    row #n34 h=60 pad=3 gap=2 fill=light align=center
+      text #n35 "← Home" size=s on
+      text #n36 "New expense" bold size=l grow justify=center
+    col #n37 grow pad=3 gap=3
+      input #n38 "Paid by" value=You on
+      input #n39 "Amount" value=$ on
+      input #n40 "For what" value="" on
+      col #n41 gap=2
+        text #n42 "Who paid?" size=s shade=mid
+        text #n43 "You" bold
+        text #n44 "Alex" on
+        text #n45 "Jamie" on
+        text #n46 "Sam" on
+      col #n47 gap=2
+        text #n48 "Split among" size=s shade=mid
+        text #n49 "You" check
+        text #n50 "Alex" check
+        text #n51 "Jamie" check
+        text #n52 "Sam" check
+      col #n53 grow
+      button #n54 "Save" primary w=fill
+  screen #n55 "Settle Up"
+    row #n56 h=60 pad=3 gap=2 fill=light align=center
+      text #n57 "← Home" size=s on
+      text #n58 "Settle up" bold size=l grow justify=center
+    col #n59 grow pad=3 gap=3
+      col #n60 gap=2
+        text #n61 "Simple payments" size=s shade=mid bold
+        col #n62 gap=2
+          col #n63 border pad=2 gap=1
+            text #n64 "You pay Alex $200" bold
+            button #n65 "Mark paid" ghost w=fill
+          col #n66 border pad=2 gap=1
+            text #n67 "Jamie pays you $42.50" bold
+            button #n68 "Mark paid" ghost w=fill
+          col #n69 border pad=2 gap=1
+            text #n70 "You pay Sam $40" bold
+  screen #n74 "Settings"
+    row #n75 h=60 pad=3 gap=2 fill=light align=center
+      text #n76 "← Home" size=s on
+      text #n77 "Settings" bold size=l grow justify=center
+      row #n125 h=40 pad=3 gap=2 fill=light align=center border
+        text #n126 "Version 3.2.1" size=xs shade=mid
+    col #n78 grow pad=3 gap=3
+      col #n79 gap=2
+        text #n80 "Account" size=s shade=mid bold
+        col #n81 border pad=2 gap=1
+          text #n82 "Email" shade=mid
+          text #n83 "alex@email.com" size=s data
+        col #n84 border pad=2 gap=1
+          text #n85 "Name" shade=mid
+          text #n86 "Alex Chen" size=s data
+        col #n87 border pad=2 gap=1
+          text #n88 "Phone" shade=mid
+          text #n89 "+1 (555) 234-5678" size=s data
+      col #n90 gap=2
+        text #n91 "Preferences" size=s shade=mid bold
+        col #n92 border pad=2 gap=1
+          row #n93 justify=between align=center
+            text #n94 "Currency"
+            text #n95 "USD" size=s shade=mid
+        col #n96 border pad=2 gap=1
+          row #n97 justify=between align=center
+            text #n98 "Notifications"
+            text #n99 "On" toggle
+        col #n100 border pad=2 gap=1
+          row #n101 justify=between align=center
+            text #n102 "Round amounts"
+            text #n103 "Off" toggle
+      col #n104 gap=2
+        text #n105 "Other" size=s shade=mid bold
+        col #n106 border pad=2 gap=1
+          text #n107 "Privacy policy" on
+        col #n108 border pad=2 gap=1
+          text #n109 "Terms of service" on
+        col #n110 border pad=2 gap=1
+          text #n111 "Log out" on shade=dark
+      col #n112 grow

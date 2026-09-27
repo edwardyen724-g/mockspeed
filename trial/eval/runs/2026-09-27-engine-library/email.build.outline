@@ -1,0 +1,91 @@
+app #n1 "Mail" phone
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=60 fill=light pad=2 gap=3 align=center
+        text #n5 "✉" size=xl bold
+        text #n6 "Inbox" size=xs bold
+        text #n7 "Drafts" size=xs shade=mid
+        text #n8 "Sent" size=xs shade=mid
+        text #n9 "Trash" size=xs shade=mid
+      col #n10 grow pad=3 gap=2
+        input #n11 "Search" search
+        col #n12 gap=0 grow
+          row #n13 gap=2 pad=2 border align=start
+            shape #n14 circle w=32 h=32
+            col #n15 grow
+              text #n16 "Sarah Chen" bold
+              text #n17 "Project kickoff tomorrow" size=s shade=mid
+              text #n18 "10:45 AM" size=xs shade=light data
+            text #n19 "▶" shade=mid
+          row #n20 gap=2 pad=2 border align=start
+            shape #n21 circle w=32 h=32 fill=mid
+            col #n22 grow
+              text #n23 "Acme Corp" bold
+              text #n24 "Invoice #2847 attached" size=s shade=mid
+              text #n25 "9:30 AM" size=xs shade=light data
+            text #n26 "▶" shade=mid
+          row #n27 gap=2 pad=2 border align=start
+            shape #n28 circle w=32 h=32 fill=light
+            col #n29 grow
+              text #n30 "Marcus Liu" bold
+              text #n31 "Re: budget review feedback" size=s shade=mid
+              text #n32 "8:15 AM" size=xs shade=light data
+            text #n33 "▶" shade=mid
+          row #n34 gap=2 pad=2 border align=start
+            shape #n35 circle w=32 h=32
+            col #n36 grow
+              text #n37 "Elena Rodriguez" bold
+              text #n38 "Team lunch next Thursday?" size=s shade=mid
+              text #n39 "Yesterday" size=xs shade=light data
+            text #n40 "▶" shade=mid
+  screen #n41 "Message"
+    row #n42 h=fill
+      col #n43 share=nav w=60 fill=light pad=2 gap=3 align=center
+        text #n44 "✉" size=xl bold
+        text #n45 "Inbox" size=xs shade=mid
+        text #n46 "Drafts" size=xs shade=mid
+        text #n47 "Sent" size=xs shade=mid
+        text #n48 "Trash" size=xs shade=mid
+      col #n49 grow pad=3 gap=3
+        row #n50 justify=between align=center
+          col #n51 grow
+            text #n52 "Sarah Chen" bold size=l
+            text #n53 "sarah@acmecorp.io" size=s shade=mid
+          text #n54 "⋯" size=l
+        text #n55 "10:45 AM • Today" size=xs shade=mid
+        line #n56
+        col #n57 gap=3 grow
+          text #n58 "Hi there! Just wanted to confirm our kickoff meeting is still on for tomorrow at 2pm. Let me know if you need to reschedule." size=m
+          row #n59 gap=2
+            shape #n60 w=120 h=80 pill
+            col #n61 gap=1
+              text #n62 "schedule.pdf" bold size=s
+              text #n63 "2.4 MB" size=xs shade=mid
+          text #n64 "Looking forward to getting started!" size=m
+        line #n65
+        row #n66 gap=2 pad=2 fill=light
+          input #n67 placeholder=Reply… area h=60
+        row #n68 justify=between pad=2 gap=2
+          button #n69 "Delete" ghost
+          button #n70 "Reply" primary
+  screen #n71 "Compose"
+    row #n72 h=fill
+      col #n73 share=nav w=60 fill=light pad=2 gap=3 align=center
+        text #n74 "✉" size=xl bold
+        text #n75 "Inbox" size=xs shade=mid
+        text #n76 "Drafts" size=xs shade=mid
+        text #n77 "Sent" size=xs bold
+        text #n78 "Trash" size=xs shade=mid
+      col #n79 grow pad=3 gap=2
+        row #n80 justify=between align=center
+          text #n81 "New Message" bold size=l
+          text #n82 "✕" size=l
+        input #n83 "To:" value=jessica@design.co
+        input #n84 "Subject:" value="Design feedback on homepage mockups"
+        input #n85 placeholder="Message body…" area h=200
+        row #n86 gap=2 pad=2
+          button #n87 "Attach" ghost
+          button #n88 "Schedule" ghost
+        row #n89 justify=end gap=2
+          button #n90 "Save Draft" ghost
+          button #n91 "Send" primary

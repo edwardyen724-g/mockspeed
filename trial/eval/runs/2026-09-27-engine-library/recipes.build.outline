@@ -1,0 +1,87 @@
+app #n1 "Recipes" phone
+  screen #n2 "Home"
+    row #n3 h=60 pad=3 gap=2 align=center
+      text #n4 "Recipes" bold size=l
+    col #n5 grow gap=3 pad=3
+      input #n6 "Search recipes" search
+      text #n7 "This week" bold size=m
+      col #n8 gap=2
+        col #n9 border pad=3 gap=1
+          text #n10 "Monday" bold size=s shade=mid
+          text #n11 "Spaghetti Carbonara"
+          text #n12 "30 min" size=xs shade=mid
+        col #n13 border pad=3 gap=1
+          text #n14 "Tuesday" bold size=s shade=mid
+          text #n15 "Grilled Salmon" data
+          text #n16 "25 min" size=xs shade=mid
+        col #n17 border pad=3 gap=1
+          text #n18 "Wednesday" bold size=s shade=mid
+          text #n19 "Vegetable Stir Fry" data
+          text #n20 "20 min" size=xs shade=mid
+      text #n21 "Saved Recipes" bold size=m
+      col #n22 gap=2
+        col #n23 border pad=3 gap=1
+          text #n24 "Chocolate Chip Cookies" data
+          text #n25 "Jamie Oliver" size=xs shade=mid
+        col #n26 border pad=3 gap=1
+          text #n27 "Risotto" data
+          text #n28 "Gordon Ramsay" size=xs shade=mid
+    row #n29 h=60 pad=2 gap=3 justify=center border
+      text #n30 "Home" bold shade=dark
+      text #n31 "Plan" shade=mid
+      text #n32 "Saved" shade=mid
+  screen #n33 "Recipe Detail"
+    row #n34 h=60 pad=3 gap=2 align=center
+      text #n35 "Back" shade=mid size=s
+      text #n36 "Spaghetti Carbonara" bold size=l grow
+      button #n37 "★" ghost
+    col #n38 grow gap=2 pad=3
+      shape #n39 "Pasta" w=fill h=200
+      text #n40 "30 minutes" size=s shade=mid
+      text #n41 "4 servings" size=s shade=mid
+      text #n42 "Ingredients" bold size=m
+      col #n43 gap=1
+        text #n44 "400g spaghetti" size=s data
+        text #n45 "200g guanciale" size=s data
+        text #n46 "4 eggs" size=s data
+        text #n47 "100g Pecorino Romano" size=s data
+      text #n48 "Instructions" bold size=m
+      col #n49 gap=2
+        text #n50 "1. Cook pasta in salted water." size=s data
+        text #n51 "2. Fry guanciale until crispy." size=s data
+        text #n52 "3. Mix eggs with grated cheese." size=s data
+        text #n53 "4. Combine all with reserved pasta water." size=s data
+      button #n54 "Add to Plan" primary
+  screen #n55 "Meal Plan"
+    row #n56 h=60 pad=3 gap=2 align=center
+      text #n57 "Meal Plan" bold size=l
+    col #n58 grow gap=3 pad=3
+      text #n59 "Next 7 days" bold size=m
+      col #n60 gap=2
+        col #n61 border pad=3 gap=1
+          text #n62 "Mon" bold size=s shade=mid
+          text #n63 "Spaghetti Carbonara" data
+          text #n64 "Grilled Salmon" data
+        col #n65 border pad=3 gap=1
+          text #n66 "Tue" bold size=s shade=mid
+          text #n67 "Vegetable Stir Fry" data
+        col #n68 border pad=3 gap=1
+          text #n69 "Wed" bold size=s shade=mid
+          text #n70 "Risotto" data
+        col #n71 border pad=3 gap=1
+          text #n72 "Thu" bold size=s shade=mid
+          text #n73 "Chicken Curry" data
+        col #n74 border pad=3 gap=1
+          text #n75 "Fri" bold size=s shade=mid
+          text #n76 "Fish Tacos" data
+      text #n77 "Shopping List" bold size=m
+      col #n78 gap=1
+        text #n79 "□ Spaghetti 500g" size=s data
+        text #n80 "□ Guanciale 250g" size=s data
+        text #n81 "□ Eggs (6)" size=s data
+        text #n82 "□ Salmon fillets" size=s data
+        text #n83 "□ Mixed vegetables" size=s data
+    row #n84 h=60 pad=2 gap=3 justify=center border
+      text #n85 "Home" shade=mid
+      text #n86 "Plan" bold shade=dark
+      text #n87 "Saved" shade=mid
