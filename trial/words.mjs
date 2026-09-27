@@ -423,6 +423,13 @@ export const ui = {
   save: "Save file",
   you: "You",
   empty: "Describe a website or app to start.",
+  // Export (plan §6): the mock as a file, and a prompt that builds it for real.
+  export: "Export",
+  exportHtml: "Download the mock (.html)",
+  exportPrompt: "Copy a prompt for your AI site builder",
+  exportMd: "Download the prompt as a file (.md)",
+  copied: "Copied. Paste it into Lovable, v0, Cursor or any AI site builder.",
+  copyFailed: "Couldn't copy it here, so the prompt is open in a new tab.",
 };
 
 // The line under the app's name: how many pages it has.

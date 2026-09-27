@@ -1,0 +1,95 @@
+app #n1 "Flour & Rise" web
+  screen #n2 "Home"
+    row #n3 share=nav h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Flour & Rise" bold size=l
+        text #n6 "Menu" bold
+        text #n7 "Hours" shade=mid
+        text #n8 "Location" shade=mid
+      col #n9 grow pad=6 gap=6
+        col #n10 w=600
+          text #n11 "Flour & Rise" size=xxl bold
+          text #n12 "Artisan bread and pastries, baked fresh daily." size=m shade=mid
+          button #n13 "See Menu" primary
+        shape #n14 "Bakery storefront" w=600 h=300 fill=mid
+        col #n80 gap=3
+          text #n81 "Contact Us" size=l bold
+          col #n82 gap=2
+            input #n83 "Name" value=""
+            input #n84 "Email" value=""
+            input #n85 "Phone" value=""
+            input #n86 "Message" value="" area
+            button #n87 "Send" primary
+  screen #n15 "Menu"
+    row #n16 share=nav h=fill
+      col #n17 share=nav w=200 fill=light pad=3 gap=2
+        text #n18 "Flour & Rise" bold size=l
+        text #n19 "Menu" bold
+        text #n20 "Hours" shade=mid
+        text #n21 "Location" shade=mid
+      col #n22 grow pad=6 gap=4
+        text #n23 "Menu" size=xl bold
+        col #n24 gap=3
+          col #n25 border pad=3 gap=1
+            text #n26 "Sourdough Loaf" bold
+            text #n27 "Our signature naturally leavened loaf" size=s shade=mid
+            text #n28 "$6.50" bold
+          col #n29 border pad=3 gap=1
+            text #n30 "Croissants" bold
+            text #n31 "Buttery, flaky French pastries" size=s shade=mid
+            text #n32 "$4.00 each" bold
+          col #n33 border pad=3 gap=1
+            text #n34 "Cinnamon Rolls" bold
+            text #n35 "Swirled with brown sugar and spice" size=s shade=mid
+            text #n36 "$5.50" bold
+          col #n37 border pad=3 gap=1
+            text #n38 "Focaccia" bold
+            text #n39 "Herb and olive oil seasoned flatbread" size=s shade=mid
+            text #n40 "$7.00" bold
+          col #n41 border pad=3 gap=1
+            text #n42 "Chocolate Éclair" bold
+            text #n43 "Cream-filled choux pastry with dark chocolate" size=s shade=mid
+            text #n44 "$4.50" bold
+        col #n88 gap=3
+          text #n89 "Contact Us" size=l bold
+          col #n90 gap=2
+            input #n91 "Name" value=""
+            input #n92 "Email" value=""
+            input #n93 "Phone" value=""
+            input #n94 "Message" value="" area
+            button #n95 "Send" primary
+  screen #n45 "Hours & Location"
+    row #n46 share=nav h=fill
+      col #n47 share=nav w=200 fill=light pad=3 gap=2
+        text #n48 "Flour & Rise" bold size=l
+        text #n49 "Menu" shade=mid
+        text #n50 "Hours" bold
+        text #n51 "Location" shade=mid
+      col #n52 grow pad=6 gap=6
+        col #n53 gap=3
+          text #n54 "Hours" size=l bold
+          col #n55 gap=1
+            row #n56 justify=between
+              text #n57 "Monday – Friday"
+              text #n58 "7:00 AM – 7:00 PM" bold
+            row #n59 justify=between
+              text #n60 "Saturday"
+              text #n61 "8:00 AM – 6:00 PM" bold
+            row #n62 justify=between
+              text #n63 "Sunday"
+              text #n64 "8:00 AM – 5:00 PM" bold
+        col #n65 gap=3
+          text #n66 "Visit Us" size=l bold
+          text #n67 "427 Main Street" bold
+          text #n68 "Portland, Oregon 97214" shade=mid
+          text #n69 "503.555.0142" shade=mid
+          text #n70 "hello@flourandrise.com" shade=mid
+        shape #n71 "Map" w=500 h=300 fill=mid
+        col #n72 gap=3
+          text #n73 "Contact Us" size=l bold
+          col #n74 gap=2
+            input #n75 "Name" value=""
+            input #n76 "Email" value=""
+            input #n77 "Phone" value=""
+            input #n78 "Message" value="" area
+            button #n79 "Send" primary

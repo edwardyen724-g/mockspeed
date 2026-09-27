@@ -32,6 +32,48 @@ the runner-up as a swap beside its reply. The script records each step's swaps (
 clicks none. "≈" is a change with a swap offered and "~" is nothing changed with a swap offered.
 The judges say `swap_right` when the change was not what was meant but one click on a swap is.
 
+## Export — `runs/2026-09-27-export-probe`
+
+Phase 2 of `docs/plan-web-2026-09-26.md` (§6). The footer's Export menu offers three things. **Download the
+mock (.html)** is the render with each page anchored, the pages listed at the top, the navigation's page
+names linked, and no script (`/export.html`). **Copy a prompt for your AI site builder** is `/prompt`, and
+**Download the prompt as a file (.md)** is the same text (`/export.md`). The prompt is built by code from
+the outline (`trial/export.mjs`), not by a model: a fixed header that asks for semantic HTML and says to
+keep the pages, the order, the emphasis and every word, then each shared bar once, then each page top to
+bottom, every word quoted as written.
+
+The done-condition asks that the prompt, pasted once into an AI builder, yields a site with semantic
+tags. Sonnet 5 stood in for the builder, with one line of system prompt standing in for the builder's
+own ("answer with one complete HTML file"):
+
+```bash
+node trial/eval/probe-export.mjs --env ~/projects/jev-context/.env.local --outline <mock.outline> --out trial/eval/runs/<dir>
+```
+
+The mock was a bakery built through the app from the first starter, plus "add a contact form with name,
+email, phone and a message on the hours & location page" (`bakery.outline`; the prompt is `prompt.md`,
+2,994 characters). It came back in 104 s, 10,908 output tokens (5,476 of them thinking), about $0.11:
+
+| asked for | in `built.html` |
+|---|---|
+| header, nav, main, footer | 1 each, and a `section` per page (3) |
+| one h1 per page | 3: “Flour & Rise”, “Menu”, “Hours”, the prompt's own picks |
+| forms with labels | 3 forms, 12 fields, 12 labelled |
+| input types that fit | email, tel, textarea, text |
+| buttons for actions, links for navigation | 3 buttons, 7 links |
+| images with alt text | 1 of 1 |
+| every word as written | 40 of 40 |
+
+Two things the export had to cope with, both from the writer and both kept as they are in the mock:
+`share=nav` on the side nav **and** on the row holding it beside the whole page, where the export takes
+the innermost copies as the shared element; and a nav whose items don't match the page names. The
+second passes through to the prompt, faithfully.
+
+Unit tests (`trial/test/export.test.mjs`) hold the prompt to every word on 24 mocks (the bakery, the
+three fixtures and the twenty outlines of `runs/2026-09-26-plain-words`) and to the plain-words rule of
+`words.mjs`. A run of short texts reads as links only where navigation is: in a shared element, as tabs,
+or naming two pages. Before that rule, an address in bold over three grey lines read as “Links”.
+
 ## Check before adding, and next steps — `runs/2026-09-27-already-probe`
 
 Phase 1d of `docs/plan-web-2026-09-26.md` (§3B, §3E). In the readiness check, "add our phone

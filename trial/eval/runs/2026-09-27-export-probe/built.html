@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flour & Rise — Artisan Bakery</title>
+<style>
+  :root{
+    --cream:#faf3e7;
+    --cream-dark:#f0e4cf;
+    --brown-900:#2e1c11;
+    --brown-800:#3f2718;
+    --brown-600:#6b4226;
+    --brown-400:#9c6b3f;
+    --accent:#b5651d;
+    --accent-dark:#8f4f16;
+    --grey:#6f6660;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Tahoma, Verdana, sans-serif;
+    background:var(--cream);
+    color:var(--brown-900);
+    line-height:1.5;
+  }
+  a{color:inherit;}
+  .layout{
+    display:flex;
+    min-height:100vh;
+    align-items:stretch;
+  }
+  /* Sidebar / header */
+  header.sidebar{
+    background:var(--brown-900);
+    color:var(--cream);
+    width:240px;
+    flex-shrink:0;
+    padding:2rem 1.5rem;
+    display:flex;
+    flex-direction:column;
+    gap:2rem;
+  }
+  .brand-link{
+    font-size:1.6rem;
+    font-weight:800;
+    text-decoration:none;
+    color:var(--cream);
+    letter-spacing:0.02em;
+  }
+  header.sidebar nav ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:0.9rem;
+  }
+  header.sidebar nav a{
+    text-decoration:none;
+    color:#e7d9c4;
+    font-size:1.05rem;
+    padding:0.4rem 0.6rem;
+    border-radius:6px;
+    display:inline-block;
+  }
+  header.sidebar nav a[aria-current="page"]{
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  header.sidebar nav a:hover{
+    background:var(--brown-600);
+    color:#fff;
+  }
+  main{
+    flex:1;
+    padding:2.5rem 3rem;
+    max-width:900px;
+  }
+  section.page{
+    display:none;
+  }
+  section.page.active{
+    display:block;
+  }
+  h1{
+    margin:0 0 0.3rem 0;
+  }
+  /* Home hero */
+  .hero-title{
+    font-size:3rem;
+    font-weight:800;
+    color:var(--brown-900);
+    margin-bottom:0.4rem;
+  }
+  .hero-sub{
+    color:var(--grey);
+    font-size:1.15rem;
+    margin-top:0;
+    margin-bottom:1.5rem;
+  }
+  .btn{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    padding:0.75rem 1.6rem;
+    border-radius:999px;
+    text-decoration:none;
+    font-weight:700;
+    font-size:1rem;
+    border:none;
+    cursor:pointer;
+  }
+  .btn:hover{
+    background:var(--accent-dark);
+  }
+  figure.tall{
+    margin:2rem 0;
+  }
+  figure.tall img, figure.tall iframe{
+    width:100%;
+    max-width:480px;
+    height:420px;
+    object-fit:cover;
+    border-radius:var(--radius);
+    display:block;
+    border:1px solid var(--cream-dark);
+  }
+  figcaption{
+    margin-top:0.5rem;
+    font-size:0.9rem;
+    color:var(--grey);
+  }
+  h2.section-title{
+    font-size:1.5rem;
+    font-weight:800;
+    color:var(--brown-900);
+    margin-top:2.5rem;
+    margin-bottom:1rem;
+    border-bottom:3px solid var(--accent);
+    display:inline-block;
+    padding-bottom:0.2rem;
+  }
+  /* Forms */
+  form.contact-form{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    max-width:480px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:0.35rem;
+  }
+  .field label{
+    font-weight:600;
+    font-size:0.95rem;
+  }
+  .field input, .field textarea{
+    padding:0.65rem 0.75rem;
+    border:1px solid #cbb99b;
+    border-radius:6px;
+    font-size:1rem;
+    font-family:inherit;
+    background:#fff;
+  }
+  .field textarea{
+    min-height:110px;
+    resize:vertical;
+  }
+  form.contact-form button{
+    align-self:flex-start;
+    margin-top:0.3rem;
+  }
+  /* Menu page */
+  .menu-title{
+    font-size:2.4rem;
+    font-weight:800;
+    margin-bottom:1.5rem;
+  }
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:1.2rem;
+    list-style:none;
+    margin:0 0 2rem 0;
+    padding:0;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--cream-dark);
+    border-radius:var(--radius);
+    padding:1.1rem 1.2rem;
+    box-shadow:0 2px 6px rgba(46,28,17,0.06);
+  }
+  .card h3{
+    margin:0 0 0.4rem 0;
+    font-weight:700;
+    color:var(--brown-900);
+  }
+  .card p{
+    margin:0 0 0.7rem 0;
+    font-size:0.9rem;
+    color:var(--grey);
+  }
+  .card .price{
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+  /* Hours page */
+  h2.large-bold{
+    font-size:1.7rem;
+    font-weight:800;
+    margin-bottom:1rem;
+  }
+  ul.hours-list{
+    list-style:none;
+    margin:0 0 2rem 0;
+    padding:0;
+    max-width:480px;
+    border-top:1px solid var(--cream-dark);
+  }
+  ul.hours-list li{
+    display:flex;
+    justify-content:space-between;
+    padding:0.8rem 0.2rem;
+    border-bottom:1px solid var(--cream-dark);
+  }
+  ul.hours-list li .time{
+    font-weight:700;
+  }
+  address{
+    font-style:normal;
+    margin-bottom:1.5rem;
+  }
+  address p{
+    margin:0.2rem 0;
+  }
+  address .street{
+    font-weight:700;
+  }
+  address .grey-line{
+    color:var(--grey);
+  }
+  footer{
+    background:var(--brown-900);
+    color:#cbbba0;
+    text-align:center;
+    padding:1.2rem;
+    font-size:0.85rem;
+  }
+  @media (max-width:800px){
+    .layout{
+      flex-direction:column;
+    }
+    header.sidebar{
+      width:100%;
+      flex-direction:row;
+      align-items:center;
+      justify-content:space-between;
+      padding:1rem 1.2rem;
+    }
+    header.sidebar nav ul{
+      flex-direction:row;
+      gap:0.5rem;
+    }
+    main{
+      padding:1.5rem 1.2rem;
+    }
+    .hero-title{font-size:2.1rem;}
+    figure.tall img, figure.tall iframe{max-width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <header class="sidebar">
+    <a href="#home" class="brand-link" data-nav-home>Flour &amp; Rise</a>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="#menu" data-nav="menu">Menu</a></li>
+        <li><a href="#hours" data-nav="hours">Hours</a></li>
+        <li><a href="#location" data-nav="location">Location</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ============ HOME PAGE ============ -->
+    <section id="home" class="page">
+      <h1 class="hero-title">Flour &amp; Rise</h1>
+      <p class="hero-sub">Artisan bread and pastries, baked fresh daily.</p>
+      <a class="btn" href="#menu">See Menu</a>
+
+      <figure class="tall">
+        <img src="https://images.unsplash.com/photo-1555507036-ab794f4afe5f?auto=format&fit=crop&w=800&q=80"
+             alt="Storefront of a small artisan bakery with large glass windows, an awning, and baked goods displayed inside">
+        <figcaption>Bakery storefront</figcaption>
+      </figure>
+
+      <h2 class="section-title">Contact Us</h2>
+      <form class="contact-form" aria-label="Contact form">
+        <div class="field">
+          <label for="home-name">Name</label>
+          <input type="text" id="home-name" name="name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="home-email">Email</label>
+          <input type="email" id="home-email" name="email" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="home-phone">Phone</label>
+          <input type="tel" id="home-phone" name="phone" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="home-message">Message</label>
+          <textarea id="home-message" name="message"></textarea>
+        </div>
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </section>
+
+    <!-- ============ MENU PAGE ============ -->
+    <section id="menu" class="page">
+      <h1 class="menu-title">Menu</h1>
+
+      <ul class="card-grid">
+        <li class="card">
+          <h3>Sourdough Loaf</h3>
+          <p>Our signature naturally leavened loaf</p>
+          <span class="price">$6.50</span>
+        </li>
+        <li class="card">
+          <h3>Croissants</h3>
+          <p>Buttery, flaky French pastries</p>
+          <span class="price">$4.00 each</span>
+        </li>
+        <li class="card">
+          <h3>Cinnamon Rolls</h3>
+          <p>Swirled with brown sugar and spice</p>
+          <span class="price">$5.50</span>
+        </li>
+        <li class="card">
+          <h3>Focaccia</h3>
+          <p>Herb and olive oil seasoned flatbread</p>
+          <span class="price">$7.00</span>
+        </li>
+        <li class="card">
+          <h3>Chocolate Éclair</h3>
+          <p>Cream-filled choux pastry with dark chocolate</p>
+          <span class="price">$4.50</span>
+        </li>
+      </ul>
+
+      <h2 class="section-title">Contact Us</h2>
+      <form class="contact-form" aria-label="Contact form">
+        <div class="field">
+          <label for="menu-name">Name</label>
+          <input type="text" id="menu-name" name="name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="menu-email">Email</label>
+          <input type="email" id="menu-email" name="email" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="menu-phone">Phone</label>
+          <input type="tel" id="menu-phone" name="phone" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="menu-message">Message</label>
+          <textarea id="menu-message" name="message"></textarea>
+        </div>
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </section>
+
+    <!-- ============ HOURS & LOCATION PAGE ============ -->
+    <section id="hours" class="page">
+      <h1>Hours</h1>
+
+      <ul class="hours-list">
+        <li><span>Monday – Friday</span><span class="time">7:00 AM – 7:00 PM</span></li>
+        <li><span>Saturday</span><span class="time">8:00 AM – 6:00 PM</span></li>
+        <li><span>Sunday</span><span class="time">8:00 AM – 5:00 PM</span></li>
+      </ul>
+
+      <h2 class="large-bold" id="location">Visit Us</h2>
+      <address>
+        <p class="street">427 Main Street</p>
+        <p class="grey-line">Portland, Oregon 97214</p>
+        <p class="grey-line"><a href="tel:5035550142">503.555.0142</a></p>
+        <p class="grey-line"><a href="mailto:hello@flourandrise.com">hello@flourandrise.com</a></p>
+      </address>
+
+      <figure class="tall">
+        <iframe
+          title="Map showing the location of Flour & Rise bakery at 427 Main Street"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=-122.6620%2C45.5090%2C-122.6380%2C45.5210&amp;layer=mapnik&amp;marker=45.5150%2C-122.6500"
+          loading="lazy"></iframe>
+        <figcaption>Map</figcaption>
+      </figure>
+
+      <h2 class="section-title">Contact Us</h2>
+      <form class="contact-form" aria-label="Contact form">
+        <div class="field">
+          <label for="hours-name">Name</label>
+          <input type="text" id="hours-name" name="name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="hours-email">Email</label>
+          <input type="email" id="hours-email" name="email" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="hours-phone">Phone</label>
+          <input type="tel" id="hours-phone" name="phone" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="hours-message">Message</label>
+          <textarea id="hours-message" name="message"></textarea>
+        </div>
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p>&copy; 2024 Flour &amp; Rise Bakery. All rights reserved.</p>
+</footer>
+
+<script>
+  (function(){
+    var pages = {
+      home: document.getElementById('home'),
+      menu: document.getElementById('menu'),
+      hours: document.getElementById('hours')
+    };
+    var navLinks = document.querySelectorAll('header.sidebar nav a');
+
+    function currentPageKey(hash){
+      var h = (hash || '').replace('#','');
+      if(h === 'menu') return 'menu';
+      if(h === 'hours' || h === 'location') return 'hours';
+      return 'home';
+    }
+
+    function activate(){
+      var key = currentPageKey(window.location.hash);
+      Object.keys(pages).forEach(function(k){
+        pages[k].classList.toggle('active', k === key);
+      });
+
+      // Nav highlighting rule:
+      // Home & Menu pages -> "Menu" link current
+      // Hours & Location page -> "Hours" link current
+      var highlight = (key === 'hours') ? 'hours' : 'menu';
+
+      navLinks.forEach(function(link){
+        var navKey = link.getAttribute('data-nav');
+        if(navKey === highlight){
+          link.setAttribute('aria-current','page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+
+      window.scrollTo(0,0);
+    }
+
+    window.addEventListener('hashchange', activate);
+    if(!window.location.hash){
+      window.location.hash = '#home';
+    }
+    activate();
+  })();
+</script>
+</body>
+</html>

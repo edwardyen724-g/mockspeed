@@ -223,6 +223,27 @@ export function render(root, { title } = {})   // → "<!doctype html>…" strin
   One sans font stack, no shadows, no gradients, radius ≤ 4px except `pill` and `circle`.
 - Lint marks, as in `render/`: `data-lint="data"` on text with the `data` flag, on `tr data` rows'
   cells, on graph node labels and on `chart`/`progress`; `data-lint="ignore"` on artboard chrome.
+- `render(root, { pages: true, links })` is the export's render: each screen's section gets an `id`
+  from its name (`visit-us`, `home-2` for a second "Home"), a list of the pages sits at the top, and
+  the texts whose ids are in `links` are drawn as `<a href="#…">` to the page they name. The mock in
+  the editor never passes it, so it is drawn as before.
+
+### `trial/export.mjs` — what a person takes away (plan §6)
+
+```js
+export function exportHtml(root)          // → the mock as one file: pages anchored and listed, the navigation linked, no script
+export function builderPrompt(root)       // → Markdown for an AI site builder; the .md download is the same text
+export function fileName(root, ext)       // → "rosies-bakery.html"
+```
+
+The prompt is built by code from the tree, not by a model: a fixed header (semantic HTML, keep every
+word, keep the emphasis, don't copy the wireframe's HTML), each shared element once, then each page
+top to bottom — every word quoted exactly as written, emphasis in words ("huge, bold", "small,
+grey"), a card of a few things on one line, a run of links as `Links: “Home” (current), …`, and the
+page's h1. A run of texts is links only where navigation is: in a shared element, as tabs, or naming
+two pages. Where a writer put `share=` on an element and again on something inside it, the innermost
+copies are the shared element. `trial/test/export.test.mjs` checks every word on 24 mocks, and the
+same plain-words rule as `words.mjs`.
 
 ## Tests
 

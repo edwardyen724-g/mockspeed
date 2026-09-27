@@ -2,6 +2,9 @@
 //
 //   import { render } from "./render.mjs"
 //   render(root, { title }) → "<!doctype html>…"
+//   render(root, { pages: true, links })  the export (trial/export.mjs): each page anchored, a list
+//                                   of the pages at the top, and the texts in `links` (ids of the
+//                                   navigation's page names) linked to their pages
 //
 // The tree is the one FORMAT.md describes: a few nestable primitives, each node
 // { id, type, text, props, children }. Nothing here knows what a side nav, a kanban board or a chat
@@ -182,7 +185,10 @@ const KIND = {
     const classes = ["t", "sz-" + (sizeOf(p.size) ?? "m"), flag(p.bold) && "b", shade && shade !== "dark" && "sh-" + shade,
       flag(p.mono) && "mono", pill && "pill", under && "under"];
     const style = sizing(p, ctx, { self: { row: "flex-start", col: pill || under ? "flex-start" : null } });
-    return open("div", n, classes, style, flag(p.data) ? DATA : "") + esc(words(n.text)) + "</div>";
+    // In the export, a page's name in the navigation goes to that page.
+    const to = ctx.run.links?.has(n.id) ? ctx.run.pages?.get(words(n.text).trim().toLowerCase()) : null;
+    const tag = to ? "a" : "div";
+    return open(tag, n, classes, style, (flag(p.data) ? DATA : "") + (to ? ` href="#${esc(to)}"` : "")) + esc(words(n.text)) + `</${tag}>`;
   },
 
   button: (n, ctx) => {
@@ -753,7 +759,8 @@ function board(n, frame, children, run) {
     art = `<div class="board web ${bodyCls}" style="${esc(size + ";" + bodyStyle)}">${body}</div>`;
   }
   if (!n) return `<section class="screen loose ${frame}"><div class="board-name"${IGN}>outside a screen</div>${art}</section>`;
-  return open("section", n, ["screen", frame], [], ` data-screen="${esc(screenKey(n))}"`) +
+  const anchor = run.anchors?.get(n);
+  return open("section", n, ["screen", frame], [], ` data-screen="${esc(screenKey(n))}"${anchor ? ` id="${esc(anchor)}"` : ""}`) +
     `<div class="board-name"${IGN}>${esc(words(n.text))}</div>${art}</section>`;
 }
 
@@ -873,6 +880,11 @@ body{font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,san
 .g-arrow{fill:var(--ink2)}
 .g-elabel{font-size:11px;fill:var(--ink2);paint-order:stroke;stroke:var(--bg);stroke-width:8px;stroke-linejoin:round}
 .g-node.marked .g-box,.g-edge.marked .g-line{stroke:#111;stroke-width:2.5}
+a.t{text-decoration:none}
+.pages{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;font-size:13px;color:#666}
+.pages b{color:#111;font-weight:600;margin-right:6px}
+.pages a{color:#666;text-decoration:none;border-bottom:1px solid #ddd}
+.pages a:hover{color:#111;border-color:#111}
 `;
 // The palette is the greys FORMAT.md names (and white, for text on dark). It is set on the page
 // and again on every artboard, so a fill on the app shades the page behind the artboards but
@@ -880,12 +892,29 @@ body{font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,san
 // The last rule is the one concession to the canvas: it outlines a marked element, and an
 // outline does not draw on an svg <g>, so a marked graph node or edge darkens its stroke instead.
 
-export function render(root, { title } = {}) {
-  const run = { seq: 0 };
+export function render(root, { title, pages = false, links = null } = {}) {
+  const run = { seq: 0, links };
   let app = root && typeof root === "object" ? root : null;
   // Handed a screen or a lone subtree instead of an app: draw it inside an app that has no id.
   if (app && typeOf(app) !== "app") app = { type: "app", text: null, props: {}, children: [app] };
   const frame = app ? frameOf(app, "web") : "web";
+
+  // The export: each page gets an anchor from its name ("visit-us"), unique on the page.
+  const screens = kids(app).filter((c) => typeOf(c) === "screen");
+  if (pages) {
+    run.anchors = new Map();
+    run.pages = new Map();
+    const taken = new Set();
+    for (const s of screens) {
+      const base = words(s.text).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "page";
+      let a = base;
+      for (let i = 2; taken.has(a); i++) a = `${base}-${i}`;
+      taken.add(a);
+      run.anchors.set(s, a);
+      const key = words(s.text).trim().toLowerCase();
+      if (key && !run.pages.has(key)) run.pages.set(key, a);
+    }
+  }
 
   // Consecutive phone screens share a lane and sit side by side; web and panel screens stack.
   // Children of the app that are not screens are kept together on one implicit board.
@@ -915,12 +944,15 @@ export function render(root, { title } = {}) {
   if (gap !== null) style.push(`gap:${gap}px`);
   if (pad !== null) style.push(`padding:${pad}px`);
   const name = words(title) || words(app?.text) || "mock";
+  const list = pages && screens.length
+    ? `<nav class="pages"${IGN}><b>${esc(name)}</b>${screens.map((s) => `<a href="#${esc(run.anchors.get(s))}">${esc(words(s.text) || "Untitled")}</a>`).join("")}</nav>\n`
+    : "";
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(name)}</title>
 <style>${CSS}</style></head>
 <body>${open("main", app, ["mock", ...f.classes.filter((c) => c.startsWith("fill-"))], style)}
-${html}
+${list}${html}
 </main>
 </body></html>
 `;

@@ -63,6 +63,16 @@
   .next button:hover{background:#ececec;border-color:#ccc}
   /* Scores, timings, model names, the file and the engine's own notes: only with ?debug=1. */
   body:not(.debug) .dbg{display:none}
+  /* Export (plan §6): a menu that opens upward from the right of the footer. */
+  #export{position:relative;margin-left:auto;border:0;font-size:12px}
+  #export summary{padding:4px 9px;border:1px solid #111;background:#111;color:#fff;border-radius:3px;cursor:pointer}
+  #export summary::before{content:none}
+  #export.off summary{opacity:.4;pointer-events:none}
+  #export .menu{position:absolute;right:0;bottom:calc(100% + 6px);z-index:5;display:flex;flex-direction:column;min-width:270px;padding:4px;
+    background:#fff;border:1px solid var(--line);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+  #export .menu a,#export .menu button{display:block;padding:7px 10px;border:0;border-radius:3px;background:none;color:#111;
+    font:inherit;font-size:12px;text-align:left;text-decoration:none;cursor:pointer}
+  #export .menu a:hover,#export .menu button:hover{background:#f0f0f0}
 </style></head>
 <body>
 <iframe id="mock" src="/mock"></iframe>
@@ -100,6 +110,13 @@
     <button id="new">{{new}}</button>
     <button id="unselect">{{unselect}}</button>
     <button id="save" class="dbg">{{save}}</button>
+    <details id="export" class="off"><summary>{{export}}</summary>
+      <div class="menu">
+        <a id="exHtml" href="/export.html" download>{{exportHtml}}</a>
+        <button id="exPrompt" type="button" data-done="{{copied}}" data-failed="{{copyFailed}}">{{exportPrompt}}</button>
+        <a id="exMd" href="/export.md" download>{{exportMd}}</a>
+      </div>
+    </details>
   </footer>
 </aside>
 <script>
@@ -161,6 +178,8 @@ async function load() {
     ? `${els.length} elements · ${s.llm ? s.llm.replace(/^claude-/, "") : "no translator"} → jev ${s.jev ? "on" : "off"} · save → ${s.out.split("/").pop()}`
     : s.status;
   $("undo").disabled = !s.canUndo;
+  $("export").classList.toggle("off", !s.screens);
+  if (!s.screens) $("export").open = false;
   document.body.classList.toggle("busy", Boolean(s.busy));
   if (s.busy) $("note").textContent = DEBUG ? `building "${s.busy}" · ${s.log.length && s.log[s.log.length - 1].note || ""}` : s.working;
   // Newest first. For a person: what they said, what they picked, and what happened. With
@@ -331,6 +350,27 @@ $("undo").onclick = async () => handle(await post("/undo"));
 $("new").onclick = async () => { setMark(null); handle(await post("/new")); };
 $("save").onclick = async () => say(await post("/save"));
 $("unselect").onclick = () => setMark(null);
+
+// Export (plan §6): the mock as one file, the prompt for an AI site builder copied, or that prompt
+// as a file. The downloads are plain links; the copy fetches the prompt as the mock is now.
+$("exPrompt").onclick = async () => {
+  const text = await fetch("/prompt").then((r) => r.text());
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch {}
+  if (!ok) {
+    const t = Object.assign(document.createElement("textarea"), { value: text });
+    document.body.appendChild(t);
+    t.select();
+    try { ok = document.execCommand("copy"); } catch {}
+    t.remove();
+  }
+  if (!ok) window.open("/prompt", "_blank");
+  $("export").open = false;
+  $("note").className = "note";
+  $("note").textContent = ok ? $("exPrompt").dataset.done : $("exPrompt").dataset.failed;
+};
+for (const id of ["exHtml", "exMd"]) $(id).addEventListener("click", () => { $("export").open = false; });
+addEventListener("click", (e) => { if (!e.target.closest("#export")) $("export").open = false; });
 
 // Voice, where the browser has it: interim words land in the box, the final one is sent.
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;

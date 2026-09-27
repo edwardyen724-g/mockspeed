@@ -35,6 +35,7 @@ import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse, Stream, serialize, index, find, describe, shapeOf, positionOf, applyPatch, apply, gaps, screenGaps, partsOf, spotsIn, edgesOf, neighboursIn, padded, firstCopy, sharedView, twinsOf } from "./tree.mjs";
 import { render } from "./render.mjs";
+import { builderPrompt, exportHtml, fileName } from "./export.mjs";
 import { decide, place, spot, nextTo, which, needs, every, already, KIND_TYPES } from "./jev.mjs";
 import { writeApp, writePiece, split, MODEL } from "./writer.mjs";
 import { Turn, replay, applyEverywhere, applyAll, placeEverywhere, relocate, redo } from "./turn.mjs";
@@ -1416,6 +1417,15 @@ createServer(async (req, res) => {
     if (url.pathname === "/save" && req.method === "POST") {
       writeFileSync(resolve(OUT), serialize(root));
       return json(res, { note: W.reply.saved(OUT), changed: false });
+    }
+    // Export (plan §6): the mock as one file, and the prompt for an AI site builder — as text to copy
+    // or as a file. Both are built by code from what is on the canvas now; nothing is written here.
+    if (url.pathname === "/export.html" || url.pathname === "/export.md" || url.pathname === "/prompt") {
+      const html = url.pathname === "/export.html";
+      const head = { "content-type": `${html ? "text/html" : url.pathname === "/prompt" ? "text/plain" : "text/markdown"}; charset=utf-8`, "cache-control": "no-store" };
+      if (url.pathname !== "/prompt") head["content-disposition"] = `attachment; filename="${fileName(root, html ? "html" : "md")}"`;
+      res.writeHead(200, head);
+      return res.end(html ? exportHtml(root) : builderPrompt(root));
     }
     if (url.pathname === "/spec") {
       res.writeHead(200, { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" });
