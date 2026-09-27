@@ -48,6 +48,19 @@ group("offers — the alternatives to what Jev was least sure of", () => {
     t.doubt(0.2, [alt("The “Hours” text instead")], {});
     assert.deepEqual(t.offers().map((o) => [o.label, o.part]), [["Under “Hours” instead", 1], ["The “Hours” text instead", 3]]);
   });
+  test("an offer always made comes first, beside the least sure decision's", () => {
+    // Check before adding: the phone number that was there is moved, and "Keep both" is offered
+    // whatever else the part was unsure of.
+    const t = new Turn(BAKERY, 0);
+    t.doubt(0.31, [alt("Under “Hours” instead")], {});
+    t.doubt(0, [alt("Keep both")], {}, true);
+    t.doubt(0.2, [alt("On the “Visit us” page instead")], {});
+    assert.deepEqual(t.offers().map((o) => [o.label, o.doubt]), [["Keep both", 1], ["On the “Visit us” page instead", 2]]);
+    assert.equal(t.rewind(0, 1, 0).alt.label, "Keep both");
+    const alone = new Turn(BAKERY, 0);
+    alone.doubt(0, [alt("Add another")], {}, true);
+    assert.deepEqual(alone.offers().map((o) => o.label), ["Add another"]);
+  });
   test("a doubt with nothing to offer is not kept", () => {
     const t = new Turn(BAKERY, 0);
     t.doubt(0.1, [], {});

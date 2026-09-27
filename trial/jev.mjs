@@ -325,6 +325,35 @@ export async function every({ utterance, target, twins, marked = null, context =
   return { ms: Date.now() - started, every: p };
 }
 
+// Check before adding (docs/plan-web-2026-09-26.md §3B): is what a sentence asks to add on the mock
+// already — "add our phone number" on a site that shows one — and if so, which element is it, and
+// does the sentence name a place for it? Asked of every element on every page, since the one there
+// may be on another page from the one in view. `exists` in decide() reads "the element `said`
+// names", which for an addition is also the place it names ("under the address"), so it is not
+// this question.
+export const THERE = "`said` asks for something to be added to the mockup described in `elements`. Is the thing it asks for already on the mockup — the same information or the same feature, on any page? Answer no when `said` asks for another one, a second one, a new one or more of something, or for something that is only of the same kind as what is there (a button, where there are other buttons). A place `said` names to put it (under the address, next to the title, on the home page) is not the thing it asks for.";
+export const THERE_WHICH = "`said` asks for something to be added to the mockup. Which element in `elements` already is that thing — the same information or feature? A place `said` names to put it is not the thing it asks for.";
+// `open` (spot()'s wording) is about a place on a screen, so "to the home page" reads as open; a
+// sentence that names a page is told apart by this.
+export const PAGE = "Does `said` name a page or screen for the new piece to go on — such as the home page or the settings screen?";
+export async function already({ utterance, nodes, viewing = null, apiKey, signal, instructions = THERE }) {
+  const label = (n) => `${n.line}${n.screen ? ` · on ${n.screen}` : ""}`;
+  const started = Date.now();
+  const { answers } = await ask({
+    apiKey,
+    state: { said: utterance, viewing: viewing ?? null, elements: nodes.map((n) => `${n.id} — ${label(n)}`) },
+    questions: {
+      there: { type: "noul", instructions },
+      it: { type: "choice", instructions: THERE_WHICH, criteria: Object.fromEntries(nodes.map((n) => [n.id, label(n)])) },
+      open: { type: "noul", instructions: OPEN },
+      page: { type: "noul", instructions: PAGE },
+    },
+  }, signal);
+  for (const q of ["there", "it", "open", "page"]) if (!answers?.[q]) throw new Error(`jev returned no answer for ${q}`);
+  const ranked = Object.entries(answers.it.probabilities ?? {}).sort((a, b) => b[1] - a[1]).map(([k]) => k);
+  return { ms: Date.now() - started, there: answers.there.noul ?? 0, id: answers.it.choice, confidence: answers.it.confidence ?? 0, ranked, open: answers.open.noul ?? 0, page: answers.page.noul ?? 0 };
+}
+
 // Where a whole new screen goes: one choice over the gaps between screens (trial/tree.mjs
 // `screenGaps`), each labelled by position.
 export async function place({ utterance, gaps, screen, marked = null, apiKey, signal }) {

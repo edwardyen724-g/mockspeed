@@ -300,6 +300,10 @@ export const offer = {
   // This one, or every one like it (plan §4): the reverse of what was done, one click away.
   justThis: (root, id) => `Just ${name(root, id)} instead`,
   allLike: (root, id, n) => `All ${n} like ${name(root, id)} instead`,
+  // Check before adding (plan §3B): what was asked for was there already, and was shown or moved
+  // instead of a second one written; the second one, as asked.
+  keepBoth: "Keep both",
+  another: (root, id) => (find(root, id)?.node.type === "screen" ? `Add another ${pageWord(root)}` : "Add another"),
   undo: "Undo",
 };
 
@@ -326,6 +330,8 @@ export function onPages(root, pages) {
 const everywhere = (root, copies) => (copies ? `, on all ${pagesWord(root, copies + 1)} it's on` : "");
 // "“$3.50” and the 4 others like it": one thing and its twins, named by the one pointed at.
 const andLike = (what, others) => (others ? `${what} and the ${others === 1 ? "other one" : `${others} others`} like it` : what);
+// A place as where something went: "to the top of …", "into …".
+const toPlace = (where) => where.replace(/^at the /, "to the ").replace(/^somewhere in /, "into ").replace(/^in /, "into ");
 export const reply = {
   edited: (root, op, what0, { copies = 0, across = false, to = null, others = 0 } = {}) => {
     const what = andLike(what0, others);
@@ -345,8 +351,14 @@ export const reply = {
   started: (was) => (was ? `Started fresh. ${q(was)} is one click away.` : "Started fresh."),
   added: (root, what, where, copies = 0) => `Added ${what} ${where}${everywhere(root, copies)}.`,
   changed: (root, what, copies = 0) => `Changed ${what}${everywhere(root, copies)}.`,
-  moved: (what, where) => `Moved ${what} ${where.replace(/^at the /, "to the ").replace(/^somewhere in /, "into ").replace(/^in /, "into ")}.`,
+  moved: (what, where) => `Moved ${what} ${toPlace(where)}.`,
   alreadyThere: (what) => `${cap(what)} is already there.`,
+  // Check before adding (plan §3B): "add our phone number" when the page shows one. `pages`: the
+  // pages it is on.
+  alreadyOn: (root, id, pages = []) => (find(root, id)?.node.type === "screen" || !pages.length
+    ? `${cap(name(root, id))} is already there.`
+    : `${cap(name(root, id))} is already ${onPages(root, pages)}.`),
+  alreadyMoved: (what, where) => `${cap(what)} was already there, so I moved it ${toPlace(where)}.`,
   notAChange: "Nothing changed: that reads as a question or a comment.",
   noSuch: (kind) => `I don't see a ${KIND[kind] ?? "thing like that"} here, so nothing changed.`,
   notSeen: "I don't see that here, so nothing changed. Which one? Click a number on the mock.",
@@ -381,6 +393,22 @@ export const tool = {
   all: (n) => `All ${n} like this`,
   renameHint: "Double-click to change the words",
 };
+
+// ---- next steps (plan §3E) --------------------------------------------------------------------
+// Offered under the text box, one click each, in place of a list of what can be said: on an empty
+// canvas these, and after a build or a change the writer's own (writer.mjs `nextSteps`).
+export const starters = [
+  "A website for my bakery: menu, hours, where to find us",
+  "A phone app to split rent with roommates",
+  "An inbox for a small support team",
+];
+// The writer's next steps as the page shows them: three, each a few plain words. One that says col,
+// border or the like — or screen, on a website — is left out rather than reworded.
+export function chips(root, list = []) {
+  const bad = new Set([...BANNED, ...(frameOf(root) === "web" ? BANNED_WEB : [])]);
+  const plain = (s) => !(s.replace(/[“"][^”"]*[”"]/g, "").match(/[A-Za-z_]+/g) ?? []).some((w) => bad.has(w.toLowerCase())) && !/[#=]|->/.test(s);
+  return [...new Set(list.map((s) => String(s ?? "").trim()))].filter((s) => s && s.length <= 60 && plain(s)).slice(0, 3);
+}
 
 // ---- the page around the mock -----------------------------------------------------------------
 export const ui = {

@@ -1716,6 +1716,19 @@ group("top-down placement — parts of a screen, then spots in a part, only insi
     // Side by side there is no below or above.
     const { root: web } = parse(WEB);
     assert.deepEqual(edgesOf(web, "n2", "nav"), []);
+    // Nor is there at the start or end of a row stacked next to it: those are its left and right ends.
+    const { root: site } = parse(`app "Crumb" web
+  screen #s "Visit us"
+    row #brand pad=3
+      text "Crumb" size=xl bold
+    row #links pad=3 gap=4 justify=center
+      text "Menu"
+      text "Visit us" bold
+    col #body pad=3 gap=6
+      text "Hours" bold
+      text "(503) 555-0147"`);
+    assert.deepEqual(edgesOf(site, "s", "body").map((g) => `${g.position} ${g.anchor}`), []);
+    assert.deepEqual(edgesOf(site, "s", "brand").map((g) => `${g.position} ${g.anchor}`), []);
   });
 
   test("neighboursIn lists what a piece can follow inside the padding, with where each sits", () => {

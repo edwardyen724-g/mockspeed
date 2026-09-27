@@ -56,6 +56,11 @@
   .ask button .n{display:inline-block;min-width:16px;height:16px;line-height:16px;margin-right:5px;border-radius:8px;
     background:#111;color:#fff;font-size:10px;text-align:center}
   .ask button.go .n{background:#fff;color:#111}
+  /* Next steps (plan §3E): what could be said next, one click each, under whatever is being offered. */
+  .next{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0}
+  .next:empty{display:none}
+  .next button{border-radius:14px;padding:4px 10px;color:#333;background:#f6f6f6;border-color:#e3e3e3;text-align:left}
+  .next button:hover{background:#ececec;border-color:#ccc}
   /* Scores, timings, model names, the file and the engine's own notes: only with ?debug=1. */
   body:not(.debug) .dbg{display:none}
 </style></head>
@@ -69,6 +74,7 @@
     <!-- Whatever the canvas needs the person to decide appears here, right under what they typed. -->
     <div class="note" id="note"></div>
     <div class="ask" id="ask"></div>
+    <div class="next" id="next"></div>
   </div>
   <!-- The engine's own vocabulary; suggestion chips replace it for a person (plan §3E). -->
   <details open class="dbg"><summary>what can I say?</summary>
@@ -99,7 +105,10 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const mock = $("mock");
-let marked = null, els = [], choices = [], picked = [], drops = [];
+let marked = null, els = [], choices = [], picked = [], drops = [], next = [];
+// Something a reply showed ("… is already on the “Visit us” page"), to bring into view once the
+// mock has it.
+let revealing = null;
 // The element whose "All 5 like this" is on, so it stays on as the mock redraws after each edit.
 let allFor = null;
 // ?debug=1 shows what the person does not need: Jev's scores and timings, the model, the engine's
@@ -138,7 +147,8 @@ function redraw() {
     // The numbers on what an offer is about survive the mock redrawing under them, and so does the
     // mark with its toolbar.
     showPicks();
-    if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked }, "*"); tools(marked); }
+    if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked, reveal: revealing === marked }, "*"); tools(marked); }
+    revealing = null;
   };
   load();
 }
@@ -181,7 +191,20 @@ async function load() {
   }
   if (marked && !els.some((e) => e.key === marked)) setMark(null);
   else showMark();
+  showNext(s.next ?? []);
 }
+
+// What could be said next: the writer's suggestions after a build or a change, examples on an empty
+// canvas. A click says it, as if typed.
+function showNext(list) {
+  if (JSON.stringify(list) === JSON.stringify(next)) return;
+  next = list;
+  $("next").innerHTML = list.map((t) => `<button type="button" data-say="${esc(t)}">${esc(t)}</button>`).join("");
+}
+$("next").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (b) send(b.dataset.say, true);
+});
 
 const esc = (s) => String(s ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
 
@@ -195,7 +218,8 @@ function showMark() {
 function setMark(key) {
   marked = key;
   showMark();
-  mock.contentWindow.postMessage({ type: "mark", key }, "*");
+  mock.contentWindow.postMessage({ type: "mark", key, reveal: Boolean(key) && revealing === key }, "*");
+  if (!loading) revealing = null;
   if (key) tools(key);
 }
 
@@ -247,16 +271,21 @@ function viewingScreen() {
   } catch { return null; }
 }
 
-$("form").addEventListener("submit", async (e) => {
+$("form").addEventListener("submit", (e) => {
   e.preventDefault();
   const utterance = $("utterance").value.trim();
-  if (!utterance) return;
+  if (utterance) send(utterance);
+});
+
+// A sentence, typed or a next step clicked (`chip`, which is then not offered again).
+async function send(utterance, chip = false) {
   showChoices([]);
+  showNext([]);
   $("note").textContent = "…";
   $("utterance").value = "";
   marked = currentMark() ?? marked;
-  handle(await post("/ask", { utterance, marked, viewing: viewingScreen() }));
-});
+  handle(await post("/ask", { utterance, marked, viewing: viewingScreen(), chip }));
+}
 
 // Every decision the canvas leaves to the person comes back as choices: buttons under the text
 // box, each posting its own answer. The elements they are about are numbered in the mock.
@@ -277,6 +306,8 @@ function handle(r) {
   const offers = (r.offer ?? []).map((o) => ({ ...o, offer: true }));
   showChoices(r.choices?.length ? r.choices : offers, r.pick ?? []);
   say(r);
+  // What the reply is about — the phone number that was already there — is selected and shown.
+  if (r.mark) { revealing = r.mark; setMark(r.mark); }
 }
 
 $("ask").addEventListener("click", async (e) => {
@@ -292,7 +323,7 @@ function say(r) {
   const bits = [r.note];
   if (DEBUG && r.debug) bits.push(r.debug);
   $("note").textContent = bits.filter(Boolean).join(" · ");
-  $("note").className = "note" + (r.changed === false && !r.choices?.length ? " warn" : "");
+  $("note").className = "note" + (r.changed === false && !r.choices?.length && !r.mark ? " warn" : "");
   if (r.changed) redraw(); else load();
 }
 

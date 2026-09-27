@@ -18,6 +18,11 @@
 // element an edit acts on has twins — each card's price — Jev says whether the sentence means it or
 // every one like it, and the other reading is offered (plan §4).
 //
+// Before an addition, Jev says whether the thing is on the mock already ("add our phone number" on a
+// site that shows one): then it is shown, or moved to the place the sentence names, and a second one
+// is offered (plan §3B, checkFirst). After every build and change, three next steps sit under the
+// text box, one click each: the writer's, written in the same call (plan §3E).
+//
 // A clicked element gets a toolbar in the mock — bigger, smaller, bold, lighter, up, down, remove,
 // "All 5 like this" — and double-clicking its words edits them in place (plan §3C). Those go to
 // /edit and straight onto the tree: no Jev, no writer, free. Every string the person reads comes
@@ -30,7 +35,7 @@ import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse, Stream, serialize, index, find, describe, shapeOf, positionOf, applyPatch, apply, gaps, screenGaps, partsOf, spotsIn, edgesOf, neighboursIn, padded, firstCopy, sharedView, twinsOf } from "./tree.mjs";
 import { render } from "./render.mjs";
-import { decide, place, spot, nextTo, which, needs, every, KIND_TYPES } from "./jev.mjs";
+import { decide, place, spot, nextTo, which, needs, every, already, KIND_TYPES } from "./jev.mjs";
 import { writeApp, writePiece, split, MODEL } from "./writer.mjs";
 import { Turn, replay, applyEverywhere, applyAll, placeEverywhere, relocate, redo } from "./turn.mjs";
 import * as W from "./words.mjs";
@@ -67,6 +72,11 @@ const NOT_THERE = 0.3;   // Jev's `exists` below this: nothing is done to a stan
 const ALL = 0.5;         // Jev's `every` at or above it: the edit is made to every one like it
                          // (tree.mjs twinsOf), with "just this one" offered; below, the reverse
                          // (measured: "one" sentences at most 0.06, "every" at least 0.49)
+const THERE_AT = 0.5;    // Jev's `there` at or above it: what an addition asks for is on the mock
+                         // already, and is shown or moved rather than written again (measured: there
+                         // at least 0.65, not there at most 0.40 — trial/eval/probe-already.mjs)
+const NAMES_PAGE = 0.5;  // Jev's `page` at or above it: the addition names a page for it to go on
+                         // (measured: at least 0.94 when it does, at most 0.19 when not)
 // A removal is done like any other edit, with Undo offered beside the reply.
 const DESTRUCTIVE = new Set(["remove", "clear"]);
 // The edits that step a property, and so can be tried on each candidate to see whether they would
@@ -121,6 +131,11 @@ let on = 0;
 let turn = null;
 // The page a build is drawing, for the line under the text box while it runs.
 let drawing = null;
+// The next steps offered under the text box (plan §3E): the writer's, kept with the mock they were
+// written for, so Undo brings back the ones that went with it. A change the writer did not write
+// keeps the ones before it; a step the person took is dropped. An empty canvas offers starters.
+const nextFor = new WeakMap();
+const nextSteps = () => (screenList().length ? W.chips(root, nextFor.get(root) ?? []) : W.starters);
 const watchers = [];
 
 function announce(specChanged = true) {
@@ -138,6 +153,7 @@ function note(entry) { log.push(entry); if (log.length > 160) log.shift(); annou
 // `again` makes the same change on another canvas (turn.mjs `redo`), so a swap in an earlier part
 // of the sentence can make it again after.
 function commit(next, entry, again = null) {
+  if (!nextFor.has(next)) nextFor.set(next, nextFor.get(root) ?? []);
   past.push(root);
   root = next;
   if (again) turn?.step(again, entry);
@@ -187,7 +203,7 @@ function settle() { pending = null; question = null; }
 // Where Jev is unsure, its top pick is done and this records the rest: `conf` is the top pick's
 // confidence, each alternative { label, body } is a swap — the body is what an answer to the old
 // question posted, so a swap goes through answered() like one.
-const doubt = (ctx, conf, alts) => turn?.doubt(conf, alts, ctx);
+const doubt = (ctx, conf, alts, always = false) => turn?.doubt(conf, alts, ctx, always);
 const swapFor = (label, body) => ({ label, body });
 
 // What a swap is about, for the mock to show it where it is (plan §3D): the element it would act on
@@ -212,14 +228,16 @@ function offering(r) {
   const back = r.offer ?? [];
   const undo = r.changed && !back.length && (swaps.length || r.undo) ? [{ label: W.offer.undo, post: { path: "/undo", body: { on } } }] : [];
   offer = [...swaps, ...back, ...undo];
-  const { undo: _, ...rest } = r;
+  const { undo: _, gap: __, ...rest } = r;
   return offer.length ? { ...rest, offer } : rest;
 }
 
 // ---- routing -----------------------------------------------------------------------------
-async function ask({ utterance, marked, viewing }) {
+async function ask({ utterance, marked, viewing, chip = false }) {
   if (busy) return { note: W.reply.busy(busy), changed: false };
   if (!apiKey) return { note: W.reply.notSetUp, debug: "no TYPESAFE_API_KEY — start with --env", blocked: true };
+  // A next step the person clicked is not offered again.
+  if (chip && nextFor.has(root)) nextFor.set(root, nextFor.get(root).filter((c) => c !== utterance));
   busy = utterance;
   settle();
   offer = null;
@@ -241,7 +259,8 @@ async function ask({ utterance, marked, viewing }) {
 }
 
 // The reply, in the history the person reads (the log's other entries are for ?debug=1).
-function said(r) { note({ op: "reply", note: r.note, say: r.note, refused: r.changed === false && !r.choices?.length }); }
+// A reply that shows the person something already there (`mark`) is not a refusal.
+function said(r) { note({ op: "reply", note: r.note, say: r.note, refused: r.changed === false && !r.choices?.length && !r.mark }); }
 
 // One sentence, from Jev's first decision to the change on the canvas (or the question to the
 // person). `depth` is 1 for the parts of a sentence the writer split; `context` is then the whole
@@ -268,6 +287,14 @@ async function handle({ utterance, marked, viewing, started, depth, context = nu
   // the direct route cannot carry the sentence ("make this bold and move it to the top" routed
   // direct at 0.96 with job several at 0.80, and the move was lost), so it goes to be split.
   if (route === "direct" && d.job === "several" && d.jobConfidence >= ACT_JOB && depth === 0) route = "write";
+  // "Add our phone number above the hours" on a page that shows one reads to Jev as a move of it
+  // (direct 0.87, move 0.92) while its job answer is add, and the move's element, found by its kind
+  // ("group" at 0.47), was the whole column. An addition checks first (checkFirst): it moves the one
+  // there when there is one, found by Jev's "which is it?", and adds one when not — both readings.
+  if (route === "direct" && (d.op === "move_earlier" || d.op === "move_later") && d.dest >= FIRE && d.job === "add") {
+    note({ op: "route", route: "write", note: "an addition read as a move — checked before adding instead", source: why, said: utterance });
+    route = "write";
+  }
   return proceed(ctx, route, why);
 }
 
@@ -557,6 +584,8 @@ async function build({ utterance, started, d }) {
   const warn = stream.warnings.length ? ` · ${stream.warnings.length} parser warnings` : "";
   note({ op: "done", note: `built "${root.text}"${frame ? ` (${frame}, as Jev decided)` : ""}: ${screens} screens, ${index(root).length - 1} nodes from ${t.lines} lines (first at ${t.firstLineMs} ms, ${t.outputTokens} tokens) · ${secsSince(started)}${warn}`, source: "canvas" });
   for (const w of stream.warnings.slice(0, 5)) note({ op: "said", note: `parser: ${w}`, source: "tree" });
+  nextFor.set(root, t.next ?? []);
+  note({ op: "said", note: `next: ${(t.next ?? []).join(" | ") || "none"}`, source: WHO });
   if (was != null) offer = [{ label: W.reply.bringBack(was), post: { path: "/undo", body: {} } }];
   return { note: W.reply.built(root, screens) + (was != null ? ` ${W.reply.replaced(was)}` : ""), changed: true, offer, debug: `built in ${secsSince(started)}` };
 }
@@ -667,6 +696,12 @@ async function openSpot(ctx, within, screenName, markedLine, skip) {
 // (`ctx.piece`, what this part wrote), rather than having it written again.
 async function addPiece(ctx, chosen = null, chosenScreen = null) {
   const { d, marked } = ctx;
+  // Check before adding, unless the place was chosen or the person asked for a second one.
+  if (!chosen && !chosenScreen && !ctx.from && ctx.check !== false) {
+    const c = await checkFirst(ctx);
+    if (c?.note) return c;
+    if (c?.page) chosenScreen = c.page;
+  }
   let whole = ctx.whole ?? null;
   if (whole == null) {
     whole = d.whole >= 0.5;
@@ -701,6 +736,73 @@ async function addPiece(ctx, chosen = null, chosenScreen = null) {
   if (turn) turn.current.piece = { ...w, whole };
   return landPiece(next, w, gap, { debug: `added ${gap.text}`, where: W.place(root, gap) });
 }
+
+// ---- check before adding (plan §3B) -------------------------------------------------------------
+// Before anything is written for an addition, Jev says whether the thing is on the mock already —
+// "add our phone number" on a site that shows one — which element it is, on any page, and whether
+// the sentence names a page or a place for it:
+//   it names neither                        → the one there is shown (selected, in view), nothing
+//                                             changes, and "Add another" is offered
+//   the page it asks for is the one's own   → the one there is moved to the place named, with "Keep
+//                                             both" offered; named no place on it, it is shown
+//   the page it asks for is another         → a new one is added there as asked: it is not there
+// A page, or a thing drawn on several pages, is never moved: it is shown. Returns a reply; or
+// { page }, the page an addition goes on, already chosen; or null to add as usual.
+async function checkFirst(ctx) {
+  const all = nodes({ once: true });
+  if (!all.length) return null;
+  const a = await already({ utterance: ctx.utterance, nodes: all, viewing: ctx.viewing, apiKey });
+  const id = a.there >= THERE_AT && all.some((n) => n.id === a.id) && find(root, a.id) ? a.id : null;
+  note({ op: "check", note: id ? `already there: ${lineOf(id)}` : "not there yet — added", conf: a.there, ms: a.ms, source: `jev · there ${a.there.toFixed(2)} · it ${a.confidence.toFixed(2)} · open ${a.open.toFixed(2)} · page ${a.page.toFixed(2)} · ${a.ms} ms`, said: ctx.utterance });
+  if (!id) return null;
+  const view = sharedView(root);
+  const pages = view.screens.get(id) ?? [screenOf(id)].filter(Boolean);
+  const open = a.open >= OPEN_SPOT;
+  const isPage = find(root, id).node.type === "screen";
+  // A new page asked for, and what is there is part of one: the page is added, as asked.
+  if (!isPage && (ctx.whole ?? ctx.d.whole >= 0.5)) return null;
+  if (isPage || view.screens.has(id) || (open && a.page < NAMES_PAGE)) return pointOut(ctx, id, pages);
+  const page = pickScreen(ctx);
+  if (typeof page !== "string") return null;
+  if (!pages.includes(page)) {
+    note({ op: "check", note: `it is on ${pages.join(", ")}, not ${page} — added there as asked`, source: "canvas", said: ctx.utterance });
+    return { page };
+  }
+  return open ? pointOut(ctx, id, pages) : moveExisting(ctx, id, page);
+}
+
+// The thing asked for, there already: shown, and a second one offered.
+function pointOut(ctx, id, pages) {
+  doubt(ctx, 0, [swapFor(W.offer.another(root, id), { kind: "keep" })], true);
+  note({ op: "check", note: `shown, not added: ${lineOf(id)}`, source: "canvas", said: ctx.utterance, target: id });
+  return { note: W.reply.alreadyOn(root, id, pages), changed: false, mark: id, debug: `already there: ${lineOf(id)}` };
+}
+
+// The thing asked for, there already on the page, and the sentence names a place for it: it is moved
+// there, as a move would place it (tree.mjs partsOf / spotsIn, with it left out of the places), and
+// "Keep both" puts it back and adds a new one at that place.
+async function moveExisting(ctx, id, page) {
+  const { d, marked } = ctx;
+  const pointed = marked && d.points != null && d.points >= POINTS;
+  // `kept`: another place taken instead is still a move of the one there, and still offers Keep both.
+  const gap = await pickGap(ctx, page, { markedLine: pointed ? `${lineOf(marked)} (#${marked})` : null, kind: "move", extra: { target: id, kept: true }, skip: new Set([id]) });
+  if (!gap.anchor) return gap;
+  keepBoth(ctx, gap);
+  const what = W.name(root, id);
+  const moved = relocate(root, id, gap);
+  if (!moved) return { note: W.reply.gone, changed: false };
+  if (serialize(moved) === serialize(root)) {
+    note({ op: "check", note: `${lineOf(id)} is already ${gap.text}`, source: "canvas", said: ctx.utterance, target: id });
+    return { note: W.reply.alreadyThere(what), changed: false, mark: id };
+  }
+  const to = W.place(root, gap, new Set([id]));
+  commit(moved, { op: "move", note: `already there — moved ${lineOf(id)} ${gap.text}`, said: ctx.utterance, target: id, source: "jev · already there, where it goes" }, redo.move(id, gap));
+  note({ op: "done", note: `moved, not added · ${secsSince(ctx.started)}`, source: "canvas" });
+  return { note: W.reply.alreadyMoved(what, to), changed: true, mark: id, debug: `moved ${gap.text}` };
+}
+
+// "Keep both": the one there put back where it was, and a new one written for the place it went to.
+const keepBoth = (ctx, gap) => doubt(ctx, 0, [swapFor(W.offer.keepBoth, { kind: "keep", anchor: gap.anchor, position: gap.position, text: gap.text })], true);
 
 // A piece written as a whole screen starts with a screen line; one for an existing screen has none.
 function wrongShape(text, whole) {
@@ -760,7 +862,7 @@ async function movePiece(ctx, target, chosen = null, chosenScreen = null) {
   const to = W.place(root, gap, new Set([target]));
   commit(r.root, { op: "move", note: `moved ${lineOf(target)} ${gap.text}`, said: ctx.utterance, target, source: "jev · where it goes" }, redo.move(target, gap));
   note({ op: "done", note: `moved · ${secsSince(ctx.started)}`, source: "canvas" });
-  return { note: W.reply.moved(what, to), changed: true, debug: `moved ${gap.text}` };
+  return { note: W.reply.moved(what, to), changed: true, debug: `moved ${gap.text}`, gap };
 }
 
 // Put a written piece where it was decided (`at`: { anchor, position }), or say why not. The person
@@ -780,6 +882,7 @@ function landPiece({ utterance, started }, w, at, { debug, where = null, changed
   }
   const say = changed != null ? W.reply.changed(root, changed, copies) : W.reply.added(root, W.pieceName(root, w.text), where, copies);
   const r = applyPatch(root, patch);
+  if (w.next?.length) nextFor.set(r.root, w.next);
   commit(r.root, { op: "piece", note: `${debug} (${w.lines} lines from ${WHO}, ${w.ms} ms)`, said: utterance, source: `${WHO} → tree` }, redo.place(at.anchor, at.position, w.text));
   for (const x of r.warnings.slice(0, 5)) note({ op: "said", note: `parser: ${x}`, source: "tree", refused: true });
   note({ op: "done", note: `${debug} · ${secsSince(started)}`, source: "canvas" });
@@ -920,7 +1023,7 @@ async function answered(body, next, rest, human) {
     r = await build(next);
   } else if (body.kind === "whole") {
     human(body.whole ? "you chose: a new screen" : "you chose: on a screen that is there");
-    r = await addPiece({ ...next, whole: body.whole });
+    r = await addPiece({ ...next, whole: body.whole, check: false });
   } else if (body.kind === "screen") {
     human(`you chose the ${body.screen} screen`);
     r = next.moving ? await movePiece(next, next.moving, null, body.screen) : await addPiece(next, null, body.screen);
@@ -933,12 +1036,18 @@ async function answered(body, next, rest, human) {
   } else if (body.kind === "move") {
     human(`you chose: ${body.text}`);
     r = await movePiece(next, body.target, { anchor: body.anchor, position: body.position, text: body.text });
+    if (body.kept && r.gap) keepBoth(next, r.gap);
   } else if (body.kind === "move_in") {
     human(`you chose: somewhere in ${lineOf(body.into)}`);
     r = await movePiece({ ...next, from: body.into }, body.target);
+    if (body.kept && r.gap) keepBoth(next, r.gap);
   } else if (body.kind === "rewrite") {
     human(`you chose ${lineOf(body.target)}`);
     r = await rewritePiece(next, body.target);
+  } else if (body.kind === "keep") {
+    // A second one, as the sentence asked: at the place it was moved to, or wherever it goes.
+    human("you chose: a second one");
+    r = await addPiece({ ...next, check: false }, body.anchor ? { anchor: body.anchor, position: body.position, text: body.text } : null);
   } else if (body.kind === "job") {
     human(`you chose: ${body.job}`);
     r = await writeJob({ ...next, d: { ...next.d, job: body.job, jobConfidence: 1 } });
@@ -1215,6 +1324,8 @@ const MARKER = `
     const m = e.data || {};
     if (m.type === "mark") {
       mark(m.key);
+      // A reply about something already there brings it into view, on whichever page it is.
+      if (m.reveal && m.key) byId(m.key)?.scrollIntoView({ block: "center", inline: "center" });
       if (!m.key || m.key !== bar?.id) { bar = null; allOn = false; }
       drawBar();
     }
@@ -1263,7 +1374,7 @@ createServer(async (req, res) => {
       return json(res, {
         title: root.text ?? "mock", heading: screenList().length ? root.text ?? W.ui.title : W.ui.title, status: W.status(root),
         elements: els, screens: screenList().length, log, busy, working: busy ? W.working(root, busy, drawing) : null,
-        question, offer, jev: Boolean(apiKey), llm: llmKey ? LLM : null, canUndo: past.length > 0, out: OUT,
+        question, offer, next: busy || question ? [] : nextSteps(), jev: Boolean(apiKey), llm: llmKey ? LLM : null, canUndo: past.length > 0, out: OUT,
       });
     }
     if (url.pathname === "/tools") return json(res, toolsFor(url.searchParams.get("id")));

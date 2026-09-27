@@ -30,8 +30,10 @@ export class Turn {
   // One decision Jev was unsure of: its top pick's confidence, and the alternatives to it, each
   // { label, body } — the body is what the person's answer would have posted when this was a
   // question, so a swap is that answer. `ctx` is the sentence as it stood when Jev decided.
-  doubt(conf, alts, ctx) {
-    if (alts.length) this.current.doubts.push({ conf, alts, ctx });
+  // `always`: offered whatever else the part was unsure of — "Keep both" once the phone number
+  // that was already there has been moved, rather than a second one added (plan §3B).
+  doubt(conf, alts, ctx, always = false) {
+    if (alts.length) this.current.doubts.push({ conf, alts, ctx, always });
   }
   // Alternatives that no longer are any: a pick among five prices, once every price is being changed.
   forget(gone) {
@@ -40,13 +42,16 @@ export class Turn {
   }
   // A change made, as the same change on another canvas (see `redo` below), with its log entry.
   step(redo, entry) { this.current.steps.push({ redo, entry }); }
-  // The swaps to offer: for each part, every alternative to the decision Jev was least sure of.
+  // The swaps to offer: for each part, those always offered, then every alternative to the decision
+  // Jev was least sure of.
   offers() {
     const out = [];
     this.parts.forEach((p, part) => {
-      if (!p.doubts.length) return;
-      const least = p.doubts.reduce((a, b) => (b.conf < a.conf ? b : a));
-      least.alts.forEach((a, alt) => out.push({ label: a.label, body: a.body, part, doubt: p.doubts.indexOf(least), alt }));
+      const unsure = p.doubts.filter((d) => !d.always);
+      const least = unsure.length ? unsure.reduce((a, b) => (b.conf < a.conf ? b : a)) : null;
+      for (const d of [...p.doubts.filter((x) => x.always), least].filter(Boolean)) {
+        d.alts.forEach((a, alt) => out.push({ label: a.label, body: a.body, part, doubt: p.doubts.indexOf(d), alt }));
+      }
     });
     return out;
   }

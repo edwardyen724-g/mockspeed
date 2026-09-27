@@ -49,6 +49,12 @@ Name ids after what they are (#planner, #nav) — never n1, n2: those are taken 
 Realistic, specific fake data: real-sounding names that fit what things are, plausible numbers and times, a mix of states with one edge case (failed, empty, overdue, very long). Put the flag data on texts and tr rows that are data. No placeholders, no lorem ipsum.
 Greyscale only; emphasis is size, bold and shade. Text on fill=dark turns light by itself — give it no shade unless it should be fainter.`;
 
+// The next steps a person might take, offered under the text box as one-click suggestions (plan
+// §3E): written in the same call as what they follow, so they cost a line.
+const NEXT_STEPS = `NEXT STEPS
+End with one more line: // next: followed by five things the person might ask for next, separated by |. Each is a short instruction in plain words, at most six words, the way the person would say it: something to add that is not there yet, a new page, or a change to what is there. For example: // next: Add customer reviews | Add a catering page | Make the prices bigger | Add a photo of the shop | Turn the menu into a list
+Say page for a website and screen for a phone app. Never use layout words (row, column, border, padding) or ids.`;
+
 const APP = `You write greyscale wireframe mockups as an indented outline that code renders. A person describes an app; you write it, starting with the app line.
 
 ${FORMAT}
@@ -57,7 +63,9 @@ BUILDING AN APP
 First decide what the product's substance is and show that, not a generic dashboard of numbers: an orchestration tool shows agents handing work to each other as a graph and a run as it happens; a chat app shows the thread; a map app is mostly map. 2-3 screens. On each screen: its navigation, then the one thing the screen is for, made the biggest, boldest and darkest thing on it, then only what supports it.
 At most about twenty words of non-data text per screen: no explanations, no helper text, no headings that describe the screen.
 
-Output only the outline, starting with the app line. No markdown fences, no commentary.`;
+${NEXT_STEPS}
+
+Output only the outline, starting with the app line, then the next line. No markdown fences, no commentary.`;
 
 const PIECE = `You write one piece of a greyscale wireframe mockup, as an indented outline fragment that code renders and puts in place. Where it goes has already been decided; you only write what goes there.
 
@@ -70,7 +78,9 @@ If you are replacing an element, write its replacement in full, keeping whatever
 Keep it small: what was asked for, and nothing else.
 If you will not or cannot write it, answer with one line starting with // saying why, and nothing else.
 
-Output only the fragment. No markdown fences, no commentary.`;
+${NEXT_STEPS} Think of the mockup with your piece in it.
+
+Output only the fragment, then the next line. No markdown fences, no commentary.`;
 
 const SPLIT = `A person asked for several changes to a mockup in one sentence. Cut it into separate requests, one change per line. Cutting is all you do: copy the person's words exactly, including every word they used to point at things — this, it, that, the title, the settle up button — spelled exactly as they wrote it. What those words point at is decided after you, so you never need to know it and never ask about it. Do not add, drop, merge or rename anything. If the sentence cannot be cut, write it back unchanged on one line.
 
@@ -143,18 +153,31 @@ async function stream({ system, context, apiKey, model = MODEL, onLine = () => {
   return { text, lines, firstLineMs, ms: Date.now() - started, outputTokens, stop, model };
 }
 
+// The next steps an answer ends with ("// next: Add reviews | Add a catering page"), taken off it:
+// { text, next }. They are the writer's words for the person, not outline.
+const NEXT = /^\s*\/\/\s*next\s*:\s*/i;
+export function nextSteps(text) {
+  const lines = String(text ?? "").split("\n");
+  const at = lines.findIndex((l) => NEXT.test(l));
+  if (at < 0) return { text, next: [] };
+  const next = [...new Set(lines[at].replace(NEXT, "").split("|")
+    .map((s) => s.trim().replace(/^["“'`]+|["”'`.]+$/g, "").trim()).filter(Boolean))];
+  return { text: lines.filter((_, i) => i !== at).join("\n"), next };
+}
+const withNext = (r) => ({ ...r, ...nextSteps(r.text) });
+
 // A new app, streamed a line at a time onto an empty canvas. `frame` is decided before the writer
 // is called (Jev, or the person); when it is set, the app line must carry it.
-export function writeApp({ utterance, frame = null, apiKey, model, onLine, signal }) {
+export async function writeApp({ utterance, frame = null, apiKey, model, onLine = () => {}, signal }) {
   const context = `${frame ? `It runs on: ${frame}. Write the app line with that frame.\n\n` : ""}The person says: ${utterance}`;
-  return stream({ system: APP, context, apiKey, model, onLine, signal });
+  return withNext(await stream({ system: APP, context, apiKey, model, onLine: (l) => { if (!NEXT.test(l)) onLine(l); }, signal }));
 }
 
 // One piece. `outline` is the whole mockup with ids, for style and data; `where` is Jev's chosen
 // gap in words; `replacing` is the outline of the element being replaced, when it is a rewrite.
 // `screen` says the piece must be a whole screen (start with a screen line); false says it must not
 // contain one. `retry` is set on the second attempt after the first came back the wrong shape.
-export function writePiece({ utterance, outline, where, replacing = null, screen = false, retry = false, apiKey, model, signal }) {
+export async function writePiece({ utterance, outline, where, replacing = null, screen = false, retry = false, apiKey, model, signal }) {
   const shape = screen
     ? " It is a whole new screen: start with a screen line."
     : " It goes on a screen that already exists: do not write a screen line.";
@@ -166,7 +189,7 @@ export function writePiece({ utterance, outline, where, replacing = null, screen
     "",
     `The person says: ${utterance}`,
   ].join("\n");
-  return stream({ system: PIECE, context, apiKey, model, signal, maxTokens: 4000 });
+  return withNext(await stream({ system: PIECE, context, apiKey, model, signal, maxTokens: 4000 }));
 }
 
 // Several changes → one per line. The writer is not shown the mockup: cutting a sentence needs

@@ -1117,7 +1117,9 @@ export function edgesOf(root, screenId, id, skip = new Set()) {
   if (!h?.parent || h.parent.type === "row") return [];
   const out = [];
   const next = h.parent.children[h.index + 1], prev = h.parent.children[h.index - 1];
-  const fits = (n) => n && !skip.has(n.id) && LAYOUT.has(n.type) && padded(root, n.id);
+  // A row's start and end are its left and right ends, not just below or above what is next to it:
+  // "just above the Hours" once landed at the right end of the nav row over it.
+  const fits = (n) => n && !skip.has(n.id) && LAYOUT.has(n.type) && n.type !== "row" && padded(root, n.id);
   if (fits(next)) out.push({ anchor: next.id, position: "inside_start", text: `just below ${describe(h.node)}, at the top of ${describe(next)}` });
   if (fits(prev)) out.push({ anchor: prev.id, position: "inside_end", text: `just above ${describe(h.node)}, at the bottom of ${describe(prev)}` });
   return out;

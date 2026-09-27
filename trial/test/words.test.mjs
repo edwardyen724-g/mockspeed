@@ -75,6 +75,9 @@ function strings(root) {
     say(`all like ${id}`, W.offer.allLike(root, id, 5));
     say(`changed ${id}`, W.reply.changed(root, nm, 1));
     say(`already ${id}`, W.reply.alreadyThere(nm));
+    say(`already on ${id}`, W.reply.alreadyOn(root, id, [all.find((n) => n.id === id).screen].filter(Boolean)));
+    say(`already on shared ${id}`, W.reply.alreadyOn(root, id, screens.map((s) => s.text)));
+    say(`another ${id}`, W.offer.another(root, id));
   }
   // Several offered at once, twins told apart: every page's things together.
   for (const s of screens) W.distinct(root, all.filter((n) => n.screen === s.text).map((n) => n.id)).forEach((nm, i) => say(`distinct ${s.text} ${i}`, nm));
@@ -106,6 +109,7 @@ function strings(root) {
     say(`place instead ${i}`, W.offer.place(root, g, skip));
     say(`added ${i}`, W.reply.added(root, "a “Call us” button", p, i % 2));
     say(`moved ${i}`, W.reply.moved("the “Order now” button", p));
+    say(`already moved ${i}`, W.reply.alreadyMoved("“(555) 014-2290”", p));
   });
 
   // The pieces a writer returns, named before they land.
@@ -133,6 +137,8 @@ function strings(root) {
   };
   for (const [k, v] of Object.entries(fixed)) say(k, v);
   say("tool all", W.tool.all(5));
+  for (const t of W.starters) say("starter", t);
+  for (const t of W.chips(root, ["Add customer reviews", "Add a catering page", "Make the prices bigger", "Add a settings screen"])) say("chip", t);
   say("tool rename", W.tool.renameHint);
   for (const [k, v] of Object.entries(W.ask)) if (typeof v === "string") say(`ask.${k}`, v);
   for (const [k, v] of Object.entries(W.reply)) if (typeof v === "string") say(`reply.${k}`, v);
@@ -280,6 +286,25 @@ group("replies", () => {
     assert.equal(W.offer.doIt(BAKERY, null, "menu"), "Change the cards “Sourdough · Rye · Baguette”");
     assert.equal(W.offer.justThis(BAKERY, "price"), "Just “$6.50” instead");
     assert.equal(W.offer.allLike(BAKERY, "price", 3), "All 3 like “$6.50” instead");
+  });
+
+  test("check before adding: what was there, shown or moved, and a second one offered", () => {
+    assert.equal(W.reply.alreadyOn(BAKERY, "street", ["Visit us"]), "“427 Maple Street” is already on the “Visit us” page.");
+    assert.equal(W.reply.alreadyOn(BAKERY, "order", ["Home", "Visit us"]), "The “Order now” button is already on 2 pages.");
+    assert.equal(W.reply.alreadyOn(BAKERY, BAKERY.children[1].id, ["Visit us"]), "The “Visit us” page is already there.");
+    assert.equal(W.reply.alreadyMoved("“427 Maple Street”", W.place(BAKERY, { anchor: "visit", position: "inside_start" })),
+      "“427 Maple Street” was already there, so I moved it to the top of the part with “Address · 427 Maple Street”.");
+    assert.equal(W.offer.keepBoth, "Keep both");
+    assert.equal(W.offer.another(BAKERY, "street"), "Add another");
+    assert.equal(W.offer.another(BAKERY, BAKERY.children[1].id), "Add another page");
+  });
+  test("next steps: three, in plain words", () => {
+    assert.deepEqual(W.chips(BAKERY, ["Add customer reviews", "Add a catering screen", "Make the header row darker", "Add customer reviews", "Add a #hero", "Add a catering page", "Make the prices bold", "Add a map"]),
+      ["Add customer reviews", "Add a catering page", "Make the prices bold"]);
+    const phone = parse('app "Split" phone\n  screen "Home"\n    text "Hi"').root;
+    assert.deepEqual(W.chips(phone, ["Add a settings screen"]), ["Add a settings screen"]);
+    assert.deepEqual(W.chips(BAKERY), []);
+    assert.equal(W.starters.length, 3);
   });
 
   test("every one like it: named by the one pointed at, and the others counted", () => {

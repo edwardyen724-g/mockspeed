@@ -32,6 +32,77 @@ the runner-up as a swap beside its reply. The script records each step's swaps (
 clicks none. "≈" is a change with a swap offered and "~" is nothing changed with a swap offered.
 The judges say `swap_right` when the change was not what was meant but one click on a swap is.
 
+## Check before adding, and next steps — `runs/2026-09-27-already-probe`
+
+Phase 1d of `docs/plan-web-2026-09-26.md` (§3B, §3E). In the readiness check, "add our phone
+number" duplicated a phone number the page already showed. Now an addition asks Jev first
+(`jev.mjs` `already`): is the thing already on the mock, which element is it, and does the sentence
+name a page or a place for it? Then:
+
+- **It names neither** ("add our phone number"). The one there is selected and scrolled into view,
+  nothing changes, and "Add another" is offered.
+- **It names a place on that page** ("…under the address"). The one there is moved to that place,
+  and "Keep both" is offered, which puts it back and writes a new one at that place.
+- **The page it asks for is another** ("add the opening hours to the home page"). A new one is added
+  there as asked, since it is not on that page.
+
+A page, or a thing shared across pages, is never moved; it is shown. After every build and every
+change, three next steps sit under the text box, one click each. The writer ends each answer with a
+`// next:` line in the same call; an empty canvas shows three starters.
+
+The question was probed before anything relied on it:
+
+```bash
+node trial/eval/probe-already.mjs --env ~/projects/jev-context/.env.local --runs 2 --out trial/eval/runs/<dir>/results.json
+```
+
+The set has 46 sentences. The first 28 are on a three-page bakery: the thing there with no place
+named, with a page named (its own or another), with a place named; the thing not there; "another" /
+"a second" / only the same kind; and not there while the place it names is ("an email address under
+our phone number", where decide()'s `exists` would read yes). The other 18 are held out, on the
+email and CRM apps from the 1b run. Each is run twice. Rows where the thing is on another page from
+the one asked for are scored on `open` and `page` only, since the answer to `there` changes nothing.
+
+| wording of `there` | right | held out | there | not there |
+|---|---|---|---|---|
+| the question alone ("Is the thing `said` asks to add already on the mockup…?") | 90/92 | 36/36 | ≥ 0.73 | ≤ 0.62 |
+| plus: another / a second / only the same kind means no, and a place named is not the thing (what `jev.mjs` asks) | **92/92** | **36/36** | ≥ 0.65 | ≤ 0.40 |
+
+- **Without those lines, "a second phone number" read as there** (0.57-0.62), and "another bread
+  card" came back 0.40.
+- **`open` alone could not tell a page from nowhere.** spot()'s `open` asks about a place *on a
+  screen*, so "to the home page" is open (0.88-0.91). The `page` question splits them: at least 0.94
+  when a page is named, at most 0.19 when not. The first run, without it, scored "add the opening
+  hours to the home page" wrong on both wordings.
+- **Which element:** 38/38, the phone number itself (0.91-1.00) more often than its labelled group.
+- The call takes a median 127 ms and a max of 355 ms, and costs one Jev request per addition.
+
+**In the app (browser pane, a bakery built from "make a mock of my bakery's website: a menu page
+with five breads as cards with prices, and a visit us page with our address, phone number and
+opening hours").**
+- The build showed three next steps, from the writer's five. A click sent one ("Add email
+  address"), which was checked (not there), added, and replaced by three new steps. "Make the prices
+  bigger" and a toolbar Bigger kept them. Undo brought back the ones that went with the mock before,
+  less the one taken.
+- "Add our phone number": there 0.85, open 0.94, page 0.07. The reply was "“(503) 555-0147” is
+  already on the “Visit Us” page." The number was selected and in view, with "Add another"
+  offered, and nothing changed.
+- "Add our phone number under the address", with the number above it in a "Call" block: there
+  0.80, it 0.92, open 0.09. It was moved under the address, and "Keep both" was offered. Keep both put
+  it back and had the writer add a second one under the address.
+- **Unmarked, "add our phone number above the hours" routed direct as a move** (0.87), while Jev's
+  job answer was add. Its element, chosen by kind ("group" 0.47), was the whole column. Such a
+  sentence now goes to the addition, which moves the one there, found by `already`, or adds one.
+- **Placement is still top down, by parts.** On one run "under the address" chose the brand row as
+  the part (0.42) and put the number at the top of the content. The right part was the offered swap,
+  and taking it kept "Keep both". An edge spot also landed "just above the hours" at the right end
+  of the nav row: edges into a row are no longer offered (tree.mjs `edgesOf`).
+
+What this does not cover:
+- A value moved out of its labelled block leaves the label behind ("Call" with nothing under it).
+- A mock opened from a file has no next steps until the first thing the writer writes.
+- Jev does not rank the writer's steps against the mock; they are shown in the writer's order.
+
 ## This one, or every one like it — `runs/2026-09-26-twins-probe`
 
 Phase 1c of `docs/plan-web-2026-09-26.md` (§4). With one of five prices marked, "make the prices
