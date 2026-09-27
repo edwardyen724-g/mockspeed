@@ -64,9 +64,15 @@ function strings(root) {
     for (const op of W.OPS) {
       for (const copies of [0, 2]) say(`edited ${op} ${id}`, W.reply.edited(root, op, nm, { copies, across: copies > 0, to: "New words" }));
       say(`limit ${op} ${id}`, W.reply.limit(op, nm));
+      say(`edited all ${op} ${id}`, W.reply.edited(root, op, nm, { others: 4, to: "New words" }));
+      say(`limit all ${op} ${id}`, W.reply.limit(op, nm, 4));
+      say(`tool ${op}`, W.tool.label(op, true));
+      say(`tool ${op} down`, W.tool.label(op));
       say(`doIt ${op} ${id}`, W.offer.doIt(root, op, id, nm, screens.slice(0, 2).map((s) => s.text)));
     }
     say(`doIt rewrite ${id}`, W.offer.doIt(root, null, id));
+    say(`just this ${id}`, W.offer.justThis(root, id));
+    say(`all like ${id}`, W.offer.allLike(root, id, 5));
     say(`changed ${id}`, W.reply.changed(root, nm, 1));
     say(`already ${id}`, W.reply.alreadyThere(nm));
   }
@@ -126,6 +132,8 @@ function strings(root) {
     edited: W.reply.edited(root, "clear"), clearLimit: W.reply.limit("clear", W.name(root, root.id)),
   };
   for (const [k, v] of Object.entries(fixed)) say(k, v);
+  say("tool all", W.tool.all(5));
+  say("tool rename", W.tool.renameHint);
   for (const [k, v] of Object.entries(W.ask)) if (typeof v === "string") say(`ask.${k}`, v);
   for (const [k, v] of Object.entries(W.reply)) if (typeof v === "string") say(`reply.${k}`, v);
   for (const [k, v] of Object.entries(W.offer)) if (typeof v === "string") say(`offer.${k}`, v);
@@ -270,6 +278,18 @@ group("replies", () => {
     assert.equal(W.offer.job(BAKERY, "rewrite", "menu"), "Change the cards “Sourdough · Rye · Baguette” instead");
     assert.equal(W.offer.doIt(BAKERY, "darker", "bar"), "Make the “Crumb · Order now” bar darker");
     assert.equal(W.offer.doIt(BAKERY, null, "menu"), "Change the cards “Sourdough · Rye · Baguette”");
+    assert.equal(W.offer.justThis(BAKERY, "price"), "Just “$6.50” instead");
+    assert.equal(W.offer.allLike(BAKERY, "price", 3), "All 3 like “$6.50” instead");
+  });
+
+  test("every one like it: named by the one pointed at, and the others counted", () => {
+    assert.equal(W.reply.edited(BAKERY, "bigger", "“$6.50”", { others: 2 }), "Made “$6.50” and the 2 others like it bigger.");
+    assert.equal(W.reply.edited(BAKERY, "remove", "“$6.50”", { others: 1 }), "Removed “$6.50” and the other one like it.");
+    assert.equal(W.reply.edited(BAKERY, "rename", "the “Add” button", { others: 2, to: "Buy" }), "Renamed the “Add” button and the 2 others like it to “Buy”.");
+    assert.equal(W.reply.limit("bigger", "“$6.50”", 2), "“$6.50” and the 2 others like it are already as big as they go.");
+    assert.equal(W.tool.label("move_earlier"), "↑ Up");
+    assert.equal(W.tool.label("move_earlier", true), "← Left");
+    assert.equal(W.tool.all(3), "All 3 like this");
   });
 });
 

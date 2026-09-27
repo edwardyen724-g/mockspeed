@@ -302,6 +302,29 @@ export async function needs({ utterance, earlier, context, apiKey, signal }) {
   return { ms: Date.now() - started, noul: answers.needs.noul ?? 0 };
 }
 
+// This one, or every one like it (docs/plan-web-2026-09-26.md §4): asked only when the element an
+// edit acts on has twins (trial/tree.mjs `twinsOf` — each card's price when it is one card's
+// price). Plurals, "all", "each", "these" and "them" are Jev's to read, not a word list's. `target`
+// is the element's line, `twins` every twin's line, itself among them; `marked` is set when the
+// person pointed at it. Returns how likely `said` means every one.
+// Measured 2026-09-26 (trial/eval/probe-twins.mjs, trial/eval/README.md): this wording 89/90 and
+// 90/90 over 45 sentences run twice, 37/38 and 38/38 on the two apps it was not tuned on — "one"
+// sentences at most 0.06, "every" at least 0.49. Without the line about plurals and the mark, "make the prices bigger" with one
+// price marked came back 0.35-0.48: the mark pulled it to "this one".
+export const EVERY = "Does `said` act on only `target`, or on every one of `twins` — the same thing repeated, `target` among them? `marked` is the one the speaker clicked, if any. A plural — the prices, these, those, them, all, each — means every one, even when one of them is marked; a singular — this, that, it, the price, the croissant price — means only `target`.";
+export async function every({ utterance, target, twins, marked = null, context = null, apiKey, signal, instructions = EVERY }) {
+  const started = Date.now();
+  const { answers } = await ask({
+    apiKey,
+    state: { said: utterance, instruction: unquoted(utterance), marked: marked ?? null, context: context ?? null, target, twins },
+    questions: { every: { type: "choice", instructions, criteria: { one: `only ${target}`, every: `all ${twins.length}: ${twins.join(" · ")}` } } },
+  }, signal);
+  if (!answers?.every) throw new Error("jev returned no answer for every");
+  const a = answers.every;
+  const p = a.probabilities?.every ?? (a.choice === "every" ? a.confidence ?? 0 : 1 - (a.confidence ?? 0));
+  return { ms: Date.now() - started, every: p };
+}
+
 // Where a whole new screen goes: one choice over the gaps between screens (trial/tree.mjs
 // `screenGaps`), each labelled by position.
 export async function place({ utterance, gaps, screen, marked = null, apiKey, signal }) {

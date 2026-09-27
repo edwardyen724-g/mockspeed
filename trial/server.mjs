@@ -13,19 +13,26 @@
 // and the runner-up comes back as an `offer`, a one-click swap the page shows next to the text box
 // with Undo (trial/turn.mjs, docs/plan-web-2026-09-26.md §3A); a swap comes back to /swap. The
 // person is asked first (`choices`, answered at /answer) only before a new app when Jev is torn
-// between that and another kind of change, and before clearing on an unsure answer. Every string
-// the person reads comes from trial/words.mjs; the log's own notes, Jev's scores and timings are
-// for ?debug=1. Runs beside canvas/ so the two can be compared.
+// between that and another kind of change, and before clearing on an unsure answer. An offer about
+// an element or a place is also numbered in the mock, where a click takes it (plan §3D). When the
+// element an edit acts on has twins — each card's price — Jev says whether the sentence means it or
+// every one like it, and the other reading is offered (plan §4).
+//
+// A clicked element gets a toolbar in the mock — bigger, smaller, bold, lighter, up, down, remove,
+// "All 5 like this" — and double-clicking its words edits them in place (plan §3C). Those go to
+// /edit and straight onto the tree: no Jev, no writer, free. Every string the person reads comes
+// from trial/words.mjs; the log's own notes, Jev's scores and timings are for ?debug=1. Runs beside
+// canvas/ so the two can be compared.
 
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { parse, Stream, serialize, index, find, describe, shapeOf, positionOf, applyPatch, apply, gaps, screenGaps, partsOf, spotsIn, edgesOf, neighboursIn, padded, firstCopy, sharedView } from "./tree.mjs";
+import { parse, Stream, serialize, index, find, describe, shapeOf, positionOf, applyPatch, apply, gaps, screenGaps, partsOf, spotsIn, edgesOf, neighboursIn, padded, firstCopy, sharedView, twinsOf } from "./tree.mjs";
 import { render } from "./render.mjs";
-import { decide, place, spot, nextTo, which, needs, KIND_TYPES } from "./jev.mjs";
+import { decide, place, spot, nextTo, which, needs, every, KIND_TYPES } from "./jev.mjs";
 import { writeApp, writePiece, split, MODEL } from "./writer.mjs";
-import { Turn, replay, applyEverywhere, placeEverywhere, relocate, redo } from "./turn.mjs";
+import { Turn, replay, applyEverywhere, applyAll, placeEverywhere, relocate, redo } from "./turn.mjs";
 import * as W from "./words.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -57,11 +64,17 @@ const WHOLE_HI = 0.7;    // "a whole new screen" at or above this; "on a screen"
 const WHOLE_LO = 0.3;    // WHOLE_LO; in between, Jev's leaning with the other offered
 const NOT_THERE = 0.3;   // Jev's `exists` below this: nothing is done to a stand-in for the thing
                          // named; the likeliest are offered
+const ALL = 0.5;         // Jev's `every` at or above it: the edit is made to every one like it
+                         // (tree.mjs twinsOf), with "just this one" offered; below, the reverse
+                         // (measured: "one" sentences at most 0.06, "every" at least 0.49)
 // A removal is done like any other edit, with Undo offered beside the reply.
 const DESTRUCTIVE = new Set(["remove", "clear"]);
 // The edits that step a property, and so can be tried on each candidate to see whether they would
 // change it. A move or a removal changes anything; a rename needs its words.
 const PROPERTY = new Set(["bigger", "smaller", "bold", "regular", "darker", "lighter", "wider", "narrower", "taller", "shorter"]);
+// The toolbar on a clicked element (docs/plan-web-2026-09-26.md §3C): the direct edits a person can
+// make with no words, in the order they are shown. Rename is double-click. No model is called.
+const TOOLS = ["bigger", "smaller", "bold", "regular", "lighter", "darker", "move_earlier", "move_later", "remove"];
 
 // ---- args and keys -----------------------------------------------------------------------
 const args = process.argv.slice(2);
@@ -147,6 +160,8 @@ const nodes = ({ once = false } = {}) => {
 };
 const screenList = () => root.children.filter((s) => s.type === "screen");
 const lineOf = (id) => { const h = find(root, id); return h ? describe(h.node) : id; };
+// An element with what holds it, so one card's price reads as that card's (jev.mjs `every`).
+const lineIn = (id) => { const h = find(root, id); return !h ? id : h.parent ? `${describe(h.node)} · in ${describe(h.parent)}` : describe(h.node); };
 const screenOf = (id) => index(root).find((n) => n.id === id)?.screen ?? null;
 const secsSince = (t) => ((Date.now() - t) / 1000).toFixed(1) + " s";
 
@@ -175,13 +190,25 @@ function settle() { pending = null; question = null; }
 const doubt = (ctx, conf, alts) => turn?.doubt(conf, alts, ctx);
 const swapFor = (label, body) => ({ label, body });
 
+// What a swap is about, for the mock to show it where it is (plan §3D): the element it would act on
+// instead — numbered in the mock, and a click on it takes the swap — or the place it would put a
+// piece instead, drawn as a numbered line there. Nothing for a swap about one-or-every, a page or a
+// kind of change.
+function pointsAt(b) {
+  if (!b || b.all !== undefined) return null;
+  if ((b.kind === "apply" || b.kind === "rewrite") && b.target && find(root, b.target)) return { pick: b.target };
+  if ((b.kind === "place_in" || b.kind === "move_in") && find(root, b.into)) return { pick: b.into };
+  if ((b.kind === "place" || b.kind === "move") && find(root, b.anchor)) return { drop: { anchor: b.anchor, position: b.position } };
+  return null;
+}
+
 // What is offered once a sentence is done: for each part, the alternatives to the decision Jev was
 // least sure of; then Undo, which takes back the whole sentence, when it changed the mock and a
 // swap is offered or it removed something. A replaced app's "Bring back" stands in for Undo.
 function offering(r) {
   if (r.choices?.length) return r;
   on += 1;
-  const swaps = r.error ? [] : (turn?.offers() ?? []).map(({ label, part, doubt: d, alt }) => ({ label, post: { path: "/swap", body: { on, part, doubt: d, alt } } }));
+  const swaps = r.error ? [] : (turn?.offers() ?? []).map(({ label, body: b, part, doubt: d, alt }) => ({ label, at: pointsAt(b), post: { path: "/swap", body: { on, part, doubt: d, alt } } }));
   const back = r.offer ?? [];
   const undo = r.changed && !back.length && (swaps.length || r.undo) ? [{ label: W.offer.undo, post: { path: "/undo", body: { on } } }] : [];
   offer = [...swaps, ...back, ...undo];
@@ -287,7 +314,46 @@ async function direct(ctx) {
   }
   const target = pointed ? marked : await choose(ctx, { op: d.op, body: (id) => ({ kind: "apply", op: d.op, target: id, span: d.span }) });
   if (typeof target !== "string") return target;
-  return finishEdit(ctx, d.op, target, d.span, pointed ? `jev · the marked element (points ${d.points.toFixed(2)})` : "jev");
+  return editWith(ctx, d.op, target, d.span, pointed ? `jev · the marked element (points ${d.points.toFixed(2)})` : "jev");
+}
+
+// ---- this one, or every one like it ---------------------------------------------------------
+// Once the element is known: when it has twins (tree.mjs twinsOf — each card's price when it is one
+// card's price), Jev says whether the sentence means it alone or every one like it, and the other
+// reading is offered beside the reply. Every one being changed, a pick between two of them is no
+// longer a choice, and is not offered. Returns true for every one.
+async function plural(ctx, op, target, span) {
+  if (op === "clear") return false;
+  const twins = twinsOf(root, target);
+  if (twins.length < 2) return false;
+  const { utterance, marked } = ctx;
+  // The mark, when the person clicked one of them: "make the prices bigger" with one price marked.
+  const clicked = marked && twins.includes(marked) ? lineIn(marked) : null;
+  const e = await every({ utterance, target: lineIn(target), twins: twins.map(lineIn), marked: clicked, context: ctx.context, apiKey });
+  const all = e.every >= ALL;
+  note({ op: "twins", note: `${all ? "every one like it" : "this one"} · ${twins.length} alike`, conf: all ? e.every : 1 - e.every, ms: e.ms, source: `jev · every ${e.every.toFixed(2)} of ${twins.length} alike · ${e.ms} ms`, said: utterance });
+  if (all) turn?.forget((a) => a.body?.kind === "apply" && twins.includes(a.body.target));
+  // "Just this one" is the one the person clicked, when they clicked one of them.
+  const one = marked && twins.includes(marked) ? marked : target;
+  const label = all ? W.offer.justThis(root, one) : W.offer.allLike(root, target, twins.length);
+  doubt(ctx, Math.max(e.every, 1 - e.every), [swapFor(label, { kind: "apply", op, target: all ? one : target, span, all: !all })]);
+  return all;
+}
+
+// An edit once the element is known: a move to a named place and a rename without clear words go
+// elsewhere; otherwise one-or-every is settled (unless a swap already says which) and it is made.
+async function editWith(ctx, op, target, span, how, all) {
+  const { d } = ctx;
+  if (!find(root, target) && op !== "clear") return { note: W.reply.gone, changed: false };
+  // A move that names where it should end up is a placement, not one step.
+  if ((op === "move_earlier" || op === "move_later") && d.dest >= FIRE) return { moveTo: target };
+  if (op === "rename" && (!span || d.spanConfidence < ACT_SPAN)) return { escalate: "rename without clear new words", target };
+  // An edit that does not apply to it ("bigger" on a picture) goes to the writer, which rewrites
+  // that one; one-or-every is not asked about an edit that will not be made.
+  const tried = op === "clear" ? null : applyEverywhere(root, op, target, span);
+  if (tried && !tried.changed && !tried.limit) return { escalate: tried.note, target };
+  if (all === undefined) all = await plural(ctx, op, target, span);
+  return finishEdit(ctx, op, target, span, how, all);
 }
 
 // ---- which element -----------------------------------------------------------------------
@@ -386,24 +452,24 @@ async function choose(ctx, { op = null, body }) {
 }
 
 // ---- the edit ----------------------------------------------------------------------------
-// The edit once the element is known — from Jev, or from a swap. An element drawn on several
-// screens (tree.mjs `share=`) is one element: the edit is made to every copy (turn.mjs
-// applyEverywhere). A removal is done like any other edit, with Undo beside the reply.
-function finishEdit(ctx, op, target, span, how) {
-  const { utterance, d } = ctx;
-  if (!find(root, target) && op !== "clear") return { note: W.reply.gone, changed: false };
-  // A move that names where it should end up is a placement, not one step.
-  if ((op === "move_earlier" || op === "move_later") && d.dest >= FIRE) return { moveTo: target };
-  if (op === "rename" && (!span || d.spanConfidence < ACT_SPAN)) return { escalate: "rename without clear new words", target };
-  // Named before the edit: a removed or renamed thing is not there to be named by its old words after.
-  const what = W.name(root, target);
+// The edit once the element is known — from Jev, or from a swap: to it alone, or with `all` to every
+// one like it. An element drawn on several screens (tree.mjs `share=`) is one element: the edit is
+// made to every copy (turn.mjs applyEverywhere). A removal is done like any other edit, with Undo
+// beside the reply.
+function finishEdit(ctx, op, target, span, how, all = false) {
+  const { utterance, d, marked } = ctx;
+  const twins = all ? twinsOf(root, target) : [];
+  const targets = twins.length >= 2 ? twins : [target];
+  // Named before the edit: a removed or renamed thing is not there to be named by its old words
+  // after. Every one being changed, it is named by the one the person clicked, if they clicked one.
+  const what = W.name(root, targets.length > 1 && targets.includes(marked) ? marked : target);
   const across = find(root, target)?.parent?.type === "row";
-  const r = applyEverywhere(root, op, target, span);
+  const r = applyAll(root, op, targets, span);
   // "already bold" is an answer; "has no set width" is a job for the writer, who can set one.
   if (!r.changed && !r.limit) return { escalate: r.note, target };
   const entry = { note: r.note, op, conf: d.opConfidence, ms: d.ms, source: how, said: utterance, target };
-  if (r.changed) commit(r.root, entry, redo.edit(op, target, span)); else note({ ...entry, refused: true });
-  const say = r.changed ? W.reply.edited(root, op, what, { copies: r.copies ?? 0, across, to: span }) : W.reply.limit(op, what);
+  if (r.changed) commit(r.root, entry, targets.length > 1 ? redo.edits(op, targets, span) : redo.edit(op, target, span)); else note({ ...entry, refused: true });
+  const say = r.changed ? W.reply.edited(root, op, what, { copies: r.copies ?? 0, across, to: span, others: r.count - 1 }) : W.reply.limit(op, what, targets.length - 1);
   return { note: say, changed: r.changed, target, debug: r.note, undo: DESTRUCTIVE.has(op) };
 }
 
@@ -843,7 +909,7 @@ async function answered(body, next, rest, human) {
     return await nextPart({ ...rest, dropped: [...(rest.dropped ?? []), rest.current] });
   } else if (body.kind === "apply") {
     human(body.target ? `you chose ${lineOf(body.target)}` : "you said yes");
-    r = body.op === "clear" ? clearAll(next) : finishEdit(next, body.op, body.target, body.span ?? null, "jev's edit · your choice");
+    r = body.op === "clear" ? clearAll(next) : await editWith(next, body.op, body.target, body.span ?? null, "jev's edit · your choice", body.all);
     if (r.moveTo) r = await movePiece(next, r.moveTo);
     else if (r.escalate) r = await writeJob({ ...next, fallbackTarget: r.target ?? null });
   } else if (body.kind === "proceed") {
@@ -929,6 +995,50 @@ async function swap({ on: n, part, doubt: d, alt }) {
   return r;
 }
 
+// ---- the toolbar and in-place words (plan §3C) ---------------------------------------------
+// What the toolbar on a clicked element offers: each edit that would change it and, when it has
+// twins, each that would change at least one of them — shown once "All 5 like this" is on. `text`
+// is its words, for a double-click to edit in place (null for what has none to edit).
+const RENAMES = new Set(["text", "button", "input", "node", "shape", "progress", "chart"]);
+function toolsFor(id) {
+  const h = find(root, id);
+  if (!h || h.node.type === "app" || h.node.type === "screen") return { id, tools: [], twins: [], allTools: [], text: null };
+  const across = h.parent?.type === "row";
+  const twins = twinsOf(root, id);
+  const label = (op) => ({ op, label: W.tool.label(op, across) });
+  const tools = TOOLS.filter((op) => apply(root, op, id).changed).map(label);
+  const allTools = twins.length >= 2 ? TOOLS.filter((op) => applyAll(root, op, twins).changed).map(label) : [];
+  const text = RENAMES.has(h.node.type) ? String(h.node.text ?? "") : null;
+  return { id, tools, twins, allTools, allLabel: twins.length >= 2 ? W.tool.all(twins.length) : null, text, renameHint: text != null ? W.tool.renameHint : null };
+}
+
+// A toolbar button or a double-clicked name: the edit, straight on the tree — no Jev, no writer, so
+// free and instant. It ends the sentence before it (its swaps would go back past it), and is a turn
+// of its own, so a removal gets Undo beside the reply like any other.
+function toolEdit({ op, target, all = false, text = null }) {
+  if (busy) return { note: W.reply.busy(busy), changed: false };
+  if (!TOOLS.includes(op) && op !== "rename") return { note: W.reply.stale, debug: `no tool ${op}`, changed: false };
+  if (!find(root, target)) return { note: W.reply.gone, changed: false };
+  const arg = op === "rename" ? String(text ?? "").trim() : null;
+  if (op === "rename" && !arg) return { note: W.reply.nothingChanged, changed: false };
+  offer = null;
+  turn = new Turn(root, past.length);
+  const twins = all ? twinsOf(root, target) : [];
+  const targets = twins.length >= 2 ? twins : [target];
+  const what = W.name(root, target);
+  const across = find(root, target).parent?.type === "row";
+  const x = applyAll(root, op, targets, arg);
+  let r;
+  if (!x.changed) {
+    r = { note: x.limit ? W.reply.limit(op, what, targets.length - 1) : W.reply.nothingChanged, debug: x.note, changed: false };
+  } else {
+    commit(x.root, { note: x.note, op, source: "you · toolbar, no model", target }, targets.length > 1 ? redo.edits(op, targets, arg) : redo.edit(op, target, arg));
+    r = offering({ note: W.reply.edited(root, op, what, { copies: x.copies ?? 0, across, to: arg, others: x.count - 1 }), changed: true, debug: x.note, undo: DESTRUCTIVE.has(op) });
+  }
+  said(r);
+  return r;
+}
+
 // ---- http --------------------------------------------------------------------------------
 const json = (res, body, code = 200) => { res.writeHead(code, { "content-type": "application/json", "cache-control": "no-store" }); res.end(JSON.stringify(body)); };
 const body = (req) => new Promise((ok, no) => { let b = ""; req.on("data", (c) => (b += c)); req.on("end", () => { try { ok(b ? JSON.parse(b) : {}); } catch (e) { no(e); } }); });
@@ -940,32 +1050,187 @@ const MARKER = `
   [data-id]{cursor:pointer}
   [data-id]:hover{outline:1px dashed #bbb;outline-offset:2px}
   [data-id].marked{outline:2px solid #111;outline-offset:2px}
+  [data-id].twin{outline:2px dashed #111;outline-offset:2px}
   .pick{position:relative}
   .pick::after{content:attr(data-pick);position:absolute;top:-10px;left:-10px;background:#111;color:#fff;
-    font:11px/18px system-ui;width:18px;height:18px;border-radius:9px;text-align:center;z-index:9}
+    font:11px/18px system-ui;width:18px;height:18px;border-radius:9px;text-align:center;z-index:9;zoom:var(--unzoom,1)}
+  /* The toolbar and the word editor are the canvas's, not the mock's: drawn over it, at true size
+     however far the page zooms the mock out (see pos()). */
+  #ms-bar{position:absolute;z-index:50;height:0}
+  #ms-bar .in{display:flex;gap:2px;padding:3px;background:#111;border-radius:6px;white-space:nowrap;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);font:12px/1 system-ui,-apple-system,sans-serif;width:max-content}
+  #ms-bar button{font:inherit;color:#fff;background:transparent;border:0;border-radius:4px;padding:6px 8px;cursor:pointer}
+  #ms-bar button:hover{background:#333}
+  #ms-bar button.on{background:#fff;color:#111}
+  #ms-bar .sep{width:1px;background:#444;margin:3px 2px}
+  #ms-edit{position:absolute;z-index:60;margin:0;padding:0 2px;border:0;outline:2px solid #111;background:#fff;color:#111;box-sizing:border-box}
+  .ms-drop{position:absolute;z-index:40;background:#111;border-radius:2px;cursor:pointer}
+  .ms-drop::after{content:attr(data-pick);position:absolute;left:-22px;top:50%;margin-top:-9px;background:#111;color:#fff;
+    font:11px/18px system-ui;width:18px;height:18px;border-radius:9px;text-align:center;zoom:var(--unzoom,1)}
 </style>
 <script>
   const byId = (k) => document.querySelector('[data-id="' + CSS.escape(k) + '"]');
+  const CHROME = "#ms-bar, #ms-edit, .ms-drop";
+  // The page zooms the whole mock out to fit (shell.html fitMock); positions here are in the mock's
+  // own pixels, which is what an absolutely placed element inside it is measured in.
+  const zoom = () => parseFloat(document.documentElement.style.zoom) || 1;
+  function pos(el) {
+    if (el.offsetParent === undefined) {
+      const r = el.getBoundingClientRect(), z = zoom();
+      return { left: r.left / z + scrollX, top: r.top / z + scrollY, width: r.width / z, height: r.height / z };
+    }
+    let left = 0, top = 0;
+    for (let n = el; n; n = n.offsetParent) { left += n.offsetLeft; top += n.offsetTop; }
+    return { left, top, width: el.offsetWidth, height: el.offsetHeight };
+  }
+  const tell = (m) => parent.postMessage(m, "*");
+  function mark(key) {
+    document.querySelectorAll(".marked").forEach((m) => m.classList.remove("marked"));
+    if (key) byId(key)?.classList.add("marked");
+  }
+
   addEventListener("click", (e) => {
+    if (e.target.closest(CHROME)) return;
     // An edge's label is drawn apart from its edge (so no line crosses it) and points back at it.
     const f = e.target.closest("[data-for]");
     const n = f ? byId(f.dataset.for) : e.target.closest("[data-id]");
     if (!n) return;
     e.preventDefault();
     e.stopPropagation();
-    document.querySelectorAll(".marked").forEach((m) => m.classList.remove("marked"));
-    n.classList.add("marked");
-    parent.postMessage({ type: "mark", key: n.dataset.id }, "*");
+    // A numbered thing is an offer: clicking it takes it, as its button beside the text box would.
+    if (n.classList.contains("pick")) return tell({ type: "take", n: Number(n.dataset.pick) });
+    mark(n.dataset.id);
+    tell({ type: "mark", key: n.dataset.id });
   }, true);
+
+  // ---- the toolbar -------------------------------------------------------------------------
+  // What the page sends once an element is marked: the edits that would change it, and — when it
+  // has twins — those that would change them, shown with "All 5 like this" on.
+  let bar = null, allOn = false, wantWords = null;
+  function drawBar() {
+    document.getElementById("ms-bar")?.remove();
+    document.querySelectorAll(".twin").forEach((n) => n.classList.remove("twin"));
+    const el = bar && byId(bar.id);
+    if (!el || !el.classList.contains("marked")) return;
+    if (allOn) for (const k of bar.twins) if (k !== bar.id) byId(k)?.classList.add("twin");
+    const list = allOn ? bar.allTools : bar.tools;
+    if (!list.length && !bar.allLabel) return;
+    const wrap = document.createElement("div");
+    wrap.id = "ms-bar";
+    const inner = document.createElement("div");
+    inner.className = "in";
+    // True size at any zoom: the wrapper sits in the mock's pixels, the buttons undo the zoom.
+    inner.style.zoom = String(1 / zoom());
+    const button = (label, on, act, title) => {
+      const b = document.createElement("button");
+      b.textContent = label;
+      if (on) b.className = "on";
+      if (title) b.title = title;
+      b.addEventListener("click", (e) => { e.preventDefault(); act(); });
+      inner.appendChild(b);
+    };
+    if (bar.allLabel) {
+      button(bar.allLabel, allOn, () => { allOn = !allOn; tell({ type: "all", key: bar.id, on: allOn }); drawBar(); });
+      if (list.length) inner.appendChild(Object.assign(document.createElement("span"), { className: "sep" }));
+    }
+    for (const t of list) button(t.label, false, () => tell({ type: "tool", key: bar.id, op: t.op, all: allOn }), bar.renameHint);
+    wrap.appendChild(inner);
+    document.body.appendChild(wrap);
+    const p = pos(el), h = inner.offsetHeight / zoom(), w = inner.offsetWidth / zoom();
+    // Inside what is in view, clear of the scrollbar.
+    const room = document.documentElement.clientWidth / zoom() + scrollX;
+    wrap.style.left = Math.max(4, Math.min(p.left, room - w - 4)) + "px";
+    // Above it, or under it where there is no room above.
+    wrap.style.top = (p.top - h - 8 >= 0 ? p.top - h - 8 : p.top + p.height + 8) + "px";
+  }
+
+  // ---- words, edited where they are ----------------------------------------------------------
+  function editWords(el) {
+    document.getElementById("ms-edit")?.remove();
+    const p = pos(el), cs = getComputedStyle(el);
+    const inp = document.createElement("input");
+    inp.id = "ms-edit";
+    inp.value = bar.text;
+    Object.assign(inp.style, { left: p.left + "px", top: p.top + "px", width: Math.max(p.width, 140) + "px", height: p.height + "px",
+      font: cs.font, letterSpacing: cs.letterSpacing, textAlign: cs.textAlign === "center" ? "center" : "left" });
+    document.body.appendChild(inp);
+    inp.focus();
+    inp.select();
+    const key = el.dataset.id, was = bar.text;
+    // Once: taking the editor out blurs it, and a blur is also a way to finish.
+    let closed = false;
+    const done = (keep) => {
+      if (closed) return;
+      closed = true;
+      const v = inp.value.trim();
+      inp.remove();
+      if (keep && v && v !== was) tell({ type: "rename", key, text: v });
+    };
+    inp.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      if (e.key === "Enter") { e.preventDefault(); done(true); }
+      if (e.key === "Escape") { e.preventDefault(); done(false); }
+    });
+    inp.addEventListener("blur", () => done(true));
+  }
+  addEventListener("dblclick", (e) => {
+    if (e.target.closest(CHROME)) return;
+    const n = e.target.closest("[data-id]");
+    if (!n) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // The toolbar's word for it may still be on its way from the page; edit once it lands.
+    if (bar && bar.id === n.dataset.id) { if (bar.text != null) editWords(n); }
+    else wantWords = n.dataset.id;
+  }, true);
+
+  // ---- offers, where they are ----------------------------------------------------------------
+  // Each offer about an element numbers it; each about a place draws a numbered line there.
+  function drops(list) {
+    document.querySelectorAll(".ms-drop").forEach((n) => n.remove());
+    for (const d of list || []) {
+      const el = byId(d.anchor);
+      if (!el) continue;
+      const p = pos(el), z = zoom(), t = 3 / z;
+      const inside = d.position === "inside_start" || d.position === "inside_end";
+      const box = inside ? el : el.parentElement;
+      const across = box && getComputedStyle(box).flexDirection.startsWith("row");
+      const start = d.position === "before" || d.position === "inside_start";
+      const line = document.createElement("div");
+      line.className = "ms-drop";
+      line.dataset.pick = d.n;
+      if (across) {
+        const x = inside ? (start ? p.left + t : p.left + p.width - 2 * t) : (start ? p.left - 2 * t : p.left + p.width + t);
+        Object.assign(line.style, { left: x + "px", top: p.top + "px", width: t + "px", height: p.height + "px" });
+      } else {
+        const y = inside ? (start ? p.top + t : p.top + p.height - 2 * t) : (start ? p.top - 2 * t : p.top + p.height + t);
+        Object.assign(line.style, { left: p.left + "px", top: y + "px", width: p.width + "px", height: t + "px" });
+      }
+      line.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); tell({ type: "take", n: d.n }); });
+      document.body.appendChild(line);
+    }
+  }
+
   addEventListener("message", (e) => {
     const m = e.data || {};
     if (m.type === "mark") {
-      document.querySelectorAll(".marked").forEach((n) => n.classList.remove("marked"));
-      if (m.key) byId(m.key)?.classList.add("marked");
+      mark(m.key);
+      if (!m.key || m.key !== bar?.id) { bar = null; allOn = false; }
+      drawBar();
+    }
+    if (m.type === "tools") {
+      allOn = Boolean(m.allOn) && m.tools.twins.length >= 2;
+      bar = m.tools;
+      drawBar();
+      if (wantWords === bar.id) { wantWords = null; if (bar.text != null) editWords(byId(bar.id)); }
     }
     if (m.type === "pick") {
+      // Numbers at true size, like the toolbar, however far the mock is zoomed out.
+      document.documentElement.style.setProperty("--unzoom", String(1 / zoom()));
       document.querySelectorAll(".pick").forEach((n) => { n.classList.remove("pick"); n.removeAttribute("data-pick"); });
-      (m.keys || []).forEach((k, i) => { const n = byId(k); if (n) { n.classList.add("pick"); n.dataset.pick = i + 1; } });
+      // keys[i] is the element offer i + 1 is about, or null.
+      (m.keys || []).forEach((k, i) => { const n = k && byId(k); if (n) { n.classList.add("pick"); n.dataset.pick = i + 1; } });
+      drops(m.drops);
     }
   });
 </script>`;
@@ -1001,6 +1266,8 @@ createServer(async (req, res) => {
         question, offer, jev: Boolean(apiKey), llm: llmKey ? LLM : null, canUndo: past.length > 0, out: OUT,
       });
     }
+    if (url.pathname === "/tools") return json(res, toolsFor(url.searchParams.get("id")));
+    if (url.pathname === "/edit" && req.method === "POST") return json(res, toolEdit(await body(req)));
     if (url.pathname === "/ask" && req.method === "POST") return json(res, await ask(await body(req)));
     if (url.pathname === "/answer" && req.method === "POST") return json(res, await onAnswer(await body(req)));
     if (url.pathname === "/swap" && req.method === "POST") return json(res, await swap(await body(req)));

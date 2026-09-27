@@ -945,6 +945,57 @@ export function mirrorsOf(root, anchor, position) {
   return copiesOf(root, anchor).map((c) => c.id);
 }
 
+// ---- twins ---------------------------------------------------------------------------------
+// The same thing in each of a run of same-shaped siblings: each menu card's price when `id` is one
+// card's price, each item of a list when it is one item, each card when it is a card. "Make the
+// prices bigger" with one price marked changed one of five (docs/plan-web-2026-09-26.md §4). This
+// is structure only: whether a sentence means this one or every one like it is Jev's to say.
+//
+// Walks up from the node to the nearest level that repeats, and takes the node at the same place
+// in each repeat. A container repeats when siblings of its type hold the same kinds of thing in
+// the same order (the five cards: picture, name, price, button). A leaf repeats only as an item of
+// a list — three or more of its type that look alike, or two or more buttons or fields — so a
+// heading and the line under it are not twins, and neither are the logo and the nav items. The
+// first row of a table is its header, not one of its rows. Stops at the screen: copies on other
+// screens are one shared element (copiesOf), not twins. Returns ids in document order, `id` among
+// them, or [] when nothing repeats.
+const CONTROLS = new Set(["button", "input"]);
+const kindsIn = (n) => (n.children ?? []).map((c) => c.type).join(",");
+function run(par, unit) {
+  const header = (s) => par.type === "table" && s.type === "tr" && par.children[0] === s;
+  const alike = (s) => s.type === unit.type && !header(s);
+  if (isContainer(unit)) {
+    const same = par.children.filter((s) => alike(s) && kindsIn(s) === kindsIn(unit));
+    return same.length >= 2 ? same : [];
+  }
+  // What kind of text it is — size, mono, pill, a set width — not its state: a nav's current item
+  // is bold where the others are grey, and it is still one of them.
+  const look = (s) => [norm(s.props?.size, SIZES, "m"), !!s.props?.mono, !!s.props?.pill, s.props?.w ?? ""].join("|");
+  const same = par.children.filter((s) => alike(s) && look(s) === look(unit));
+  return same.length >= (CONTROLS.has(unit.type) ? 2 : 3) ? same : [];
+}
+export function twinsOf(root, id) {
+  let h = find(root, id);
+  if (!h || h.node.type === "app" || h.node.type === "screen") return [];
+  const type = h.node.type;
+  const path = [];
+  while (h?.parent && h.parent.type !== "app") {
+    const units = run(h.parent, h.node);
+    if (units.includes(h.node)) {
+      const out = [];
+      for (const u of units) {
+        let t = u;
+        for (const i of path) { t = t?.children?.[i]; if (!t) break; }
+        if (t && t.type === type) out.push(t.id);
+      }
+      if (out.length >= 2) return out;
+    }
+    path.unshift(h.index);
+    h = find(root, h.parent.id);
+  }
+  return [];
+}
+
 // ---- where a new piece goes, top down ------------------------------------------------------
 // One choice over every gap on a screen spread Jev's answer over 40-70 gaps, and its favourite,
 // "at the top of the screen", put pieces above the header, against the artboard's edge: a screen

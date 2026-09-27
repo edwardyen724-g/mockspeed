@@ -33,6 +33,11 @@ export class Turn {
   doubt(conf, alts, ctx) {
     if (alts.length) this.current.doubts.push({ conf, alts, ctx });
   }
+  // Alternatives that no longer are any: a pick among five prices, once every price is being changed.
+  forget(gone) {
+    const p = this.current;
+    p.doubts = p.doubts.map((d) => ({ ...d, alts: d.alts.filter((a) => !gone(a)) })).filter((d) => d.alts.length);
+  }
   // A change made, as the same change on another canvas (see `redo` below), with its log entry.
   step(redo, entry) { this.current.steps.push({ redo, entry }); }
   // The swaps to offer: for each part, every alternative to the decision Jev was least sure of.
@@ -41,7 +46,7 @@ export class Turn {
     this.parts.forEach((p, part) => {
       if (!p.doubts.length) return;
       const least = p.doubts.reduce((a, b) => (b.conf < a.conf ? b : a));
-      least.alts.forEach((a, alt) => out.push({ label: a.label, part, doubt: p.doubts.indexOf(least), alt }));
+      least.alts.forEach((a, alt) => out.push({ label: a.label, body: a.body, part, doubt: p.doubts.indexOf(least), alt }));
     });
     return out;
   }
@@ -87,6 +92,21 @@ export function applyEverywhere(root, op, target, arg) {
   return more ? { ...r, root: tree, copies: more, note: `${r.note} · and on ${more} other screen${more === 1 ? "" : "s"}, where it is shared` } : r;
 }
 
+// The same edit on several elements — every twin (tree.mjs twinsOf) when a sentence or the toolbar
+// means every one like it — each one everywhere it is shared. `copies` counts the other pages the
+// first is on, which is what a person reads ("on all 3 pages it's on"); `count` how many changed.
+export function applyAll(root, op, targets, arg) {
+  let tree = root, count = 0, copies = 0, limit = true, first = null;
+  for (const t of targets) {
+    const x = applyEverywhere(tree, op, t, arg);
+    first ??= x;
+    if (x.changed) { tree = x.root; count += 1; if (t === targets[0]) copies = x.copies ?? 0; }
+    else if (!x.limit) limit = false;
+  }
+  if (!count) return { ...first, root, changed: false, limit: limit && Boolean(first?.limit), count: 0 };
+  return { ok: true, root: tree, changed: true, count, copies, note: targets.length > 1 ? `${op} on ${count} of ${targets.length} alike` : first.note };
+}
+
 // The patch that puts `text` at a place (tree.mjs placeAt), and at the same place in every other
 // copy when the place is inside a shared element. A shared element rewritten stays shared: its
 // replacement keeps the name. Returns { patch, copies } or null.
@@ -118,6 +138,7 @@ export function relocate(root, target, gap) {
 // or null when it cannot be made there.
 export const redo = {
   edit: (op, target, arg) => (t) => applyEverywhere(t, op, target, arg),
+  edits: (op, targets, arg) => (t) => applyAll(t, op, targets, arg),
   place: (anchor, position, text) => (t) => {
     const p = placeEverywhere(t, anchor, position, text);
     return p ? { root: applyPatch(t, p.patch).root, changed: true } : null;

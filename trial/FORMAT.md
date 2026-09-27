@@ -176,6 +176,8 @@ export function copiesOf(root, id)        // → [{ id, copy }] — the same nod
 export function firstCopy(root, id)       // → the copy that stands for all of them
 export function sharedView(root)          // → { hidden, screens } — each shared element once, on all its screens
 export function mirrorsOf(root, anchor, position) // → the same place in the other copies, when the place is inside a shared element
+// twins — the same thing in each of a run of same-shaped siblings (each card's price, each nav item, each card)
+export function twinsOf(root, id)         // → [ids] in document order, `id` among them; [] when nothing repeats. Stops at the screen
 export function applyPatch(root, patchText)          // → { root, notes: string[], warnings: string[] }  (new object; input untouched)
 export function apply(root, op, id, arg)  // → { ok, root, note, changed }  (new object; input untouched)
 ```

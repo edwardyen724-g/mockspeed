@@ -10,7 +10,7 @@
 import { describe as group, test } from "node:test";
 import assert from "node:assert/strict";
 import { parse, find, serialize } from "../tree.mjs";
-import { Turn, replay, redo, relocate, applyEverywhere } from "../turn.mjs";
+import { Turn, replay, redo, relocate, applyEverywhere, applyAll } from "../turn.mjs";
 
 const BAKERY = parse(`app "Crumb" web
   screen "Home"
@@ -168,5 +168,49 @@ group("the changes, as functions of the canvas", () => {
     const r = redo.clear()(BAKERY);
     assert.equal(r.changed, true);
     assert.deepEqual(r.root.children, []);
+  });
+});
+
+group("every one like it — the same edit on each twin (plan §4)", () => {
+  const MENU = parse(`app "Crumb" web
+  screen "Menu"
+    grid #cards cols=3 gap=3
+      col #c1 border pad=3
+        text #n1 "Sourdough" bold
+        text #p1 "$6.00"
+      col #c2 border pad=3
+        text #n2 "Baguette" bold
+        text #p2 "$3.50" size=xxl
+      col #c3 border pad=3
+        text #n3 "Croissant" bold
+        text #p3 "$2.75"`).root;
+  const size = (root, id) => find(root, id).node.props?.size ?? "m";
+
+  test("applyAll makes it on each, counts those that changed, and leaves the canvas it was given alone", () => {
+    const r = applyAll(MENU, "bigger", ["p1", "p2", "p3"]);
+    assert.equal(r.changed, true);
+    assert.equal(r.count, 2, "the one already the largest stays");
+    assert.deepEqual(["p1", "p2", "p3"].map((id) => size(r.root, id)), ["l", "xxl", "l"]);
+    assert.equal(size(MENU, "p1"), "m");
+    const none = applyAll(MENU, "bigger", ["p2"]);
+    assert.equal(none.changed, false);
+    assert.equal(none.limit, true);
+  });
+
+  test("redo.edits makes the same edits again on another canvas", () => {
+    const again = redo.edits("bold", ["p1", "p3"])(MENU);
+    assert.equal(again.changed, true);
+    assert.equal(find(again.root, "p1").node.props.bold, true);
+    assert.equal(find(again.root, "p3").node.props.bold, true);
+    assert.equal(find(again.root, "p2").node.props.bold, undefined);
+  });
+
+  test("forget drops alternatives that are no longer choices, and a decision left with none", () => {
+    const t = new Turn(MENU, 0);
+    t.doubt(0.3, [{ label: "“$3.50” instead", body: { kind: "apply", target: "p2" } }, { label: "“Baguette” instead", body: { kind: "apply", target: "n2" } }]);
+    t.doubt(0.4, [{ label: "“$2.75” instead", body: { kind: "apply", target: "p3" } }]);
+    t.forget((a) => ["p1", "p2", "p3"].includes(a.body.target));
+    assert.deepEqual(t.offers().map((o) => o.label), ["“Baguette” instead"]);
+    assert.equal(t.current.doubts.length, 1);
   });
 });

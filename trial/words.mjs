@@ -297,6 +297,9 @@ export const offer = {
   // Nothing was done — Jev doesn't see the thing named — and these are the likeliest: the edit
   // itself, on each ("Make the “Home · Add” bar darker"). `op` null is a rewrite.
   doIt: (root, op, id, named = name(root, id), pages = []) => `${cap(doing(op ?? "change", named))}${pages.length && find(root, id)?.node.type !== "screen" ? ` ${onPages(root, pages)}` : ""}`,
+  // This one, or every one like it (plan §4): the reverse of what was done, one click away.
+  justThis: (root, id) => `Just ${name(root, id)} instead`,
+  allLike: (root, id, n) => `All ${n} like ${name(root, id)} instead`,
   undo: "Undo",
 };
 
@@ -321,8 +324,11 @@ export function onPages(root, pages) {
 // ---- replies ----------------------------------------------------------------------------------
 // What changed, or why nothing did. `copies`: the other pages a shared thing is also on.
 const everywhere = (root, copies) => (copies ? `, on all ${pagesWord(root, copies + 1)} it's on` : "");
+// "“$3.50” and the 4 others like it": one thing and its twins, named by the one pointed at.
+const andLike = (what, others) => (others ? `${what} and the ${others === 1 ? "other one" : `${others} others`} like it` : what);
 export const reply = {
-  edited: (root, op, what, { copies = 0, across = false, to = null } = {}) => {
+  edited: (root, op, what0, { copies = 0, across = false, to = null, others = 0 } = {}) => {
+    const what = andLike(what0, others);
     if (op === "remove") return `Removed ${what}${everywhere(root, copies)}.`;
     if (op === "rename") return `Renamed ${what} to ${q(to ?? "")}${everywhere(root, copies)}.`;
     if (op === "move_earlier" || op === "move_later") return `Moved ${what} ${op === "move_earlier" ? (across ? "left" : "up") : (across ? "right" : "down")}${everywhere(root, copies)}.`;
@@ -330,7 +336,9 @@ export const reply = {
     const [v, rest] = verb(op);
     return `${cap(v === "make" ? "made" : v)} ${what} ${rest}${everywhere(root, copies)}.`.replace(" .", ".");
   },
-  limit: (op, what) => `${cap(what)} is ${LIMIT[op] ?? "already like that"}.`,
+  limit: (op, what, others = 0) => (others
+    ? `${cap(andLike(what, others))} are ${(LIMIT[op] ?? "already like that").replace(/\bit goes\b/, "they go")}.`
+    : `${cap(what)} is ${LIMIT[op] ?? "already like that"}.`),
   built: (root, pages) => `Made ${name(root, root.id)}: ${pagesWord(root, pages)}.`,
   replaced: (was) => `Your earlier app, ${q(was)}, is one click away.`,
   bringBack: (was) => `Bring back ${q(was)}`,
@@ -341,7 +349,7 @@ export const reply = {
   alreadyThere: (what) => `${cap(what)} is already there.`,
   notAChange: "Nothing changed: that reads as a question or a comment.",
   noSuch: (kind) => `I don't see a ${KIND[kind] ?? "thing like that"} here, so nothing changed.`,
-  notSeen: "I don't see that here, so nothing changed.",
+  notSeen: "I don't see that here, so nothing changed. Which one? Click a number on the mock.",
   gone: "That's no longer there. Say it again?",
   noPlace: (root, screen) => `I couldn't find a place for it on ${pageName(root, screen)}. Say where?`,
   missed: "That didn't come out right, so nothing changed. Try saying it again.",
@@ -360,6 +368,18 @@ export const reply = {
   error: "Something went wrong, so nothing changed. Try again.",
   notSetUp: "This app isn't set up yet: it needs its API keys.",
   saved: (file) => `Saved to ${q(file)}.`,
+};
+
+// ---- the toolbar on a clicked thing (plan §3C) ------------------------------------------------
+// Direct edits with no words and no model: what each button says, and the one that turns every
+// one like it on. `across`: the thing sits in a row, where up and down are left and right.
+export const tool = {
+  label: (op, across = false) => ({
+    bigger: "Bigger", smaller: "Smaller", bold: "Bold", regular: "Not bold", lighter: "Lighter", darker: "Darker",
+    move_earlier: across ? "← Left" : "↑ Up", move_later: across ? "Right →" : "↓ Down", remove: "Remove",
+  })[op] ?? op,
+  all: (n) => `All ${n} like this`,
+  renameHint: "Double-click to change the words",
 };
 
 // ---- the page around the mock -----------------------------------------------------------------

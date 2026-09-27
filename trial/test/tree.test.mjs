@@ -11,7 +11,7 @@ import { describe as group, test } from "node:test";
 import assert from "node:assert/strict";
 import {
   TYPES, parse, Stream, nextId, serialize, index, find, describe, applyPatch, apply, gaps, screenGaps, placeAt, shapeOf, positionOf,
-  padded, sectionsOf, partsOf, spotsIn, edgesOf, neighboursIn, shares, copiesOf, firstCopy, sharedView, mirrorsOf,
+  padded, sectionsOf, partsOf, spotsIn, edgesOf, neighboursIn, shares, copiesOf, firstCopy, sharedView, mirrorsOf, twinsOf,
 } from "../tree.mjs";
 
 // ---- fixtures ----------------------------------------------------------------------------
@@ -1776,5 +1776,91 @@ group("shared elements — one element drawn on several screens", () => {
     assert.deepEqual(mirrorsOf(root, "main1", "inside_start"), []);
     // share is an ordinary prop to the parser and the serializer.
     assert.match(serialize(root), /col #nav1 share=nav w=200/);
+  });
+});
+
+group("twinsOf — the same thing in each of a run of same-shaped siblings (plan §4)", () => {
+  const MENU = `app "Crumb" web
+  screen "Menu"
+    row #bar pad=3 justify=between
+      text #logo "Crumb" size=l bold
+      row #links gap=3
+        text #l1 "Menu" bold
+        text #l2 "Order" shade=mid
+        text #l3 "Visit" shade=mid
+      row #acts gap=2
+        button #sign "Sign in" ghost
+        button #cart "Cart" primary
+    col #main pad=4 gap=3
+      text #hero "Our bread" size=xl bold
+      text #tag "Baked every morning"
+      grid #cards cols=3 gap=3
+        col #c1 border pad=3
+          shape #p1 h=80
+          text #n1x "Sourdough" bold
+          text #pr1 "$6.00"
+          button #b1 "Add"
+        col #c2 border pad=3
+          shape #p2 h=80
+          text #n2x "Baguette" bold
+          text #pr2 "$3.50"
+          button #b2 "Add"
+        col #c3 border pad=3
+          shape #p3 h=80
+          text #n3x "Croissant" bold
+          text #pr3 "$2.75"
+          button #b3 "Add"
+        col #c4 border pad=3
+          text #soon "Coming soon" shade=light
+      table #hours
+        tr #th "Day | Open"
+        tr #t1 "Mon | 7–3" data
+        tr #t2 "Tue | 7–3" data
+        tr #t3 "Wed | 7–3" data
+  screen "Visit"
+    col #vmain pad=4
+      grid #vcards cols=3
+        col #v1 border pad=3
+          shape #vp1 h=80
+          text #vn1 "Sourdough" bold
+          text #vpr1 "$6.00"
+          button #vb1 "Add"
+        col #v2 border pad=3
+          shape #vp2 h=80
+          text #vn2 "Baguette" bold
+          text #vpr2 "$3.50"
+          button #vb2 "Add"`;
+
+  test("one card's price: every card's price, in order, itself among them; the card that differs is left out", () => {
+    const { root } = parse(MENU);
+    assert.deepEqual(twinsOf(root, "pr2"), ["pr1", "pr2", "pr3"]);
+    assert.deepEqual(twinsOf(root, "b1"), ["b1", "b2", "b3"]);
+    assert.deepEqual(twinsOf(root, "c3"), ["c1", "c2", "c3"]);
+    assert.deepEqual(twinsOf(root, "soon"), []);
+  });
+
+  test("a leaf repeats only as an item of a list: nav items without the logo, two buttons, not a heading and its line", () => {
+    const { root } = parse(MENU);
+    // The current item is bold and the others grey: still one of them.
+    assert.deepEqual(twinsOf(root, "l3"), ["l1", "l2", "l3"]);
+    assert.deepEqual(twinsOf(root, "logo"), []);
+    assert.deepEqual(twinsOf(root, "cart"), ["sign", "cart"]);
+    assert.deepEqual(twinsOf(root, "hero"), []);
+    assert.deepEqual(twinsOf(root, "tag"), []);
+  });
+
+  test("a table's rows without its header; the header has none", () => {
+    const { root } = parse(MENU);
+    assert.deepEqual(twinsOf(root, "t2"), ["t1", "t2", "t3"]);
+    assert.deepEqual(twinsOf(root, "th"), []);
+  });
+
+  test("stops at the screen: the same cards on another page are not twins; a screen and the app have none", () => {
+    const { root } = parse(MENU);
+    assert.deepEqual(twinsOf(root, "vpr1"), ["vpr1", "vpr2"]);
+    assert.deepEqual(twinsOf(root, "main"), []);
+    assert.equal(twinsOf(root, root.children[0].id).length, 0);
+    assert.equal(twinsOf(root, root.id).length, 0);
+    assert.deepEqual(twinsOf(root, "nope"), []);
   });
 });

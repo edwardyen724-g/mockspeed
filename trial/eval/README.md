@@ -32,6 +32,56 @@ the runner-up as a swap beside its reply. The script records each step's swaps (
 clicks none. "≈" is a change with a swap offered and "~" is nothing changed with a swap offered.
 The judges say `swap_right` when the change was not what was meant but one click on a swap is.
 
+## This one, or every one like it — `runs/2026-09-26-twins-probe`
+
+Phase 1c of `docs/plan-web-2026-09-26.md` (§4). With one of five prices marked, "make the prices
+bigger" changed one price. Now code finds the element's twins (tree.mjs `twinsOf`: each card's
+price, each nav item, each card), and Jev answers one question, asked only when there are twins:
+does the sentence mean this one or every one like it? The other reading is offered beside the reply
+as a swap: *"Made “$5.75” and the 4 others like it bigger · [Just “$5.75” instead] [Undo]"*.
+
+The question was probed before anything relied on it. This is a probe of one Jev question, not a
+run through the app:
+
+```bash
+node trial/eval/probe-twins.mjs --env ~/projects/jev-context/.env.local --runs 2 --out trial/eval/runs/<dir>/results.json
+```
+
+The set has 45 sentences. The first 26 are on a bakery menu page: marked and unmarked, singular and
+plural, pointing words (this, these, them) and names ("the croissant price"). The other 19 are held
+out, on the email and orchestration apps from the 1b run, with nouns the wording never mentions
+(times, senders, checkboxes, agent cards, status dots). Each sentence is run twice.
+
+| wording | right | held out | "every" sentences | "one" sentences |
+|---|---|---|---|---|
+| the question alone ("…or on every one of `twins`? this / that / it means `target` alone; these / those / them mean every one") | 79/90 | 30/38 | ≥ 0.25 | ≤ 0.08 |
+| plus: a plural means every one *even when one of them is marked* (what `jev.mjs` asks) | **90/90** | **38/38** | ≥ 0.51 | ≤ 0.05 |
+
+- **Without that line, the mark pulled Jev to "this one".** "Make the prices bigger" with a price
+  marked scored 0.39-0.48 and "make the times lighter" 0.34-0.35. The same sentences unmarked scored
+  0.66-0.76.
+- **A yes/no wording was worse still.** The first run tried a yes/no question beside the choice: 47/52 on
+  the bakery set, and "one" sentences reached 0.22. The choice wording keeps "one" near zero.
+- **The least sure answer:** "make the status dots bigger", with a dot marked, came back 0.51 and 0.63
+  here. In the tuning run before it, it came back 0.49 once, the one miss out of 90. A wrong pick
+  there costs one click on the swap.
+- The question takes a median 118 ms and a max of 342 ms, and costs one Jev request. It is asked
+  after the element is chosen, and only when the edit will be made directly. "Bigger" on a picture
+  goes to the writer, and one-or-every is not asked about it.
+
+**In the app (browser pane, the bakery built from "make a mock of my bakery's website: a menu page
+with five breads as cards…").** Tested with one price marked.
+- "Make the prices bigger": Jev picked bigger at 0.99, a price at 0.95 and every one at 0.93. All
+  five changed, and "Just “$5.75” instead" was offered. The swap left only $5.75 bigger.
+- Double-clicking "Ciabatta" and typing renamed it with no question and no model call.
+- The toolbar's "All 5 like this" followed by Bold made all five bold, also with no model call.
+- When Jev was unsure which element, the alternative was numbered in the mock. Clicking it there
+  took the swap (§3D).
+
+What the probe does not cover: `which()` choosing among the twins. It spreads its confidence over
+five identical prices; once every one is being changed, those alternatives are dropped rather than
+offered. Rewrites ("turn the prices into pills") still act on one element.
+
 ## Act, then offer — `runs/2026-09-26-act-then-offer`
 
 Phase 1b of `docs/plan-web-2026-09-26.md` (§3A). The app no longer asks before it acts. Where Jev

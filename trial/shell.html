@@ -52,6 +52,10 @@
   .ask button.offer{align-self:flex-start}
   /* After acting: the swaps and Undo sit in a line under the reply, not stacked like a question. */
   .ask.offers{flex-direction:row;flex-wrap:wrap}
+  /* The number an offer carries in the mock, where it shows the thing or the place it is about. */
+  .ask button .n{display:inline-block;min-width:16px;height:16px;line-height:16px;margin-right:5px;border-radius:8px;
+    background:#111;color:#fff;font-size:10px;text-align:center}
+  .ask button.go .n{background:#fff;color:#111}
   /* Scores, timings, model names, the file and the engine's own notes: only with ?debug=1. */
   body:not(.debug) .dbg{display:none}
 </style></head>
@@ -95,7 +99,9 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const mock = $("mock");
-let marked = null, els = [], choices = [], picked = [];
+let marked = null, els = [], choices = [], picked = [], drops = [];
+// The element whose "All 5 like this" is on, so it stays on as the mock redraws after each edit.
+let allFor = null;
 // ?debug=1 shows what the person does not need: Jev's scores and timings, the model, the engine's
 // notes in the log, the file the mock saves to.
 const DEBUG = new URLSearchParams(location.search).has("debug");
@@ -129,9 +135,10 @@ function redraw() {
     loading = false;
     fitMock();
     try { mock.contentWindow.scrollTo(0, keepY); } catch {}
-    // The numbers on what a question is about survive the mock redrawing under them.
-    if (picked.length) try { mock.contentWindow.postMessage({ type: "pick", keys: picked }, "*"); } catch {}
-    if (marked) mock.contentWindow.postMessage({ type: "mark", key: marked }, "*");
+    // The numbers on what an offer is about survive the mock redrawing under them, and so does the
+    // mark with its toolbar.
+    showPicks();
+    if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked }, "*"); tools(marked); }
   };
   load();
 }
@@ -189,9 +196,25 @@ function setMark(key) {
   marked = key;
   showMark();
   mock.contentWindow.postMessage({ type: "mark", key }, "*");
+  if (key) tools(key);
 }
 
-addEventListener("message", (e) => { if (e.data?.type === "mark") setMark(e.data.key); });
+// The toolbar on the marked element (plan §3C): which edits would change it, from the server, drawn
+// in the mock beside it. Its buttons and a double-clicked name come back here as edits.
+async function tools(key) {
+  const t = await fetch("/tools?id=" + encodeURIComponent(key)).then((r) => r.json());
+  if (key === marked) try { mock.contentWindow.postMessage({ type: "tools", tools: t, allOn: allFor === key }, "*"); } catch {}
+}
+
+addEventListener("message", async (e) => {
+  const m = e.data || {};
+  if (m.type === "mark") setMark(m.key);
+  if (m.type === "all") allFor = m.on ? m.key : null;
+  if (m.type === "tool") handle(await post("/edit", { op: m.op, target: m.key, all: m.all }));
+  if (m.type === "rename") handle(await post("/edit", { op: "rename", target: m.key, text: m.text }));
+  // A numbered thing or line in the mock, clicked: the offer with that number.
+  if (m.type === "take") $("ask").querySelector(`button[data-i="${m.n - 1}"]`)?.click();
+});
 
 // The mark lives in the mock's own DOM; the message that tells this page about it arrives a task
 // later. Read it back at the moment it is used, so a change said straight after a click binds to
@@ -237,13 +260,18 @@ $("form").addEventListener("submit", async (e) => {
 
 // Every decision the canvas leaves to the person comes back as choices: buttons under the text
 // box, each posting its own answer. The elements they are about are numbered in the mock.
+// An offer about an element, or a place, carries the number it has in the mock (plan §3D): the
+// element is numbered there, the place drawn as a numbered line, and clicking either takes it.
 function showChoices(list, pick = []) {
   choices = list;
-  picked = pick;
-  $("ask").innerHTML = list.map((c, i) => `<button data-i="${i}" class="${c.primary ? "go" : ""}${c.offer ? " offer" : ""}">${esc(c.label)}</button>`).join("");
+  const at = list.some((c) => c.at);
+  picked = at ? list.map((c) => c.at?.pick ?? null) : pick;
+  drops = list.map((c, i) => (c.at?.drop ? { ...c.at.drop, n: i + 1 } : null)).filter(Boolean);
+  $("ask").innerHTML = list.map((c, i) => `<button data-i="${i}" class="${c.primary ? "go" : ""}${c.offer ? " offer" : ""}">${c.at ? `<span class="n">${i + 1}</span>` : ""}${esc(c.label)}</button>`).join("");
   $("ask").classList.toggle("offers", list.length > 0 && list.every((c) => c.offer));
-  try { mock.contentWindow.postMessage({ type: "pick", keys: pick }, "*"); } catch {}
+  showPicks();
 }
+function showPicks() { try { mock.contentWindow.postMessage({ type: "pick", keys: picked, drops }, "*"); } catch {} }
 
 function handle(r) {
   const offers = (r.offer ?? []).map((o) => ({ ...o, offer: true }));
@@ -289,7 +317,7 @@ if (SR) {
   };
 } else $("mic").disabled = true;
 
-mock.onload = () => { fitMock(); if (marked) mock.contentWindow.postMessage({ type: "mark", key: marked }, "*"); };
+mock.onload = () => { fitMock(); showPicks(); if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked }, "*"); tools(marked); } };
 
 // Changes can arrive from outside this page — Claude appending a screen, an element at a time.
 let seen = null;
