@@ -8,22 +8,32 @@
 // did what they meant.
 
 import { spans, unquoted } from "../canvas/jev.mjs";
+import { meter } from "./meter.mjs";
 
 const ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 const MODEL = "jev-latest";
 
 // Jev's API answers 429 and 529 ("system_overloaded") under load, and TypeSafe's own SDK retries
 // those and 5xx with backoff. The raw calls here do the same, twice, then give up and say so —
-// the canvas shows the error rather than act without Jev's answer.
-async function ask(body, signal) {
+// the canvas shows the error rather than act without Jev's answer. Every request is told to the
+// meter (trial/meter.mjs) with the tokens TypeSafe reports, what it was for, and how many questions
+// it asked; a refused one with none, so the 429s show.
+async function ask(body, signal, purpose = "decide") {
+  const questions = Object.keys(body.questions ?? {}).length;
   for (let attempt = 0; ; attempt++) {
+    const started = Date.now();
     const res = await fetch(ENDPOINT, {
       method: "POST",
       headers: { Authorization: `Bearer ${body.apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ model: MODEL, state: body.state, questions: body.questions }),
       signal,
     });
-    if (res.ok) return res.json();
+    if (res.ok) {
+      const j = await res.json();
+      meter({ provider: "typesafe", model: MODEL, purpose, input: j.usage?.input_tokens ?? 0, output: j.usage?.output_tokens ?? 0, questions, ms: Date.now() - started, status: "ok" });
+      return j;
+    }
+    meter({ provider: "typesafe", model: MODEL, purpose, input: 0, output: 0, questions, ms: Date.now() - started, status: `http ${res.status}` });
     const retryable = res.status === 408 || res.status === 429 || res.status >= 500;
     if (!retryable || attempt >= 2) throw new Error(`jev ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
     await new Promise((ok) => setTimeout(ok, 400 * 2 ** attempt));
@@ -192,7 +202,7 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
   }
 
   const started = Date.now();
-  const { answers } = await ask({ apiKey, state, questions }, signal);
+  const { answers } = await ask({ apiKey, state, questions }, signal, "decide");
   // An unanswered question is not an answer: nothing downstream may read a default as Jev's word.
   for (const q of Object.keys(questions)) if (!answers?.[q]) throw new Error(`jev returned no answer for ${q}`);
   return {
@@ -245,7 +255,7 @@ export async function which({ utterance, pool, viewing = null, apiKey, signal })
     apiKey,
     state: { said: utterance, instruction: unquoted(utterance), marked: null, viewing, elements: pool.map((n) => `${n.id} — ${label(n)}`) },
     questions: { target: { type: "choice", instructions: TARGET, criteria: Object.fromEntries(pool.map((n) => [n.id, label(n)])) } },
-  }, signal);
+  }, signal, "which");
   if (!answers?.target) throw new Error("jev returned no answer for target");
   const ranked = Object.entries(answers.target.probabilities ?? {}).sort((a, b) => b[1] - a[1]).map(([k]) => k).filter((k) => pool.some((n) => n.id === k));
   return { ms: Date.now() - started, id: answers.target.choice, confidence: answers.target.confidence ?? 0, ranked };
@@ -264,7 +274,7 @@ export async function spot({ utterance, options, screen, marked = null, first = 
   const started = Date.now();
   const questions = { spot: { type: "choice", instructions: first ? PART : SPOT, criteria: Object.fromEntries(options.map((o, i) => [`o${i + 1}`, o.text])) } };
   if (withOpen) questions.open = { type: "noul", instructions: OPEN };
-  const { answers } = await ask({ apiKey, state: { said: utterance, screen: screen ?? null, marked: marked ?? null }, questions }, signal);
+  const { answers } = await ask({ apiKey, state: { said: utterance, screen: screen ?? null, marked: marked ?? null }, questions }, signal, "spot");
   if (!answers?.spot) throw new Error("jev returned no answer for spot");
   const at = (label) => (/^o\d+$/.test(label ?? "") ? Number(label.slice(1)) - 1 : -1);
   const ranked = Object.entries(answers.spot.probabilities ?? {}).sort((a, b) => b[1] - a[1]).map(([l]) => at(l)).filter((i) => i >= 0 && i < options.length);
@@ -281,7 +291,7 @@ export async function nextTo({ utterance, elements, screen, marked = null, apiKe
     apiKey,
     state: { said: utterance, screen: screen ?? null, marked: marked ?? null, elements: elements.map((e) => `${e.id} — ${e.text}`) },
     questions: { next: { type: "choice", instructions: "The new piece `said` asks for goes right after one element in `elements`, in the same row or column. Which element does it belong next to?", criteria: Object.fromEntries(elements.map((e) => [e.id, e.text])) } },
-  }, signal);
+  }, signal, "nextTo");
   if (!answers?.next) throw new Error("jev returned no answer for next");
   return { ms: Date.now() - started, id: answers.next.choice, confidence: answers.next.confidence ?? 0 };
 }
@@ -297,7 +307,7 @@ export async function needs({ utterance, earlier, context, apiKey, signal }) {
     apiKey,
     state: { said: utterance, earlier, context },
     questions: { needs: { type: "noul", instructions: "`said` and `earlier` are parts of one request, `context`. Does `said` need `earlier` to be done first — because it acts on or is placed relative to something `earlier` adds, removes or puts in place — rather than on what is already on the mockup?" } },
-  }, signal);
+  }, signal, "needs");
   if (!answers?.needs) throw new Error("jev returned no answer for needs");
   return { ms: Date.now() - started, noul: answers.needs.noul ?? 0 };
 }
@@ -318,7 +328,7 @@ export async function every({ utterance, target, twins, marked = null, context =
     apiKey,
     state: { said: utterance, instruction: unquoted(utterance), marked: marked ?? null, context: context ?? null, target, twins },
     questions: { every: { type: "choice", instructions, criteria: { one: `only ${target}`, every: `all ${twins.length}: ${twins.join(" · ")}` } } },
-  }, signal);
+  }, signal, "every");
   if (!answers?.every) throw new Error("jev returned no answer for every");
   const a = answers.every;
   const p = a.probabilities?.every ?? (a.choice === "every" ? a.confidence ?? 0 : 1 - (a.confidence ?? 0));
@@ -347,7 +357,7 @@ export async function already({ utterance, nodes, viewing = null, apiKey, signal
       open: { type: "noul", instructions: OPEN },
       page: { type: "noul", instructions: PAGE },
     },
-  }, signal);
+  }, signal, "already");
   for (const q of ["there", "it", "open", "page"]) if (!answers?.[q]) throw new Error(`jev returned no answer for ${q}`);
   const ranked = Object.entries(answers.it.probabilities ?? {}).sort((a, b) => b[1] - a[1]).map(([k]) => k);
   return { ms: Date.now() - started, there: answers.there.noul ?? 0, id: answers.it.choice, confidence: answers.it.confidence ?? 0, ranked, open: answers.open.noul ?? 0, page: answers.page.noul ?? 0 };
@@ -367,7 +377,7 @@ export async function place({ utterance, gaps, screen, marked = null, apiKey, si
         criteria: Object.fromEntries(gaps.map((g, i) => [`g${i + 1}`, g.text])),
       },
     },
-  }, signal);
+  }, signal, "place");
   const at = (label) => (/^g\d+$/.test(label ?? "") ? Number(label.slice(1)) - 1 : -1);
   const ranked = Object.entries(answers.gap?.probabilities ?? {}).sort((a, b) => b[1] - a[1]).map(([l]) => at(l)).filter((i) => i >= 0);
   return { ms: Date.now() - started, index: at(answers.gap?.choice), confidence: answers.gap?.confidence ?? 0, ranked };

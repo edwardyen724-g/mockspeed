@@ -3,3 +3,5 @@ node_modules/
 .env
 .claude/launch.json
 .DS_Store
+.vercel
+.env*

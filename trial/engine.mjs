@@ -31,10 +31,10 @@
 // trial/words.mjs; the log's own notes, Jev's scores and timings are for ?debug=1. Runs beside
 // canvas/ so the two can be compared.
 
-import { parse, Stream, serialize, index, find, describe, shapeOf, positionOf, applyPatch, apply, gaps, screenGaps, partsOf, spotsIn, edgesOf, neighboursIn, padded, firstCopy, sharedView, twinsOf } from "./tree.mjs";
+import { parse, Stream, serialize, pack, unpack, index, find, describe, shapeOf, positionOf, applyPatch, apply, gaps, screenGaps, partsOf, spotsIn, edgesOf, neighboursIn, padded, firstCopy, sharedView, twinsOf } from "./tree.mjs";
 import { decide, place, spot, nextTo, which, needs, every, already, KIND_TYPES } from "./jev.mjs";
-import { writeApp, writePiece, split, MODEL } from "./writer.mjs";
-import { Turn, replay, applyEverywhere, applyAll, placeEverywhere, relocate, redo } from "./turn.mjs";
+import { writeApp, writePiece, split, MODEL, BUILD_MODEL } from "./writer.mjs";
+import { Turn, replay, applyEverywhere, applyAll, placeEverywhere, relocate, redo, redoOf } from "./turn.mjs";
 import * as W from "./words.mjs";
 
 // ---- policy ------------------------------------------------------------------------------
@@ -81,12 +81,20 @@ const PROPERTY = new Set(["bigger", "smaller", "bold", "regular", "darker", "lig
 // they are shown. Rename is double-click. No model is called.
 const TOOLS = ["bigger", "smaller", "bold", "regular", "lighter", "darker", "move_earlier", "move_later", "remove"];
 
+// A saved project keeps this many steps of undo; older ones are dropped when it is saved.
+const KEEP = 40;
+// What save() writes; a project saved in another shape is not opened as this one.
+const SAVED = 1;
+
 export const blank = () => parse('app "new" web').root;
 
-// A project: `root` is the mock it opens with (an empty canvas when none). The keys and the writer's
-// model are the process's, passed in; nothing here reads the environment, the disk or the network
-// except through jev.mjs and writer.mjs.
-export function project({ root: start = null, apiKey = null, llmKey = null, model = MODEL } = {}) {
+// A project: `root` is the mock it opens with (an empty canvas when none), or `saved`, what an
+// earlier project's save() returned, to carry on from where it was. The keys and the writer — its
+// provider (writer.mjs PROVIDERS), the model that writes a new app (`buildModel`) and the one that
+// writes pieces and cuts sentences (`model`) — are the process's, passed in; `llmKey` is that
+// provider's key. Nothing here reads the environment, the disk or the network except through
+// jev.mjs and writer.mjs.
+export function project({ root: start = null, saved = null, apiKey = null, llmKey = null, model = MODEL, buildModel = BUILD_MODEL, provider = "anthropic" } = {}) {
   const LLM = model;
   const WHO = LLM.replace(/^claude-/, "").replace(/-\d+(-\d+)*$/, "");
 
@@ -533,7 +541,7 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     let t;
     try {
       t = await writeApp({
-        utterance, frame, apiKey: llmKey, model: LLM,
+        utterance, frame, apiKey: llmKey, model: buildModel, provider,
         onLine: (line) => {
           if (/^\s*\/\//.test(line)) { replies.push(line.replace(/^\s*\/\/\s*/, "")); return; }
           const { node } = stream.push(line);
@@ -702,9 +710,9 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     let w = ctx.piece?.whole === whole ? ctx.piece : null;
     if (w) note({ op: "said", note: "the same piece, put where the swap says", source: "canvas" });
     else {
-      w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, apiKey: llmKey, model: LLM });
+      w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, apiKey: llmKey, model: LLM, provider });
       // The piece must be the shape Jev decided on. Once more with the shape spelled out, and then no.
-      if (wrongShape(w.text, whole)) w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, retry: true, apiKey: llmKey, model: LLM });
+      if (wrongShape(w.text, whole)) w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, retry: true, apiKey: llmKey, model: LLM, provider });
       if (wrongShape(w.text, whole)) {
         note({ op: "said", note: `${WHO} wrote ${whole ? "no screen line" : "a whole screen"} twice — nothing changed`, source: "canvas", refused: true });
         return { note: W.reply.missed, debug: `the writer did not write ${whole ? "a screen" : "a piece for a screen"}`, changed: false };
@@ -800,7 +808,7 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     const hit = find(root, target);
     if (!hit) return { note: W.reply.gone, changed: false };
     const isScreen = hit.node.type === "screen";
-    const args = { utterance, outline: serialize(root, { ids: false }), replacing: serialize(hit.node, { ids: false }), screen: isScreen, apiKey: llmKey, model: LLM };
+    const args = { utterance, outline: serialize(root, { ids: false }), replacing: serialize(hit.node, { ids: false }), screen: isScreen, apiKey: llmKey, model: LLM, provider };
     let w = await writePiece(args);
     if (wrongShape(w.text, isScreen)) w = await writePiece({ ...args, retry: true });
     // A screen's replacement that still arrives without its screen line keeps the screen, with the
@@ -870,7 +878,7 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
   // words for what they point at, and each goes back through Jev on its own, with the whole
   // sentence as context.
   async function several(ctx) {
-    const s = await split({ utterance: ctx.utterance, marked: Boolean(ctx.marked), apiKey: llmKey, model: LLM });
+    const s = await split({ utterance: ctx.utterance, marked: Boolean(ctx.marked), apiKey: llmKey, model: LLM, provider });
     note({ op: "split", note: s.parts.join(" / "), source: `${WHO} · ${s.parts.length} parts · ${s.ms} ms`, said: ctx.utterance });
     if (!s.parts.length) return { note: W.reply.noChanges, changed: false };
     return runParts({ ctx, parts: s.parts, done: [], waiting: [], dropped: [] });
@@ -1169,8 +1177,58 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     };
   }
 
+  // ---- save, and open again --------------------------------------------------------------------
+  // The project as plain data, for a store to keep between requests: the web app opens a project,
+  // acts on it and saves it again, each request in whichever process serves it. Every mock the
+  // project holds — the one shown, the undo history, the one each part of the sentence goes back to
+  // for a swap — goes into one table (tree.mjs pack), and each change a swap makes again goes as its
+  // `spec` (turn.mjs redoOf). Undo past KEEP steps is dropped, and so is the sentence's record when
+  // a part of it would go back further than that; its offers then say they are gone.
+  function save() {
+    if (busy) throw new Error(`a project is saved between requests, not during one ("${busy}")`);
+    const cut = Math.max(0, past.length - KEEP);
+    const trees = [], at = new Map();
+    const ref = (t) => { if (!at.has(t)) { at.set(t, trees.length); trees.push(t); } return at.get(t); };
+    const kept = turn && turn.parts.every((p) => p.snap.depth >= cut) ? turn : null;
+    const data = {
+      v: SAVED,
+      root: ref(root),
+      past: past.slice(cut).map(ref),
+      turn: kept && {
+        at: kept.at,
+        parts: kept.parts.map((p) => ({
+          snap: ref(p.snap.root), depth: p.snap.depth - cut, whole: p.whole, piece: p.piece, doubts: p.doubts,
+          steps: p.steps.map((s) => ({ redo: s.redo.spec, entry: s.entry })),
+        })),
+      },
+      log, rev, seq, on, qn, pending, question, offer,
+    };
+    data.next = trees.flatMap((t, i) => (nextFor.has(t) ? [[i, nextFor.get(t)]] : []));
+    data.trees = pack(trees);
+    // Plain data all through: nothing in it is shared with this project, which carries on.
+    return JSON.parse(JSON.stringify(data));
+  }
+
+  if (saved) {
+    if (saved.v !== SAVED) throw new Error(`a project saved as version ${saved.v}; this opens version ${SAVED}`);
+    const trees = unpack(saved.trees);
+    root = trees[saved.root];
+    past.push(...saved.past.map((i) => trees[i]));
+    log.push(...saved.log);
+    ({ rev, seq, on, qn, pending, question, offer } = saved);
+    for (const [i, list] of saved.next) nextFor.set(trees[i], list);
+    if (saved.turn) {
+      turn = new Turn(root, past.length);
+      turn.at = saved.turn.at;
+      turn.parts = saved.turn.parts.map((p) => ({
+        snap: { root: trees[p.snap], depth: p.depth }, whole: p.whole, piece: p.piece, doubts: p.doubts,
+        steps: p.steps.map((s) => ({ redo: redoOf(s.redo), entry: s.entry })),
+      }));
+    }
+  }
+
   return {
-    ask, answer: onAnswer, swap, edit: toolEdit, undo, startAgain, tools: toolsFor, state,
+    ask, answer: onAnswer, swap, edit: toolEdit, undo, startAgain, tools: toolsFor, state, save,
     // The mock as it is now, for the shell to draw, save and export. Read it; change it only here.
     get root() { return root; },
     get version() { return { rev, seq }; },

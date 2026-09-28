@@ -12,8 +12,12 @@
 // wrote patches ("in n12:", "after n30:") and so chose where its own pieces went; through the app,
 // half of those patches came back garbled. Placement is a closed choice, so it is Jev's.
 
-const ENDPOINT = "https://api.anthropic.com/v1/messages";
+import { meter } from "./meter.mjs";
+
+// The writer's models: Sonnet 5 writes a whole new app, the first thing a person sees; Haiku 4.5
+// writes pieces and cuts sentences, where speed and price matter more than range.
 export const MODEL = "claude-haiku-4-5";
+export const BUILD_MODEL = "claude-sonnet-5";
 
 const FORMAT = `FORMAT
 One node per line; two-space indentation is nesting.
@@ -103,22 +107,81 @@ put it under the header
 
 Output only the lines. No numbering, no commentary.`;
 
-// One streamed request; `onLine` gets each complete line as it arrives.
-async function stream({ system, context, apiKey, model = MODEL, onLine = () => {}, signal, maxTokens = 8000 }) {
+// Where the writer's words come from — the writer provider switch. Anthropic by default. OpenRouter,
+// one OpenAI-shaped API in front of many models, is there to try a cheaper writer: it takes its own
+// key and its own model names ("google/gemini-2.5-flash"), and says what each call cost. Each
+// provider makes the request and reads one server-sent event: the text in it, and into `u` what it
+// says about tokens and stopping.
+const take = (u, x) => {
+  if (!x) return;
+  if (x.input_tokens != null) u.input = x.input_tokens;
+  if (x.output_tokens != null) u.output = x.output_tokens;
+  if (x.cache_read_input_tokens != null) u.cacheRead = x.cache_read_input_tokens;
+  if (x.cache_creation_input_tokens != null) u.cacheWrite = x.cache_creation_input_tokens;
+};
+// Thinking, per model, for a writer that streams to a person watching: Sonnet 5 thinks by default
+// when the request says nothing, which holds back the first line; off, the page starts drawing
+// sooner. Haiku 4.5 does not think unless asked.
+const THINKING = { "claude-sonnet-5": { type: "disabled" } };
+export const PROVIDERS = {
+  anthropic: {
+    endpoint: "https://api.anthropic.com/v1/messages",
+    request: ({ apiKey, model, system, context, maxTokens }) => ({
+      headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+      body: { model, max_tokens: maxTokens, stream: true, system, messages: [{ role: "user", content: context }], ...(THINKING[model] ? { thinking: THINKING[model] } : {}) },
+    }),
+    read(e, u) {
+      if (e.type === "message_start") take(u, e.message?.usage);
+      else if (e.type === "content_block_delta" && e.delta?.type === "text_delta") return e.delta.text;
+      else if (e.type === "message_delta") { take(u, e.usage); u.stop = e.delta?.stop_reason ?? u.stop; }
+      else if (e.type === "error") throw new Error(`stream: ${e.error?.message ?? "error"}`);
+      return "";
+    },
+  },
+  openrouter: {
+    endpoint: "https://openrouter.ai/api/v1/chat/completions",
+    request: ({ apiKey, model, system, context, maxTokens }) => ({
+      headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+      body: { model, max_tokens: maxTokens, stream: true, usage: { include: true }, messages: [{ role: "system", content: system }, { role: "user", content: context }] },
+    }),
+    read(e, u) {
+      if (e.error) throw new Error(`stream: ${e.error.message ?? "error"}`);
+      if (e.usage) {
+        u.cacheRead = e.usage.prompt_tokens_details?.cached_tokens ?? 0;
+        u.input = (e.usage.prompt_tokens ?? 0) - u.cacheRead;
+        u.output = e.usage.completion_tokens ?? u.output;
+        if (typeof e.usage.cost === "number") u.cost = e.usage.cost;
+      }
+      const c = e.choices?.[0];
+      if (c?.finish_reason) u.stop = c.finish_reason;
+      return c?.delta?.content ?? "";
+    },
+  },
+};
+
+// One streamed request; `onLine` gets each complete line as it arrives. Each request is told to
+// the meter (trial/meter.mjs) with what it was for (`purpose`), whether it finished, and the tokens
+// the provider reported — a refused request with none.
+async function stream({ system, context, apiKey, model = MODEL, provider = "anthropic", purpose = "write", onLine = () => {}, signal, maxTokens = 8000 }) {
+  const P = PROVIDERS[provider];
+  if (!P) throw new Error(`no writer provider "${provider}"`);
   const started = Date.now();
-  const res = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model, max_tokens: maxTokens, stream: true, system, messages: [{ role: "user", content: context }] }),
-    signal,
-  });
+  const u = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, stop: null, cost: undefined };
+  const told = (status) => meter({ provider, model, purpose, input: u.input, output: u.output, cacheRead: u.cacheRead, cacheWrite: u.cacheWrite, ms: Date.now() - started, firstLineMs, status, ...(u.cost != null ? { cost: u.cost } : {}) });
+  let firstLineMs = null;
+  const { headers, body } = P.request({ apiKey, model, system, context, maxTokens });
+  let res;
+  try {
+    res = await fetch(P.endpoint, { method: "POST", headers, body: JSON.stringify(body), signal });
+  } catch (e) { told("failed"); throw e; }
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    let msg = body.slice(0, 200);
-    try { msg = JSON.parse(body).error?.message ?? msg; } catch {}
+    const text = await res.text().catch(() => "");
+    let msg = text.slice(0, 200);
+    try { const j = JSON.parse(text); msg = j.error?.message ?? msg; } catch {}
+    told(`http ${res.status}`);
     throw new Error(`${model} ${res.status}: ${msg}`);
   }
-  let text = "", pending = "", buffer = "", lines = 0, firstLineMs = null, outputTokens = 0, stop = null;
+  let text = "", pending = "", buffer = "", lines = 0;
   const emit = (raw) => {
     // Fences are the one decoration models add whatever the prompt says; they are not outline.
     if (/^\s*```/.test(raw) || !raw.trim()) return;
@@ -128,29 +191,27 @@ async function stream({ system, context, apiKey, model = MODEL, onLine = () => {
     onLine(raw);
   };
   const decoder = new TextDecoder();
-  for await (const chunk of res.body) {
-    buffer += decoder.decode(chunk, { stream: true });
-    let cut;
-    while ((cut = buffer.indexOf("\n\n")) >= 0) {
-      const event = buffer.slice(0, cut);
-      buffer = buffer.slice(cut + 2);
-      const data = event.split("\n").find((l) => l.startsWith("data: "));
-      if (!data) continue;
-      const e = JSON.parse(data.slice(6));
-      if (e.type === "content_block_delta" && e.delta?.type === "text_delta") {
-        pending += e.delta.text;
+  try {
+    for await (const chunk of res.body) {
+      buffer += decoder.decode(chunk, { stream: true });
+      let cut;
+      while ((cut = buffer.indexOf("\n\n")) >= 0) {
+        const event = buffer.slice(0, cut);
+        buffer = buffer.slice(cut + 2);
+        const data = event.split("\n").find((l) => l.startsWith("data: "));
+        if (!data || data === "data: [DONE]") continue;
+        pending += P.read(JSON.parse(data.slice(6)), u);
         let nl;
         while ((nl = pending.indexOf("\n")) >= 0) { emit(pending.slice(0, nl).replace(/\r$/, "")); pending = pending.slice(nl + 1); }
-      } else if (e.type === "message_delta") {
-        outputTokens = e.usage?.output_tokens ?? outputTokens;
-        stop = e.delta?.stop_reason ?? stop;
-      } else if (e.type === "error") {
-        throw new Error(`${model} stream: ${e.error?.message ?? "error"}`);
       }
     }
+  } catch (e) {
+    told("broken");
+    throw new Error(`${model} ${e.message}`);
   }
   emit(pending);
-  return { text, lines, firstLineMs, ms: Date.now() - started, outputTokens, stop, model };
+  told(u.stop === "max_tokens" || u.stop === "length" ? "cut off" : "ok");
+  return { text, lines, firstLineMs, ms: Date.now() - started, outputTokens: u.output, inputTokens: u.input, stop: u.stop, model };
 }
 
 // The next steps an answer ends with ("// next: Add reviews | Add a catering page"), taken off it:
@@ -168,16 +229,16 @@ const withNext = (r) => ({ ...r, ...nextSteps(r.text) });
 
 // A new app, streamed a line at a time onto an empty canvas. `frame` is decided before the writer
 // is called (Jev, or the person); when it is set, the app line must carry it.
-export async function writeApp({ utterance, frame = null, apiKey, model, onLine = () => {}, signal }) {
+export async function writeApp({ utterance, frame = null, apiKey, model = BUILD_MODEL, provider, onLine = () => {}, signal }) {
   const context = `${frame ? `It runs on: ${frame}. Write the app line with that frame.\n\n` : ""}The person says: ${utterance}`;
-  return withNext(await stream({ system: APP, context, apiKey, model, onLine: (l) => { if (!NEXT.test(l)) onLine(l); }, signal }));
+  return withNext(await stream({ system: APP, context, apiKey, model, provider, purpose: "build", onLine: (l) => { if (!NEXT.test(l)) onLine(l); }, signal }));
 }
 
 // One piece. `outline` is the whole mockup with ids, for style and data; `where` is Jev's chosen
 // gap in words; `replacing` is the outline of the element being replaced, when it is a rewrite.
 // `screen` says the piece must be a whole screen (start with a screen line); false says it must not
 // contain one. `retry` is set on the second attempt after the first came back the wrong shape.
-export async function writePiece({ utterance, outline, where, replacing = null, screen = false, retry = false, apiKey, model, signal }) {
+export async function writePiece({ utterance, outline, where, replacing = null, screen = false, retry = false, apiKey, model, provider, signal }) {
   const shape = screen
     ? " It is a whole new screen: start with a screen line."
     : " It goes on a screen that already exists: do not write a screen line.";
@@ -189,14 +250,14 @@ export async function writePiece({ utterance, outline, where, replacing = null, 
     "",
     `The person says: ${utterance}`,
   ].join("\n");
-  return withNext(await stream({ system: PIECE, context, apiKey, model, signal, maxTokens: 4000 }));
+  return withNext(await stream({ system: PIECE, context, apiKey, model, provider, purpose: replacing ? "rewrite" : "piece", signal, maxTokens: 4000 }));
 }
 
 // Several changes → one per line. The writer is not shown the mockup: cutting a sentence needs
 // none of it, and shown it, the writer refused to cut when a named thing was not on it, or asked
 // what "this" was. `marked` says only that something is marked; Jev resolves what the words mean.
-export async function split({ utterance, marked = false, apiKey, model, signal }) {
+export async function split({ utterance, marked = false, apiKey, model, provider, signal }) {
   const context = `${marked ? "The person has marked an element.\n" : ""}The person says: ${utterance}`;
-  const r = await stream({ system: SPLIT, context, apiKey, model, signal, maxTokens: 600 });
+  const r = await stream({ system: SPLIT, context, apiKey, model, provider, purpose: "split", signal, maxTokens: 600 });
   return { ...r, parts: r.text.split("\n").map((l) => l.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "").trim()).filter(Boolean) };
 }

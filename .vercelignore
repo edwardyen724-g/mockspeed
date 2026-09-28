@@ -1,0 +1,13 @@
+# What the web app (web/, deployed with its root there) does not need from the rest of the repo. It
+# imports trial/, canvas/ (Jev helpers) and render/ (through canvas/ops.mjs).
+.claude
+.env*
+**/.env*
+docs
+examples
+lint
+SKILL.md
+trial/eval
+trial/test
+web/test
+*.outline

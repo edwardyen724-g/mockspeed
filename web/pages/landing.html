@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{product}}</title>
+<style>
+  :root{--line:#e3e3e3;--faint:#8a8a8a}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;flex-direction:column;font:15px/1.5 system-ui,-apple-system,sans-serif;color:#111;background:#f6f6f6}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+  a{color:inherit}
+  .brand{font-weight:600;text-decoration:none}
+  nav a{font-size:14px;text-decoration:none;padding:6px 10px;border-radius:4px}
+  nav a:hover{background:#ececec}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 12vh}
+  h1{font-size:34px;line-height:1.15;margin:0 0 10px;text-align:center;letter-spacing:-.01em}
+  .sub{margin:0 0 28px;color:#555;text-align:center}
+  form{width:100%;max-width:680px;background:#fff;border:1px solid #d6d6d6;border-radius:12px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  form:focus-within{border-color:#111}
+  textarea{width:100%;border:0;outline:0;resize:none;font:inherit;font-size:16px;min-height:78px;padding:4px 6px;background:transparent}
+  .row{display:flex;justify-content:flex-end}
+  button{font:inherit;font-size:14px;padding:8px 16px;border-radius:8px;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
+  button:disabled{opacity:.4;cursor:default}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:680px;margin-top:16px}
+  .chips button{background:#fff;color:#333;border-color:#e0e0e0;border-radius:16px;padding:6px 12px;font-size:13px}
+  .chips button:hover{border-color:#bbb}
+  .fine{margin:22px 0 0;color:var(--faint);font-size:13px}
+  .note{min-height:20px;margin-top:10px;color:#8a3a00;font-size:13px}
+  @media (max-width:520px){h1{font-size:26px}}
+</style></head>
+<body>
+<header>
+  <a class="brand" href="/">{{product}}</a>
+  <nav><a href="/projects" id="projects" data-in="{{projects}}" data-out="{{signIn}}"></a></nav>
+</header>
+<main data-starters="{{starters}}" data-signed-in="{{signedIn}}">
+  <h1>{{headline}}</h1>
+  <p class="sub">{{subline}}</p>
+  <form id="form">
+    <textarea id="say" placeholder="{{prompt}}" aria-label="{{headline}}"></textarea>
+    <div class="row"><button id="go" type="submit" data-busy="{{starting}}">{{make}}</button></div>
+  </form>
+  <div class="chips" id="chips"></div>
+  <div class="note" id="note"></div>
+  <p class="fine">{{wordsOnly}}</p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const main = document.querySelector("main");
+const nav = $("projects");
+nav.textContent = main.dataset.signedIn ? nav.dataset.in : nav.dataset.out;
+const starters = JSON.parse(main.dataset.starters || "[]");
+for (const s of starters) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = s;
+  b.onclick = () => { $("say").value = s; start(s); };
+  $("chips").appendChild(b);
+}
+$("say").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("form").requestSubmit(); } });
+$("form").addEventListener("submit", (e) => { e.preventDefault(); const s = $("say").value.trim() || $("say").placeholder; start(s); });
+// A new project, then its editor, which says the first sentence as soon as it opens.
+async function start(text) {
+  const go = $("go"), label = go.textContent;
+  go.disabled = true;
+  go.textContent = go.dataset.busy;
+  try {
+    const r = await fetch("/api/start", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }).then((r) => r.json());
+    if (!r.id) throw new Error(r.note || "no project");
+    try { sessionStorage.setItem("ms-first:" + r.id, text); } catch {}
+    location.href = r.url;
+  } catch (e) {
+    $("note").textContent = e.message;
+    go.disabled = false;
+    go.textContent = label;
+  }
+}
+</script>
+</body></html>

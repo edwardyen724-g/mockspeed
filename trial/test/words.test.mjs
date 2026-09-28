@@ -346,6 +346,6 @@ group("one module owns the words", () => {
     assert.equal(text, "");
     const attrs = [...shell.matchAll(/\b(placeholder|title)="([^"]*)"/g)].map((m) => m[2]).filter((v) => !/^\{\{\w+\}\}$/.test(v));
     assert.deepEqual(attrs, []);
-    for (const k of shell.matchAll(/\{\{(\w+)\}\}/g)) assert.ok(Object.hasOwn(W.ui, k[1]), `{{${k[1]}}} is not in words.mjs ui`);
+    for (const k of shell.matchAll(/\{\{(\w+)\}\}/g)) assert.ok(Object.hasOwn(W.ui, k[1]) || Object.hasOwn(W.web, k[1]), `{{${k[1]}}} is not in words.mjs ui or web`);
   });
 });

@@ -648,6 +648,36 @@ export function nextId(root) {
 
 // ---- writing -----------------------------------------------------------------------------
 
+// Several trees as data, for a project to be saved and opened again: a table of nodes, each with
+// its children as indexes into the table, and the index of each tree's root. A subtree that is the
+// same in several trees — most of a mock, from one step of the undo history to the next — is in the
+// table once, and unpack() hands it back as one object shared by those trees, which is safe because
+// no edit mutates a tree. Unlike an outline, it keeps every node exactly: ids, props, the root's
+// `next`.
+export function pack(trees) {
+  const nodes = [], at = new Map();
+  const put = (n) => {
+    const { children, ...rest } = n;
+    const rec = children ? { ...rest, $c: children.map(put) } : rest;
+    const key = JSON.stringify(rec);
+    if (!at.has(key)) { at.set(key, nodes.length); nodes.push(rec); }
+    return at.get(key);
+  };
+  return { nodes, roots: trees.map(put) };
+}
+
+export function unpack({ nodes, roots }) {
+  const made = new Array(nodes.length);
+  const get = (i) => {
+    if (!made[i]) {
+      const { $c, ...rest } = nodes[i];
+      made[i] = $c ? { ...rest, children: $c.map(get) } : { ...rest };
+    }
+    return made[i];
+  };
+  return roots.map(get);
+}
+
 // ids: true writes every id, and it is what the writer is shown before a patch. ids: false is
 // the clean outline for people: it drops automatic ids but keeps the ones a line needs, meaning
 // the writer's own names and any automatic id an edge points at.

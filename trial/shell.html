@@ -73,16 +73,31 @@
   #export .menu a,#export .menu button{display:block;padding:7px 10px;border:0;border-radius:3px;background:none;color:#111;
     font:inherit;font-size:12px;text-align:left;text-decoration:none;cursor:pointer}
   #export .menu a:hover,#export .menu button:hover{background:#f0f0f0}
+  /* The web app's own: who is signed in, and signing in when a change needs an account. */
+  body:not(.web) .web{display:none}
+  .acct{display:flex;gap:10px;font-size:11px;color:var(--faint);margin-top:6px}
+  .acct a,.acct button{color:#111;background:none;border:0;padding:0;font:inherit;font-size:11px;cursor:pointer;text-decoration:underline}
+  .signin{margin-top:10px;padding:10px;border:1px solid #111;border-radius:4px}
+  .signin p{margin:0 0 8px;font-size:12px;font-weight:600}
+  .signin form{display:flex;gap:6px}
+  .signin .note{color:#555}
 </style></head>
 <body>
 <iframe id="mock" src="mock"></iframe>
 <aside>
-  <header><h1 id="title">{{title}}</h1><div class="sub" id="status">…</div></header>
+  <header><h1 id="title">{{title}}</h1><div class="sub" id="status">…</div>
+    <div class="acct web"><a href="/projects">{{projects}}</a><span id="acct"></span><button id="acctIn" type="button" hidden>{{signIn}}</button></div></header>
   <div class="marked" id="markedBox"><span class="none">{{selectHint}}</span></div>
   <div class="say">
     <form id="form"><input id="utterance" placeholder="{{placeholder}}" autocomplete="off"><button id="mic" type="button" title="{{voice}}">●</button><button class="go" id="go" type="submit">{{say}}</button></form>
     <!-- Whatever the canvas needs the person to decide appears here, right under what they typed. -->
     <div class="note" id="note"></div>
+    <!-- The web app: a change or an export that needs an account waits here while the person signs in. -->
+    <div class="signin web" id="signin" hidden>
+      <p>{{keepGoing}}</p>
+      <form id="signinForm"><input id="email" type="email" placeholder="{{email}}" autocomplete="email" required><button class="go" type="submit">{{sendLink}}</button></form>
+      <div class="note" id="signinNote"></div>
+    </div>
     <div class="ask" id="ask"></div>
     <div class="next" id="next"></div>
   </div>
@@ -132,11 +147,50 @@ let allFor = null;
 // notes in the log, the file the mock saves to.
 const DEBUG = new URLSearchParams(location.search).has("debug");
 document.body.classList.toggle("debug", DEBUG);
+// The same page runs in the local trial and in the web app, where a change streams its frames back
+// in its own reply, and a change or an export after the first mock needs an account.
+const WEB = "{{mode}}" === "web";
+document.body.classList.toggle("web", WEB);
+let signedIn = !WEB;
+// What waits for the person to sign in: it is done again once they have.
+let held = null;
 const HINT = $("markedBox").textContent;
 
 // Every path is relative, so the page talks to its own project: /state at /, /p/<id>/state at
 // /p/<id>/. The paths the canvas sends back with its offers ("/answer") are read the same way.
-const post = (path, body) => fetch(path.replace(/^\//, ""), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }).then((r) => r.json());
+// In the web app a change answers with lines of JSON: a frame each time the mock redraws while it
+// works (a build draws a page at a time), then the reply. One that needs an account is held.
+async function post(path, body) {
+  const res = await fetch(path.replace(/^\//, ""), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) });
+  if (res.status === 401) {
+    const r = await res.json().catch(() => ({}));
+    if (r.signin) {
+      held = async () => handle(await post(path, body));
+      askSignIn();
+      // The panel says why; the reply line stays empty.
+      return { note: "", changed: false, signin: true };
+    }
+    return r;
+  }
+  if (!(res.headers.get("content-type") || "").includes("ndjson")) return res.json();
+  const reader = res.body.getReader(), dec = new TextDecoder();
+  let buf = "", result = null;
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let nl;
+    while ((nl = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, nl).trim();
+      buf = buf.slice(nl + 1);
+      if (!line) continue;
+      const m = JSON.parse(line);
+      if (m.frame) paint(m.frame);
+      if (m.result) result = m.result;
+    }
+  }
+  return result ?? { note: "…", changed: false, error: true };
+}
 
 // Keep your place: an edit to the fourth screen should not scroll you back to the first. The
 // position is read only from a mock that has finished loading — two edits landing back to back
@@ -158,22 +212,32 @@ addEventListener("resize", fitMock);
 function redraw() {
   if (!loading) { try { keepY = mock.contentWindow.scrollY; } catch {} }
   loading = true;
+  mock.removeAttribute("srcdoc");
   mock.src = "mock?" + Date.now();
-  mock.onload = () => {
-    loading = false;
-    fitMock();
-    try { mock.contentWindow.scrollTo(0, keepY); } catch {}
-    // The numbers on what an offer is about survive the mock redrawing under them, and so does the
-    // mark with its toolbar.
-    showPicks();
-    if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked, reveal: revealing === marked }, "*"); tools(marked); }
-    revealing = null;
-  };
+  mock.onload = drawn;
   load();
 }
+function drawn() {
+  loading = false;
+  fitMock();
+  try { mock.contentWindow.scrollTo(0, keepY); } catch {}
+  // The numbers on what an offer is about survive the mock redrawing under them, and so does the
+  // mark with its toolbar.
+  showPicks();
+  if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked, reveal: revealing === marked }, "*"); tools(marked); }
+  revealing = null;
+}
+// A frame streamed while a change works: the mock as it is now, and the page's state with it.
+function paint(f) {
+  if (!loading) { try { keepY = mock.contentWindow.scrollY; } catch {} }
+  loading = true;
+  mock.onload = drawn;
+  mock.srcdoc = f.html;
+  show(f.state);
+}
 
-async function load() {
-  const s = await fetch("state").then((r) => r.json());
+async function load() { show(await fetch("state").then((r) => r.json())); }
+function show(s) {
   els = s.elements;
   $("title").textContent = s.heading;
   $("status").textContent = DEBUG
@@ -182,6 +246,11 @@ async function load() {
   $("undo").disabled = !s.canUndo;
   $("export").classList.toggle("off", !s.screens);
   if (!s.screens) $("export").open = false;
+  if (WEB && s.account) {
+    signedIn = s.account.signedIn;
+    $("acct").textContent = s.account.email || "";
+    $("acctIn").hidden = signedIn;
+  }
   document.body.classList.toggle("busy", Boolean(s.busy));
   if (s.busy) $("note").textContent = DEBUG ? `building "${s.busy}" · ${s.log.length && s.log[s.log.length - 1].note || ""}` : s.working;
   // Newest first. For a person: what they said, what they picked, and what happened. With
@@ -305,7 +374,9 @@ async function send(utterance, chip = false) {
   $("note").textContent = "…";
   $("utterance").value = "";
   marked = currentMark() ?? marked;
-  handle(await post("ask", { utterance, marked, viewing: viewingScreen(), chip }));
+  const r = await post("ask", { utterance, marked, viewing: viewingScreen(), chip });
+  if (r.signin) $("utterance").value = utterance;
+  handle(r);
 }
 
 // Every decision the canvas leaves to the person comes back as choices: buttons under the text
@@ -349,13 +420,15 @@ function say(r) {
 }
 
 $("undo").onclick = async () => handle(await post("undo"));
-$("new").onclick = async () => { setMark(null); handle(await post("new")); };
+// In the web app a new mock is a new project; this one stays in the list of projects.
+$("new").onclick = async () => { if (WEB) { location.href = "/"; return; } setMark(null); handle(await post("new")); };
 $("save").onclick = async () => say(await post("save"));
 $("unselect").onclick = () => setMark(null);
 
 // Export: the mock as one file, the prompt for an AI site builder copied, or that prompt as a file.
 // The downloads are plain links; the copy fetches the prompt as the mock is now.
 $("exPrompt").onclick = async () => {
+  if (!signedIn) { $("export").open = false; held = () => $("exPrompt").click(); return askSignIn(); }
   const text = await fetch("prompt").then((r) => r.text());
   let ok = false;
   try { await navigator.clipboard.writeText(text); ok = true; } catch {}
@@ -371,7 +444,44 @@ $("exPrompt").onclick = async () => {
   $("note").className = "note";
   $("note").textContent = ok ? $("exPrompt").dataset.done : $("exPrompt").dataset.failed;
 };
-for (const id of ["exHtml", "exMd"]) $(id).addEventListener("click", () => { $("export").open = false; });
+for (const id of ["exHtml", "exMd"]) $(id).addEventListener("click", (e) => {
+  $("export").open = false;
+  if (!signedIn) { e.preventDefault(); held = () => $(id).click(); askSignIn(); }
+});
+
+// ---- signing in (the web app) -------------------------------------------------------------------
+// The first mock needs no account; the next change or an export does. The link in the email signs
+// this browser in, in whichever tab it opens; this page notices, and does what was waiting.
+function askSignIn() {
+  $("signin").hidden = false;
+  $("note").textContent = "";
+  $("email").focus();
+}
+$("acctIn").onclick = () => askSignIn();
+$("signinForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("signinNote").textContent = "…";
+  const r = await fetch("/api/auth/link", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("email").value, back: location.pathname }) }).then((r) => r.json()).catch(() => ({}));
+  $("signinNote").textContent = r.note || "";
+  if (r.ok) waitForSignIn();
+});
+let waiting = null;
+function waitForSignIn() {
+  clearInterval(waiting);
+  waiting = setInterval(async () => {
+    const me = await fetch("/api/me").then((r) => r.json()).catch(() => ({}));
+    if (!me.signedIn) return;
+    clearInterval(waiting);
+    signedIn = true;
+    $("signin").hidden = true;
+    $("signinNote").textContent = "";
+    const again = held;
+    held = null;
+    if (again && $("utterance").value) $("utterance").value = "";
+    await load();
+    if (again) again();
+  }, 2500);
+}
 addEventListener("click", (e) => { if (!e.target.closest("#export")) $("export").open = false; });
 
 // Voice, where the browser has it: interim words land in the box, the final one is sent.
@@ -392,14 +502,22 @@ if (SR) {
 
 mock.onload = () => { fitMock(); showPicks(); if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked }, "*"); tools(marked); } };
 
-// Changes can arrive from outside this page — Claude appending a screen, an element at a time.
+// Changes can arrive from outside this page — Claude appending a screen, an element at a time. (In
+// the web app each change brings its own frames back instead.)
 let seen = null;
-new EventSource("events").onmessage = (e) => {
+if (!WEB) new EventSource("events").onmessage = (e) => {
   const now = JSON.parse(e.data);
   if (seen && now.rev !== seen.rev) redraw();
   else if (seen && now.seq !== seen.seq) load();
   seen = now;
 };
 load();
+// Opened from the landing page: its sentence is said at once.
+if (WEB) {
+  const key = "ms-first:" + location.pathname.split("/")[2];
+  let first = null;
+  try { first = sessionStorage.getItem(key); sessionStorage.removeItem(key); } catch {}
+  if (first) send(first);
+}
 </script>
 </body></html>

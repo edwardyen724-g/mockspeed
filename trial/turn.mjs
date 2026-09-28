@@ -140,17 +140,23 @@ export function relocate(root, target, gap) {
 }
 
 // Each kind of change the server makes, as the same change on another canvas: { root, changed },
-// or null when it cannot be made there.
+// or null when it cannot be made there. Each carries `spec`, the change as data — its kind and its
+// arguments — so a turn can be saved with its project and made into the same function again
+// (`redoOf`) when the project is opened in another process.
+const tagged = (spec, fn) => Object.assign(fn, { spec });
 export const redo = {
-  edit: (op, target, arg) => (t) => applyEverywhere(t, op, target, arg),
-  edits: (op, targets, arg) => (t) => applyAll(t, op, targets, arg),
-  place: (anchor, position, text) => (t) => {
+  edit: (op, target, arg) => tagged(["edit", op, target, arg], (t) => applyEverywhere(t, op, target, arg)),
+  edits: (op, targets, arg) => tagged(["edits", op, targets, arg], (t) => applyAll(t, op, targets, arg)),
+  place: (anchor, position, text) => tagged(["place", anchor, position, text], (t) => {
     const p = placeEverywhere(t, anchor, position, text);
     return p ? { root: applyPatch(t, p.patch).root, changed: true } : null;
-  },
-  move: (target, gap) => (t) => {
+  }),
+  move: (target, gap) => tagged(["move", target, gap], (t) => {
     const r = relocate(t, target, gap);
     return r ? { root: r, changed: true } : null;
-  },
-  clear: () => (t) => apply(t, "clear", null),
+  }),
+  clear: () => tagged(["clear"], (t) => apply(t, "clear", null)),
 };
+// A saved change's `spec` made back into the change. An argument saved as JSON null was undefined
+// or null when the change was made, and both mean "none" to every change above.
+export const redoOf = ([kind, ...args]) => redo[kind](...args.map((a) => a ?? undefined));

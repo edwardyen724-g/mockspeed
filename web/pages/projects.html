@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{projects}} · {{product}}</title>
+<style>
+  :root{--line:#e3e3e3;--faint:#8a8a8a}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 system-ui,-apple-system,sans-serif;color:#111;background:#f6f6f6}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+  a{color:inherit}
+  .brand{font-weight:600;text-decoration:none}
+  nav{display:flex;gap:6px;align-items:center;font-size:14px}
+  nav .who{color:var(--faint);margin-right:6px}
+  button,.btn{font:inherit;font-size:14px;padding:7px 14px;border-radius:8px;border:1px solid #111;background:#111;color:#fff;cursor:pointer;text-decoration:none;display:inline-block}
+  button.plain{background:#fff;color:#111;border-color:#d6d6d6}
+  main{max-width:880px;margin:0 auto;padding:24px 16px 64px}
+  h1{font-size:22px;margin:0}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+  ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  li{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px}
+  li a.open{font-weight:600;text-decoration:none;font-size:15px}
+  li a.open:hover{text-decoration:underline}
+  li .meta{color:var(--faint);font-size:12px}
+  li .del{align-self:flex-start;margin-top:6px;background:none;border:0;color:var(--faint);padding:0;font-size:12px;cursor:pointer}
+  li .del:hover{color:#8a3a00}
+  .empty{color:#555}
+  .signin{max-width:420px;margin:12vh auto 0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px}
+  .signin p{margin:0 0 12px}
+  .signin form{display:flex;gap:8px}
+  .signin input{flex:1;font:inherit;padding:7px 10px;border:1px solid #ccc;border-radius:8px}
+  .note{margin-top:10px;font-size:13px;color:#555;min-height:18px}
+</style></head>
+<body>
+<header>
+  <a class="brand" href="/">{{product}}</a>
+  <nav id="nav" data-account="{{account}}"><span class="who" id="who"></span><button class="plain" id="out" hidden>{{signOut}}</button></nav>
+</header>
+<main data-list="{{list}}" data-signed-in="{{signedIn}}">
+  <section id="mine" hidden>
+    <div class="top"><h1>{{projects}}</h1><a class="btn" href="/">{{newProject}}</a></div>
+    <ul id="list"></ul>
+    <p class="empty" id="empty" hidden>{{noProjects}}</p>
+  </section>
+  <section class="signin" id="signin" hidden>
+    <p>{{signInFor}}</p>
+    <form id="form"><input id="email" type="email" placeholder="{{email}}" autocomplete="email" required><button type="submit">{{sendLink}}</button></form>
+    <div class="note" id="note"></div>
+  </section>
+</main>
+<template id="words"><span data-edited="{{edited}}" data-remove="{{remove}}" data-sure="{{removeSure}}"></span></template>
+<script>
+const $ = (id) => document.getElementById(id);
+const main = document.querySelector("main");
+const w = $("words").content.firstElementChild.dataset;
+const signedIn = Boolean(main.dataset.signedIn);
+if (signedIn) {
+  $("who").textContent = $("nav").dataset.account;
+  $("out").hidden = false;
+  $("mine").hidden = false;
+  const list = JSON.parse(main.dataset.list || "[]");
+  $("empty").hidden = list.length > 0;
+  const when = (t) => new Date(t).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  for (const p of list) {
+    const li = document.createElement("li");
+    const a = Object.assign(document.createElement("a"), { className: "open", href: `/p/${p.id}/`, textContent: p.title && p.title !== "new" ? p.title : p.id });
+    const meta = Object.assign(document.createElement("div"), { className: "meta", textContent: `${w.edited} ${when(p.updated_at)}` });
+    const del = Object.assign(document.createElement("button"), { className: "del", textContent: w.remove });
+    del.onclick = async () => {
+      if (!confirm(w.sure)) return;
+      const r = await fetch("/api/projects/delete", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: p.id }) }).then((r) => r.json());
+      if (r.ok) li.remove();
+    };
+    li.append(a, meta, del);
+    $("list").appendChild(li);
+  }
+} else {
+  $("signin").hidden = false;
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("note").textContent = "…";
+    const r = await fetch("/api/auth/link", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("email").value, back: "/projects" }) }).then((r) => r.json());
+    $("note").textContent = r.note;
+    if (r.ok) wait();
+  });
+}
+// Signed in from the email in another tab: this one carries on.
+function wait() {
+  const t = setInterval(async () => {
+    const me = await fetch("/api/me").then((r) => r.json()).catch(() => ({}));
+    if (me.signedIn) { clearInterval(t); location.reload(); }
+  }, 3000);
+}
+$("out").onclick = async () => { await fetch("/api/auth/out", { method: "POST" }); location.href = "/"; };
+</script>
+</body></html>

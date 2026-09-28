@@ -432,6 +432,41 @@ export const ui = {
   copyFailed: "Couldn't copy it here, so the prompt is open in a new tab.",
 };
 
+// The web app's own words (web/): the landing page, signing in, the list of projects. The name is a
+// working one until the product has its own.
+export const web = {
+  product: "mockspeed",
+  headline: "Describe your website or app.",
+  subline: "A grey mock of it appears in seconds. Then say what to change.",
+  prompt: "A website for my bakery: menu, hours, where to find us",
+  make: "Make it",
+  wordsOnly: "Words only — links and pictures aren't read yet.",
+  projects: "Your projects",
+  noProjects: "Nothing here yet. Describe a website or app to start one.",
+  newProject: "New project",
+  remove: "Delete",
+  removeSure: "Delete this mock? It can't be brought back.",
+  edited: "Changed",
+  signIn: "Sign in",
+  signOut: "Sign out",
+  keepGoing: "Sign in to keep going — your mock is saved.",
+  signInFor: "Sign in to see your projects.",
+  email: "you@example.com",
+  sendLink: "Email me a link",
+  linkSent: "Check your email: the link signs you in and brings you back here.",
+  linkFailed: "Couldn't send the link just now. Try again in a minute.",
+  badEmail: "That doesn't look like an email address.",
+  signingIn: "Signing you in…",
+  signedIn: "Signed in.",
+  linkBad: "That link didn't work — it may have expired or been used already. Ask for a new one.",
+  tooLong: "That's a lot at once. Say it in fewer words?",
+  anonLimit: "That's today's mocks without an account. Sign in to keep going.",
+  conflict: "This mock changed in another tab, so nothing changed here. Try again.",
+  notFound: "There's no mock here. It may belong to another account.",
+  home: "Start a new one",
+  starting: "Starting…",
+};
+
 // The line under the app's name: how many pages it has.
 export function status(root) {
   const n = (root?.children ?? []).filter((c) => c.type === "screen").length;
