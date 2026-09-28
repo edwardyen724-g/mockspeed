@@ -56,8 +56,9 @@ export function adminPage(all, { since, now, keys }) {
     const cost = (p) => sum(rs.filter((r) => r.provider === p)).cost;
     return [d, int(s.sentences.size), int(s.calls), usd(cost("anthropic")), usd(cost("typesafe")), usd(cost("openrouter")), `<b>${usd(s.cost)}</b>`, perSentence(s)];
   }).reverse();
-  const counted = days.flatMap((d) => group(anthropic.filter((r) => day(r.created_at) === d), (r) => r.model)
-    .map(([m, s]) => [d, esc(m), int(s.input), int(s.cacheWrite), int(s.cacheRead), int(s.output), usd(s.cost), int(s.calls)])).reverse();
+  // Per site: a local run against the same store is kept too, and may use a different key.
+  const counted = days.flatMap((d) => group(anthropic.filter((r) => day(r.created_at) === d), (r) => `${r.origin ?? "—"}\u0000${r.model}`)
+    .map(([k, s]) => [d, ...k.split("\u0000").map(esc), int(s.input), int(s.cacheWrite), int(s.cacheRead), int(s.output), usd(s.cost), int(s.calls)])).reverse();
   const people = (rs) => group(rs, who).map(([k, s]) => [esc(k), int(s.sentences.size), int(s.calls), usd(s.cost), perSentence(s)]);
   const purposes = (rs) => group(rs, (r) => `${r.provider} · ${r.purpose}`).map(([k, s]) => [esc(k), int(s.calls), int(s.input), int(s.output), usd(s.cost), s.errors ? `<b>${int(s.errors)}</b>` : "0"]);
 
@@ -84,7 +85,7 @@ export function adminPage(all, { since, now, keys }) {
   <div class="tile"><b>${int(events.filter((r) => r.purpose === "signin").length)} · ${int(events.filter((r) => r.purpose.startsWith("export")).length)}</b><span>sign-ins · exports, 7 days</span></div>
 </div>
 <h2>By day</h2><div class="wrap">${table(["day (UTC)", "sentences", "calls", "Anthropic", "Jev", "OpenRouter", "total", "per sentence"], byDay)}</div>
-<h2>Anthropic, as the console counts it</h2><div class="wrap">${table(["day (UTC)", "model", "input", "cache write", "cache read", "output", "cost", "calls"], counted)}</div>
+<h2>Anthropic, as the console counts it</h2><div class="wrap">${table(["day (UTC)", "site", "model", "input", "cache write", "cache read", "output", "cost", "calls"], counted)}</div>
 <h2>By person, today</h2><div class="wrap">${table(["who", "sentences", "calls", "cost", "per sentence"], people(todays))}</div>
 <h2>By person, 7 days</h2><div class="wrap">${table(["who", "sentences", "calls", "cost", "per sentence"], people(rows))}</div>
 <h2>By what it was for, 7 days</h2><div class="wrap">${table(["provider · purpose", "calls", "input", "output", "cost", "not ok"], purposes(rows))}</div>

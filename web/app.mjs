@@ -101,7 +101,7 @@ export function app(env) {
         const user = token ? await A.whose(env, String(token)) : null;
         if (!user) return json({ ok: false, note: W.web.linkBad }, 401);
         const claimed = await db.claim(user.id, who.anon, user.email);
-        await db.use([{ user_id: user.id, anon: who.anon, sentence: randomUUID(), provider: "mockspeed", model: "auth", purpose: "signin", status: `claimed ${claimed}`, cost_usd: 0 }]);
+        await db.use([{ user_id: user.id, anon: who.anon, sentence: randomUUID(), provider: "mockspeed", model: "auth", purpose: "signin", status: `claimed ${claimed}`, cost_usd: 0, origin: url.host }]);
         return json({ ok: true, back: safeBack(back), claimed }, 200, { "set-cookie": A.sessionCookie(user, secret, secure) });
       }
       if (path === "/api/auth/out" && req.method === "POST") return json({ ok: true }, 200, { "set-cookie": A.signedOut(secure) });
@@ -145,7 +145,7 @@ export function app(env) {
         const isHtml = route === "/export.html";
         const head = { "content-type": `${isHtml ? "text/html" : route === "/prompt" ? "text/plain" : "text/markdown"}; charset=utf-8`, "cache-control": "no-store" };
         if (route !== "/prompt") head["content-disposition"] = `attachment; filename="${fileName(root, isHtml ? "html" : "md")}"`;
-        await db.use([{ user_id: who.user.id, project: row.id, sentence: randomUUID(), provider: "mockspeed", model: "export", purpose: route.slice(1), status: "ok", cost_usd: 0 }]);
+        await db.use([{ user_id: who.user.id, project: row.id, sentence: randomUUID(), provider: "mockspeed", model: "export", purpose: route.slice(1), status: "ok", cost_usd: 0, origin: url.host }]);
         return new Response(isHtml ? exportHtml(root) : builderPrompt(root), { headers: head });
       }
       if (CHANGES.has(route) && req.method === "POST") {
@@ -156,7 +156,7 @@ export function app(env) {
           if (route === "/ask" && (await db.anonBuilds(A.ipHash(req, secret))) >= anonBuilds) return json({ signin: true, note: W.web.anonLimit, changed: false }, 401);
         }
         if (route === "/ask" && String(input.utterance ?? "").length > LONGEST) return json({ note: W.web.tooLong, changed: false });
-        return act(row, route, input, who);
+        return act(row, route, input, who, url.host);
       }
       return json({ note: W.web.notFound, changed: false }, 404);
     } catch (e) {
@@ -166,9 +166,10 @@ export function app(env) {
   };
 
   // A change to a mock: opened from the store, made, saved over the state it was opened from, its
-  // model calls kept as usage rows. Streams a frame each time the mock redraws — a build draws a
+  // model calls kept as usage rows, each with the site it was made on (`origin`: the deployed app, or a
+// local run against the same store). Streams a frame each time the mock redraws — a build draws a
   // page at a time — then the reply.
-  function act(row, route, input, who) {
+  function act(row, route, input, who, origin) {
     const p = open(row.state);
     const sentence = randomUUID();
     const uses = [];
@@ -208,7 +209,7 @@ export function app(env) {
             user_id: who.user?.id ?? null, anon: who.user ? null : who.anon, project: row.id, sentence,
             provider: u.provider, model: u.model, purpose: u.purpose, input_tokens: u.input ?? 0, output_tokens: u.output ?? 0,
             cache_read_tokens: u.cacheRead ?? 0, cache_write_tokens: u.cacheWrite ?? 0, jev_questions: u.questions ?? null,
-            ms: u.ms ?? null, first_line_ms: u.firstLineMs ?? null, status: u.status ?? "ok", cost_usd: u.cost,
+            ms: u.ms ?? null, first_line_ms: u.firstLineMs ?? null, status: u.status ?? "ok", cost_usd: u.cost, origin,
           })));
         } catch (e) {
           console.error(`web: usage for ${row.id} not kept: ${e.message}`);
