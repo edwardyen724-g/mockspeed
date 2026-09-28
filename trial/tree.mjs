@@ -948,8 +948,8 @@ export function mirrorsOf(root, anchor, position) {
 // ---- twins ---------------------------------------------------------------------------------
 // The same thing in each of a run of same-shaped siblings: each menu card's price when `id` is one
 // card's price, each item of a list when it is one item, each card when it is a card. "Make the
-// prices bigger" with one price marked changed one of five (docs/plan-web-2026-09-26.md §4). This
-// is structure only: whether a sentence means this one or every one like it is Jev's to say.
+// prices bigger" with one price marked changed one of five. This is structure only: whether a
+// sentence means this one or every one like it is Jev's to say.
 //
 // Walks up from the node to the nearest level that repeats, and takes the node at the same place
 // in each repeat. A container repeats when siblings of its type hold the same kinds of thing in

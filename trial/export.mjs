@@ -1,4 +1,4 @@
-// export — what a person takes away from the mock (docs/plan-web-2026-09-26.md §6).
+// export — what a person takes away from the mock.
 //
 //   exportHtml(root)     the mock as one file that opens on its own: every page stacked, a list of
 //                        the pages at the top, the navigation linked to them, no editor script

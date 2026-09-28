@@ -1,4 +1,4 @@
-// engine.test — one project's canvas is its own (trial/engine.mjs, docs/plan-web-2026-09-26.md phase 3).
+// engine.test — one project's canvas is its own (trial/engine.mjs).
 //
 //   node --test "trial/test/*.test.mjs"
 //

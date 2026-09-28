@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// probe-export — does the prompt for an AI site builder build the site? (docs/plan-web-2026-09-26.md
-// §6, phase 2: "the prompt, pasted once into an AI builder, yields a site with semantic tags")
+// probe-export — does the prompt for an AI site builder build the site? Pasted once into an AI
+// builder, the prompt should yield a site with semantic tags.
 //
 //   node trial/eval/probe-export.mjs --env <env file> --outline <mock.outline> [--model claude-sonnet-5] [--out <dir>]
 //

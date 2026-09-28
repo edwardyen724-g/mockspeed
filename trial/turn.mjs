@@ -1,4 +1,4 @@
-// turn — act, then offer (docs/plan-web-2026-09-26.md §3A).
+// turn — act, then offer.
 //
 // Where Jev is unsure, the server acts on its top pick and keeps the other options as doubts. Once
 // the sentence is done, the page offers the alternatives to the decision Jev was least sure of,
@@ -31,7 +31,7 @@ export class Turn {
   // { label, body } — the body is what the person's answer would have posted when this was a
   // question, so a swap is that answer. `ctx` is the sentence as it stood when Jev decided.
   // `always`: offered whatever else the part was unsure of — "Keep both" once the phone number
-  // that was already there has been moved, rather than a second one added (plan §3B).
+  // that was already there has been moved, rather than a second one added (check before adding).
   doubt(conf, alts, ctx, always = false) {
     if (alts.length) this.current.doubts.push({ conf, alts, ctx, always });
   }

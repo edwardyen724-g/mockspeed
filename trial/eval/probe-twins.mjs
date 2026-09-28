@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// probe-twins — does Jev tell "this one" from "every one like it"? (docs/plan-web-2026-09-26.md §4)
+// probe-twins — does Jev tell "this one" from "every one like it"?
 //
 //   node trial/eval/probe-twins.mjs --env <env file> [--runs 2] [--out <file.json>]
 //

@@ -1,5 +1,4 @@
-// words.test — what a person reads is in their words, never the engine's (docs/plan-web-2026-09-26.md
-// §2, phase 1a).
+// words.test — what a person reads is in their words, never the engine's.
 //
 //   node --test "trial/test/*.test.mjs"
 //

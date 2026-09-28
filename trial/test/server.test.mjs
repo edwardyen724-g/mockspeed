@@ -1,5 +1,4 @@
-// server.test — the http shell routes each request to its own project (trial/server.mjs, docs/plan-
-// web-2026-09-26.md phase 3).
+// server.test — the http shell routes each request to its own project (trial/server.mjs).
 //
 //   node --test "trial/test/*.test.mjs"
 //

@@ -1,4 +1,4 @@
-// words — every string a person reads, in one place (docs/plan-web-2026-09-26.md §2).
+// words — every string a person reads, in one place.
 //
 // The trial talks to two readers. Jev and the writer read tree.mjs's lines — `text #n9 "$340.50"
 // bold xl`, "in col · border · holds text, text, line" — and Jev's measured accuracy rests on that
@@ -280,9 +280,9 @@ export const ask = {
 
 // ---- offers, after acting ---------------------------------------------------------------------
 // Where Jev was unsure, the app does its top pick and offers the runner-up beside the reply, one
-// click each (docs/plan-web-2026-09-26.md §3A): "Between “Address” and “Hours” instead", "The
-// “Cancel” button instead". `named`: the name to show, from distinct() when two could read the
-// same; `pages`: the pages a thing is on, said when the app has several.
+// click each: "Between “Address” and “Hours” instead", "The “Cancel” button instead". `named`: the
+// name to show, from distinct() when two could read the same; `pages`: the pages a thing is on,
+// said when the app has several.
 export const offer = {
   target: (root, id, named = name(root, id), pages = []) => `${cap(named)}${pages.length && find(root, id)?.node.type !== "screen" ? ` ${onPages(root, pages)}` : ""} instead`,
   place: (root, g, skip) => `${cap(place(root, g, skip, "where it was"))} instead`,
@@ -297,11 +297,11 @@ export const offer = {
   // Nothing was done — Jev doesn't see the thing named — and these are the likeliest: the edit
   // itself, on each ("Make the “Home · Add” bar darker"). `op` null is a rewrite.
   doIt: (root, op, id, named = name(root, id), pages = []) => `${cap(doing(op ?? "change", named))}${pages.length && find(root, id)?.node.type !== "screen" ? ` ${onPages(root, pages)}` : ""}`,
-  // This one, or every one like it (plan §4): the reverse of what was done, one click away.
+  // This one, or every one like it: the reverse of what was done, one click away.
   justThis: (root, id) => `Just ${name(root, id)} instead`,
   allLike: (root, id, n) => `All ${n} like ${name(root, id)} instead`,
-  // Check before adding (plan §3B): what was asked for was there already, and was shown or moved
-  // instead of a second one written; the second one, as asked.
+  // Check before adding: what was asked for was there already, and was shown or moved instead of a
+  // second one written; the second one, as asked.
   keepBoth: "Keep both",
   another: (root, id) => (find(root, id)?.node.type === "screen" ? `Add another ${pageWord(root)}` : "Add another"),
   undo: "Undo",
@@ -353,7 +353,7 @@ export const reply = {
   changed: (root, what, copies = 0) => `Changed ${what}${everywhere(root, copies)}.`,
   moved: (what, where) => `Moved ${what} ${toPlace(where)}.`,
   alreadyThere: (what) => `${cap(what)} is already there.`,
-  // Check before adding (plan §3B): "add our phone number" when the page shows one. `pages`: the
+  // Check before adding: "add our phone number" when the page shows one. `pages`: the
   // pages it is on.
   alreadyOn: (root, id, pages = []) => (find(root, id)?.node.type === "screen" || !pages.length
     ? `${cap(name(root, id))} is already there.`
@@ -382,7 +382,7 @@ export const reply = {
   saved: (file) => `Saved to ${q(file)}.`,
 };
 
-// ---- the toolbar on a clicked thing (plan §3C) ------------------------------------------------
+// ---- the toolbar on a clicked thing -----------------------------------------------------------
 // Direct edits with no words and no model: what each button says, and the one that turns every
 // one like it on. `across`: the thing sits in a row, where up and down are left and right.
 export const tool = {
@@ -394,7 +394,7 @@ export const tool = {
   renameHint: "Double-click to change the words",
 };
 
-// ---- next steps (plan §3E) --------------------------------------------------------------------
+// ---- next steps -------------------------------------------------------------------------------
 // Offered under the text box, one click each, in place of a list of what can be said: on an empty
 // canvas these, and after a build or a change the writer's own (writer.mjs `nextSteps`).
 export const starters = [
@@ -423,7 +423,7 @@ export const ui = {
   save: "Save file",
   you: "You",
   empty: "Describe a website or app to start.",
-  // Export (plan §6): the mock as a file, and a prompt that builds it for real.
+  // Export: the mock as a file, and a prompt that builds it for real.
   export: "Export",
   exportHtml: "Download the mock (.html)",
   exportPrompt: "Copy a prompt for your AI site builder",

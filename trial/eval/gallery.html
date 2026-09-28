@@ -90,7 +90,7 @@ function score(group) {
     moves: [count((st) => st.kind.startsWith("move") && st.outcome === "changed"), count((st) => st.kind.startsWith("move"))],
     rewrites: [count((st) => st.kind.startsWith("rewrite") && st.outcome === "changed"), count((st) => st.kind.startsWith("rewrite"))],
     asked: count((st) => st.asked.length && !st.human.length),
-    // Right: the first result, or one click on the swap offered beside it (phase 1b), or rightly nothing.
+    // Right: the first result, or one click on the swap offered beside it, or rightly nothing.
     right: judged.length ? [judged.filter((st) => /^(right|swap_right|correctly_nothing)$/.test(st.verdict.call)).length, judged.length] : null,
     bySwap: judged.filter((st) => st.verdict.call === "swap_right").length,
     fair: judged.filter((st) => st.verdict.call === "fair_ask").length,

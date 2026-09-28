@@ -160,11 +160,11 @@ export async function decide({ utterance, marked, nodes, screens = [], viewing =
   }
   // The screen of the element a sentence places something next to: "add our phone number under the
   // address" names no screen, but the address is on one, so the person need not be asked which
-  // (docs/plan-web-2026-09-26.md §3B). Measured 2026-09-26 on 20 sentences over six apps, twice:
-  // an element on a screen other than `viewing`, 24/24 at 0.94-1.00 (the `screen` question was
-  // under 0.6 on 18 of them, and 6 times its top pick was the wrong screen); a sentence naming no
-  // element, or one on several screens, `viewing` 16/16 at 0.87-1.00. A wording without the example
-  // ("the element or place `said` names") scored 0.70-0.74 on "next to archive".
+  // one. Measured 2026-09-26 on 20 sentences over six apps, twice: an element on a screen other
+  // than `viewing`, 24/24 at 0.94-1.00 (the `screen` question was under 0.6 on 18 of them, and 6
+  // times its top pick was the wrong screen); a sentence naming no element, or one on several
+  // screens, `viewing` 16/16 at 0.87-1.00. A wording without the example ("the element or place
+  // `said` names") scored 0.70-0.74 on "next to archive".
   if (routing && screens.length > 1) {
     questions.anchor = {
       type: "choice",
@@ -302,11 +302,11 @@ export async function needs({ utterance, earlier, context, apiKey, signal }) {
   return { ms: Date.now() - started, noul: answers.needs.noul ?? 0 };
 }
 
-// This one, or every one like it (docs/plan-web-2026-09-26.md §4): asked only when the element an
-// edit acts on has twins (trial/tree.mjs `twinsOf` — each card's price when it is one card's
-// price). Plurals, "all", "each", "these" and "them" are Jev's to read, not a word list's. `target`
-// is the element's line, `twins` every twin's line, itself among them; `marked` is set when the
-// person pointed at it. Returns how likely `said` means every one.
+// This one, or every one like it: asked only when the element an edit acts on has twins
+// (trial/tree.mjs `twinsOf` — each card's price when it is one card's price). Plurals, "all",
+// "each", "these" and "them" are Jev's to read, not a word list's. `target` is the element's line,
+// `twins` every twin's line, itself among them; `marked` is set when the person pointed at it.
+// Returns how likely `said` means every one.
 // Measured 2026-09-26 (trial/eval/probe-twins.mjs, trial/eval/README.md): this wording 89/90 and
 // 90/90 over 45 sentences run twice, 37/38 and 38/38 on the two apps it was not tuned on — "one"
 // sentences at most 0.06, "every" at least 0.49. Without the line about plurals and the mark, "make the prices bigger" with one
@@ -325,12 +325,11 @@ export async function every({ utterance, target, twins, marked = null, context =
   return { ms: Date.now() - started, every: p };
 }
 
-// Check before adding (docs/plan-web-2026-09-26.md §3B): is what a sentence asks to add on the mock
-// already — "add our phone number" on a site that shows one — and if so, which element is it, and
-// does the sentence name a place for it? Asked of every element on every page, since the one there
-// may be on another page from the one in view. `exists` in decide() reads "the element `said`
-// names", which for an addition is also the place it names ("under the address"), so it is not
-// this question.
+// Check before adding: is what a sentence asks to add on the mock already — "add our phone number"
+// on a site that shows one — and if so, which element is it, and does the sentence name a place for
+// it? Asked of every element on every page, since the one there may be on another page from the one
+// in view. `exists` in decide() reads "the element `said` names", which for an addition is also the
+// place it names ("under the address"), so it is not this question.
 export const THERE = "`said` asks for something to be added to the mockup described in `elements`. Is the thing it asks for already on the mockup — the same information or the same feature, on any page? Answer no when `said` asks for another one, a second one, a new one or more of something, or for something that is only of the same kind as what is there (a button, where there are other buttons). A place `said` names to put it (under the address, next to the title, on the home page) is not the thing it asks for.";
 export const THERE_WHICH = "`said` asks for something to be added to the mockup. Which element in `elements` already is that thing — the same information or feature? A place `said` names to put it is not the thing it asks for.";
 // `open` (spot()'s wording) is about a place on a screen, so "to the home page" reads as open; a

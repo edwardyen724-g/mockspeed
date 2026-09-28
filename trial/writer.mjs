@@ -49,8 +49,8 @@ Name ids after what they are (#planner, #nav) — never n1, n2: those are taken 
 Realistic, specific fake data: real-sounding names that fit what things are, plausible numbers and times, a mix of states with one edge case (failed, empty, overdue, very long). Put the flag data on texts and tr rows that are data. No placeholders, no lorem ipsum.
 Greyscale only; emphasis is size, bold and shade. Text on fill=dark turns light by itself — give it no shade unless it should be fainter.`;
 
-// The next steps a person might take, offered under the text box as one-click suggestions (plan
-// §3E): written in the same call as what they follow, so they cost a line.
+// The next steps a person might take, offered under the text box as one-click suggestions:
+// written in the same call as what they follow, so they cost a line.
 const NEXT_STEPS = `NEXT STEPS
 End with one more line: // next: followed by five things the person might ask for next, separated by |. Each is a short instruction in plain words, at most six words, the way the person would say it: something to add that is not there yet, a new page, or a change to what is there. For example: // next: Add customer reviews | Add a catering page | Make the prices bigger | Add a photo of the shop | Turn the menu into a list
 Say page for a website and screen for a phone app. Never use layout words (row, column, border, padding) or ids.`;

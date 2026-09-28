@@ -228,7 +228,7 @@ export function render(root, { title } = {})   // → "<!doctype html>…" strin
   the texts whose ids are in `links` are drawn as `<a href="#…">` to the page they name. The mock in
   the editor never passes it, so it is drawn as before.
 
-### `trial/export.mjs` — what a person takes away (plan §6)
+### `trial/export.mjs` — what a person takes away
 
 ```js
 export function exportHtml(root)          // → the mock as one file: pages anchored and listed, the navigation linked, no script
@@ -245,7 +245,7 @@ two pages. Where a writer put `share=` on an element and again on something insi
 copies are the shared element. `trial/test/export.test.mjs` checks every word on 24 mocks, and the
 same plain-words rule as `words.mjs`.
 
-### `trial/engine.mjs` — one project's canvas (plan phase 3)
+### `trial/engine.mjs` — one project's canvas
 
 ```js
 export function project({ root, apiKey, llmKey, model })   // → a project; root defaults to an empty canvas

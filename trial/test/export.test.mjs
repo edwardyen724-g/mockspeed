@@ -1,4 +1,4 @@
-// export.test — what a person takes away (docs/plan-web-2026-09-26.md §6, phase 2).
+// export.test — what a person takes away (trial/export.mjs).
 //
 //   node --test "trial/test/*.test.mjs"
 //

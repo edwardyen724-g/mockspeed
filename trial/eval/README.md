@@ -34,11 +34,10 @@ The judges say `swap_right` when the change was not what was meant but one click
 
 ## Engine as a library — `runs/2026-09-27-engine-library`
 
-Phase 3 of `docs/plan-web-2026-09-26.md`. The canvas moved out of `trial/server.mjs` into
-`trial/engine.mjs`, one `project()` per canvas, with its logic line for line as it was. The server
-routes `/` to the project it opened (the one this script drives, at the paths it always used) and
-`/p/<id>/` to the others. This run checks that the move changed nothing the app does. It is not a
-new measurement, and the judges were not re-run.
+The canvas moved out of `trial/server.mjs` into `trial/engine.mjs`, one `project()` per canvas, with
+its logic line for line as it was. The server routes `/` to the project it opened (the one this
+script drives, at the paths it always used) and `/p/<id>/` to the others. This run checks that the
+move changed nothing the app does. It is not a new measurement, and the judges were not re-run.
 
 364 Jev decisions, builds 10/10, 130 steps, no errors, **0 questions asked first**. 97 of 120
 follow-ups changed the mock, 49 of them with a swap offered. 8 changed nothing, each with a swap
@@ -54,17 +53,17 @@ changed and 2 changed nothing.
 
 ## Export — `runs/2026-09-27-export-probe`
 
-Phase 2 of `docs/plan-web-2026-09-26.md` (§6). The footer's Export menu offers three things. **Download the
-mock (.html)** is the render with each page anchored, the pages listed at the top, the navigation's page
-names linked, and no script (`/export.html`). **Copy a prompt for your AI site builder** is `/prompt`, and
-**Download the prompt as a file (.md)** is the same text (`/export.md`). The prompt is built by code from
-the outline (`trial/export.mjs`), not by a model: a fixed header that asks for semantic HTML and says to
-keep the pages, the order, the emphasis and every word, then each shared bar once, then each page top to
+The footer's Export menu offers three things. **Download the mock (.html)** is the render with each
+page anchored, the pages listed at the top, the navigation's page names linked, and no script
+(`/export.html`). **Copy a prompt for your AI site builder** is `/prompt`, and **Download the prompt
+as a file (.md)** is the same text (`/export.md`). The prompt is built by code from the outline
+(`trial/export.mjs`), not by a model: a fixed header that asks for semantic HTML and says to keep
+the pages, the order, the emphasis and every word, then each shared bar once, then each page top to
 bottom, every word quoted as written.
 
-The done-condition asks that the prompt, pasted once into an AI builder, yields a site with semantic
-tags. Sonnet 5 stood in for the builder, with one line of system prompt standing in for the builder's
-own ("answer with one complete HTML file"):
+The bar is that the prompt, pasted once into an AI builder, yields a site with semantic tags.
+Sonnet 5 stood in for the builder, with one line of system prompt standing in for the builder's own
+("answer with one complete HTML file"):
 
 ```bash
 node trial/eval/probe-export.mjs --env ~/projects/jev-context/.env.local --outline <mock.outline> --out trial/eval/runs/<dir>
@@ -96,10 +95,9 @@ or naming two pages. Before that rule, an address in bold over three grey lines 
 
 ## Check before adding, and next steps — `runs/2026-09-27-already-probe`
 
-Phase 1d of `docs/plan-web-2026-09-26.md` (§3B, §3E). In the readiness check, "add our phone
-number" duplicated a phone number the page already showed. Now an addition asks Jev first
-(`jev.mjs` `already`): is the thing already on the mock, which element is it, and does the sentence
-name a page or a place for it? Then:
+In a check of whether a stranger could use the app, "add our phone number" duplicated a phone number
+the page already showed. Now an addition asks Jev first (`jev.mjs` `already`): is the thing already
+on the mock, which element is it, and does the sentence name a page or a place for it? Then:
 
 - **It names neither** ("add our phone number"). The one there is selected and scrolled into view,
   nothing changes, and "Add another" is offered.
@@ -167,11 +165,11 @@ What this does not cover:
 
 ## This one, or every one like it — `runs/2026-09-26-twins-probe`
 
-Phase 1c of `docs/plan-web-2026-09-26.md` (§4). With one of five prices marked, "make the prices
-bigger" changed one price. Now code finds the element's twins (tree.mjs `twinsOf`: each card's
-price, each nav item, each card), and Jev answers one question, asked only when there are twins:
-does the sentence mean this one or every one like it? The other reading is offered beside the reply
-as a swap: *"Made “$5.75” and the 4 others like it bigger · [Just “$5.75” instead] [Undo]"*.
+With one of five prices marked, "make the prices bigger" changed one price. Now code finds the
+element's twins (tree.mjs `twinsOf`: each card's price, each nav item, each card), and Jev answers
+one question, asked only when there are twins: does the sentence mean this one or every one like it?
+The other reading is offered beside the reply as a swap: *"Made “$5.75” and the 4 others like it
+bigger · [Just “$5.75” instead] [Undo]"*.
 
 The question was probed before anything relied on it. This is a probe of one Jev question, not a
 run through the app:
@@ -209,7 +207,7 @@ with five breads as cards…").** Tested with one price marked.
 - Double-clicking "Ciabatta" and typing renamed it with no question and no model call.
 - The toolbar's "All 5 like this" followed by Bold made all five bold, also with no model call.
 - When Jev was unsure which element, the alternative was numbered in the mock. Clicking it there
-  took the swap (§3D).
+  took the swap.
 
 What the probe does not cover: `which()` choosing among the twins. It spreads its confidence over
 five identical prices; once every one is being changed, those alternatives are dropped rather than
@@ -217,11 +215,10 @@ offered. Rewrites ("turn the prices into pills") still act on one element.
 
 ## Act, then offer — `runs/2026-09-26-act-then-offer`
 
-Phase 1b of `docs/plan-web-2026-09-26.md` (§3A). The app no longer asks before it acts. Where Jev
-is unsure, its top pick is done, and the runner-up is offered beside the reply as a one-click swap,
-with Undo: *"Removed the “New Agent” button · [The “Filter” button on the “Logs” page instead]
-[Undo]"*. A wrong guess costs one click. A question cost a read, a decision and a click every time,
-even when Jev was right.
+The app no longer asks before it acts. Where Jev is unsure, its top pick is done, and the runner-up
+is offered beside the reply as a one-click swap, with Undo: *"Removed the “New Agent” button · [The
+“Filter” button on the “Logs” page instead] [Undo]"*. A wrong guess costs one click. A question cost
+a read, a decision and a click every time, even when Jev was right.
 
 1. **Every former question acts.** Which element, which page, where a new piece goes (at each
    level of the top-down placement), a new page or on a page, what kind of change, and "remove
@@ -280,8 +277,7 @@ Still weak, from the judges (writer 36 issues, Jev 18, render 7, edit 6):
 
 ## Plain words — `runs/2026-09-26-plain-words`
 
-Phase 1a of `docs/plan-web-2026-09-26.md`: what a person reads is in their words, and the
-questions with no decision behind them are gone.
+What a person reads is in their words, and the questions with no decision behind them are gone.
 
 1. **One module owns the words.** `trial/words.mjs` writes every question, choice, reply and
    page string. Things are named by what is on them ("the “You are owed” card", "the “Order
@@ -291,7 +287,7 @@ questions with no decision behind them are gone.
    behind `?debug=1`. `trial/test/words.test.mjs` renders every template against the twenty
    outlines of `runs/2026-09-23-jev-fixes` and fails on an engine word outside quotes.
 2. **No "start a new app?"** An empty canvas builds. A new app on a full canvas replaces it and
-   offers "Bring back “Relay”" (Undo), as does the new **New** button, until phase 3's project
+   offers "Bring back “Relay”" (Undo), as does the new **New** button, until a project
    list keeps it.
 3. **No "change the mockup, or is it a remark?"** When Jev's request gate and its route disagree,
    the sentence is taken as a change.

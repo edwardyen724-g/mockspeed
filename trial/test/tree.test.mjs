@@ -1792,7 +1792,7 @@ group("shared elements — one element drawn on several screens", () => {
   });
 });
 
-group("twinsOf — the same thing in each of a run of same-shaped siblings (plan §4)", () => {
+group("twinsOf — the same thing in each of a run of same-shaped siblings", () => {
   const MENU = `app "Crumb" web
   screen "Menu"
     row #bar pad=3 justify=between

@@ -1,4 +1,4 @@
-// turn.test — act, then offer (trial/turn.mjs, docs/plan-web-2026-09-26.md §3A, phase 1b).
+// turn.test — act, then offer (trial/turn.mjs).
 //
 //   node --test "trial/test/*.test.mjs"
 //
@@ -184,7 +184,7 @@ group("the changes, as functions of the canvas", () => {
   });
 });
 
-group("every one like it — the same edit on each twin (plan §4)", () => {
+group("every one like it — the same edit on each twin", () => {
   const MENU = parse(`app "Crumb" web
   screen "Menu"
     grid #cards cols=3 gap=3

@@ -12,7 +12,7 @@
 // for the answers a test needs — "yes, remove it", and "start a new app" from servers before
 // 2026-09-26 (a new app now replaces the canvas without asking, and offers the old one back) — and
 // records every other question ("which one?", "where should it go?") as asked, then leaves it.
-// Since act, then offer (phase 1b), the app mostly acts on Jev's top pick and offers the runner-up
+// Now that the app acts before it asks, it mostly takes Jev's top pick and offers the runner-up
 // as a swap beside the reply: the script records each step's swaps (`offers`) and takes none, so
 // the judges can say whether the first result, or one click on a swap, was what the person meant.
 //
@@ -113,7 +113,7 @@ for (const key of Object.keys(prompts)) {
   console.log(`${key.padEnd(14)} build ${(buildMs / 1000).toFixed(1)} s · ${jevCalls} Jev · ${humans} human · ${steps.map(sym).join("")}`);
   writeFileSync(join(OUT, "results.json"), JSON.stringify(results, null, 2));
 }
-// Phase 1b's counts: questions per follow-up — asked first, and nothing done with only offers
+// Act-then-offer counts: questions per follow-up — asked first, and nothing done with only offers
 // beside the reply (Jev does not see the thing named), which a person must also answer to get a
 // change — and swaps offered after acting.
 const follow = results.flatMap((r) => r.steps.filter((x) => x.kind !== "build"));

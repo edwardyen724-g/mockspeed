@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// probe-already — does Jev tell when what a sentence asks to add is on the mock already?
-// (docs/plan-web-2026-09-26.md §3B, "check before adding")
+// probe-already — check before adding: does Jev tell when what a sentence asks to add is on the
+// mock already?
 //
 //   node trial/eval/probe-already.mjs --env <env file> [--runs 2] [--wordings app,bare] [--out <file.json>]
 //

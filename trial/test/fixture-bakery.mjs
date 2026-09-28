@@ -1,7 +1,7 @@
-// fixture-bakery — the three-page bakery website the plan's done-conditions name (docs/plan-web-
-// 2026-09-26.md §8), as trial/eval/probe-already.mjs builds it: a shared top bar with the page
-// links and an order button, a hero, a grid of three bread cards, and a visit page with the address,
-// phone number, an hours table and a map.
+// fixture-bakery — the three-page bakery website the tests and the browser checks use, as
+// trial/eval/probe-already.mjs builds it: a shared top bar with the page links and an order button,
+// a hero, a grid of three bread cards, and a visit page with the address, phone number, an hours
+// table and a map.
 
 import { parse } from "../tree.mjs";
 

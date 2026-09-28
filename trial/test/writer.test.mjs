@@ -1,5 +1,4 @@
-// writer.test — the next steps a writer's answer ends with (trial/writer.mjs `nextSteps`,
-// docs/plan-web-2026-09-26.md §3E).
+// writer.test — the next steps a writer's answer ends with (trial/writer.mjs `nextSteps`).
 //
 //   node --test "trial/test/*.test.mjs"
 //

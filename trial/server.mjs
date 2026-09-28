@@ -6,9 +6,8 @@
 // The http shell over trial/engine.mjs, which holds everything a canvas is — its mock, undo, the
 // question waiting on the person, the offers, the log — once per project. The project at / opens the
 // outline given here and is the one trial/eval drives; /p/new makes another at /p/<id>/, with the
-// same page and the same routes under it, so two tabs edit two mocks without touching each other
-// (docs/plan-web-2026-09-26.md phase 3). Projects live as long as the process. Runs beside canvas/ so
-// the two can be compared.
+// same page and the same routes under it, so two tabs edit two mocks without touching each other.
+// Projects live as long as the process. Runs beside canvas/ so the two can be compared.
 
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -311,8 +310,8 @@ const server = createServer(async (req, res) => {
       writeFileSync(resolve(outOf(id)), serialize(p.root));
       return json(res, { note: W.reply.saved(outOf(id)), changed: false });
     }
-    // Export (plan §6): the mock as one file, and the prompt for an AI site builder — as text to copy
-    // or as a file. Both are built by code from what is on the canvas now; nothing is written here.
+    // Export: the mock as one file, and the prompt for an AI site builder — as text to copy or as a
+    // file. Both are built by code from what is on the canvas now; nothing is written here.
     if (route === "/export.html" || route === "/export.md" || route === "/prompt") {
       const html = route === "/export.html";
       const head = { "content-type": `${html ? "text/html" : route === "/prompt" ? "text/plain" : "text/markdown"}; charset=utf-8`, "cache-control": "no-store" };

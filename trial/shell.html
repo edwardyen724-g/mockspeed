@@ -56,14 +56,14 @@
   .ask button .n{display:inline-block;min-width:16px;height:16px;line-height:16px;margin-right:5px;border-radius:8px;
     background:#111;color:#fff;font-size:10px;text-align:center}
   .ask button.go .n{background:#fff;color:#111}
-  /* Next steps (plan §3E): what could be said next, one click each, under whatever is being offered. */
+  /* Next steps: what could be said next, one click each, under whatever is being offered. */
   .next{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0}
   .next:empty{display:none}
   .next button{border-radius:14px;padding:4px 10px;color:#333;background:#f6f6f6;border-color:#e3e3e3;text-align:left}
   .next button:hover{background:#ececec;border-color:#ccc}
   /* Scores, timings, model names, the file and the engine's own notes: only with ?debug=1. */
   body:not(.debug) .dbg{display:none}
-  /* Export (plan §6): a menu that opens upward from the right of the footer. */
+  /* Export: a menu that opens upward from the right of the footer. */
   #export{position:relative;margin-left:auto;border:0;font-size:12px}
   #export summary{padding:4px 9px;border:1px solid #111;background:#111;color:#fff;border-radius:3px;cursor:pointer}
   #export summary::before{content:none}
@@ -86,7 +86,7 @@
     <div class="ask" id="ask"></div>
     <div class="next" id="next"></div>
   </div>
-  <!-- The engine's own vocabulary; suggestion chips replace it for a person (plan §3E). -->
+  <!-- The engine's own vocabulary; suggestion chips replace it for a person. -->
   <details open class="dbg"><summary>what can I say?</summary>
     <dl>
       <dt>create an app for …</dt><dd>Jev routes it to the writer; the outline is drawn as it streams</dd>
@@ -244,8 +244,8 @@ function setMark(key) {
   if (key) tools(key);
 }
 
-// The toolbar on the marked element (plan §3C): which edits would change it, from the server, drawn
-// in the mock beside it. Its buttons and a double-clicked name come back here as edits.
+// The toolbar on the marked element: which edits would change it, from the server, drawn in the
+// mock beside it. Its buttons and a double-clicked name come back here as edits.
 async function tools(key) {
   const t = await fetch("tools?id=" + encodeURIComponent(key)).then((r) => r.json());
   if (key === marked) try { mock.contentWindow.postMessage({ type: "tools", tools: t, allOn: allFor === key }, "*"); } catch {}
@@ -310,8 +310,8 @@ async function send(utterance, chip = false) {
 
 // Every decision the canvas leaves to the person comes back as choices: buttons under the text
 // box, each posting its own answer. The elements they are about are numbered in the mock.
-// An offer about an element, or a place, carries the number it has in the mock (plan §3D): the
-// element is numbered there, the place drawn as a numbered line, and clicking either takes it.
+// An offer about an element, or a place, carries the number it has in the mock: the element is
+// numbered there, the place drawn as a numbered line, and clicking either takes it.
 function showChoices(list, pick = []) {
   choices = list;
   const at = list.some((c) => c.at);
@@ -353,8 +353,8 @@ $("new").onclick = async () => { setMark(null); handle(await post("new")); };
 $("save").onclick = async () => say(await post("save"));
 $("unselect").onclick = () => setMark(null);
 
-// Export (plan §6): the mock as one file, the prompt for an AI site builder copied, or that prompt
-// as a file. The downloads are plain links; the copy fetches the prompt as the mock is now.
+// Export: the mock as one file, the prompt for an AI site builder copied, or that prompt as a file.
+// The downloads are plain links; the copy fetches the prompt as the mock is now.
 $("exPrompt").onclick = async () => {
   const text = await fetch("prompt").then((r) => r.text());
   let ok = false;

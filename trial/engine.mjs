@@ -1,7 +1,6 @@
 // trial's engine — one project's canvas: its mock, its undo, the question waiting on the person, what
 // is offered, the log. `project()` makes one; every piece of state lives inside it, so two projects in
-// one process never touch each other (docs/plan-web-2026-09-26.md phase 3). trial/server.mjs is the
-// http shell over a map of them.
+// one process never touch each other. trial/server.mjs is the http shell over a map of them.
 //
 //   const p = project({ root, apiKey, llmKey, model });
 //   await p.ask({ utterance, marked, viewing });   p.state();   p.subscribe(({ rev, seq }) => …);
@@ -14,22 +13,22 @@
 //
 // Where Jev is not sure — which element, which page, where a new piece goes — its top pick is done
 // and the runner-up comes back as an `offer`, a one-click swap the page shows next to the text box
-// with Undo (trial/turn.mjs, docs/plan-web-2026-09-26.md §3A); a swap comes back to /swap. The
-// person is asked first (`choices`, answered at /answer) only before a new app when Jev is torn
-// between that and another kind of change, and before clearing on an unsure answer. An offer about
-// an element or a place is also numbered in the mock, where a click takes it (plan §3D). When the
-// element an edit acts on has twins — each card's price — Jev says whether the sentence means it or
-// every one like it, and the other reading is offered (plan §4).
+// with Undo (trial/turn.mjs); a swap comes back to /swap. The person is asked first (`choices`,
+// answered at /answer) only before a new app when Jev is torn between that and another kind of
+// change, and before clearing on an unsure answer. An offer about an element or a place is also
+// numbered in the mock, where a click takes it. When the element an edit acts on has twins — each
+// card's price — Jev says whether the sentence means it or every one like it, and the other reading
+// is offered.
 //
 // Before an addition, Jev says whether the thing is on the mock already ("add our phone number" on a
 // site that shows one): then it is shown, or moved to the place the sentence names, and a second one
-// is offered (plan §3B, checkFirst). After every build and change, three next steps sit under the
-// text box, one click each: the writer's, written in the same call (plan §3E).
+// is offered (checkFirst). After every build and change, three next steps sit under the text box,
+// one click each: the writer's, written in the same call.
 //
 // A clicked element gets a toolbar in the mock — bigger, smaller, bold, lighter, up, down, remove,
-// "All 5 like this" — and double-clicking its words edits them in place (plan §3C). Those go to
-// /edit and straight onto the tree: no Jev, no writer, free. Every string the person reads comes
-// from trial/words.mjs; the log's own notes, Jev's scores and timings are for ?debug=1. Runs beside
+// "All 5 like this" — and double-clicking its words edits them in place. Those go to /edit and
+// straight onto the tree: no Jev, no writer, free. Every string the person reads comes from
+// trial/words.mjs; the log's own notes, Jev's scores and timings are for ?debug=1. Runs beside
 // canvas/ so the two can be compared.
 
 import { parse, Stream, serialize, index, find, describe, shapeOf, positionOf, applyPatch, apply, gaps, screenGaps, partsOf, spotsIn, edgesOf, neighboursIn, padded, firstCopy, sharedView, twinsOf } from "./tree.mjs";
@@ -78,8 +77,8 @@ const DESTRUCTIVE = new Set(["remove", "clear"]);
 // The edits that step a property, and so can be tried on each candidate to see whether they would
 // change it. A move or a removal changes anything; a rename needs its words.
 const PROPERTY = new Set(["bigger", "smaller", "bold", "regular", "darker", "lighter", "wider", "narrower", "taller", "shorter"]);
-// The toolbar on a clicked element (docs/plan-web-2026-09-26.md §3C): the direct edits a person can
-// make with no words, in the order they are shown. Rename is double-click. No model is called.
+// The toolbar on a clicked element: the direct edits a person can make with no words, in the order
+// they are shown. Rename is double-click. No model is called.
 const TOOLS = ["bigger", "smaller", "bold", "regular", "lighter", "darker", "move_earlier", "move_later", "remove"];
 
 export const blank = () => parse('app "new" web').root;
@@ -108,9 +107,9 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
   let turn = null;
   // The page a build is drawing, for the line under the text box while it runs.
   let drawing = null;
-  // The next steps offered under the text box (plan §3E): the writer's, kept with the mock they were
-  // written for, so Undo brings back the ones that went with it. A change the writer did not write
-  // keeps the ones before it; a step the person took is dropped. An empty canvas offers starters.
+  // The next steps offered under the text box: the writer's, kept with the mock they were written
+  // for, so Undo brings back the ones that went with it. A change the writer did not write keeps
+  // the ones before it; a step the person took is dropped. An empty canvas offers starters.
   const nextFor = new WeakMap();
   const nextSteps = () => (screenList().length ? W.chips(root, nextFor.get(root) ?? []) : W.starters);
   // Who hears about each change: the page's event stream, once per open tab.
@@ -184,7 +183,7 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
   const doubt = (ctx, conf, alts, always = false) => turn?.doubt(conf, alts, ctx, always);
   const swapFor = (label, body) => ({ label, body });
 
-  // What a swap is about, for the mock to show it where it is (plan §3D): the element it would act on
+  // What a swap is about, for the mock to show it where it is: the element it would act on
   // instead — numbered in the mock, and a click on it takes the swap — or the place it would put a
   // piece instead, drawn as a numbered line there. Nothing for a swap about one-or-every, a page or a
   // kind of change.
@@ -256,8 +255,8 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     const gate = d.request >= FIRE;
     // Jev asks itself twice whether this is a request — the gate, and the route's "none". When both
     // are sure and they disagree, the sentence is a change: in a mock editor a sentence is a change
-    // unless it is a question (docs/plan-web-2026-09-26.md §3B, decided 2026-09-26), and Undo takes it
-    // back. The person is no longer asked "change the mockup, or is it a remark?".
+    // unless it is a question (decided 2026-09-26), and Undo takes it back. The person is no longer
+    // asked "change the mockup, or is it a remark?".
     const disagree = confident && gate !== (d.route !== "none");
     if (disagree) note({ op: "route", route: "?", note: "Jev's gate and route disagree — taken as a change", source: why, said: utterance });
     let route = disagree ? (d.route !== "none" ? d.route : "write") : confident ? d.route : gate ? "write" : "none";
@@ -483,18 +482,18 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     const { d, fallbackTarget, depth, marked } = ctx;
     if (!llmKey) return { note: W.reply.notSetUp, debug: "this needs writing, and there is no ANTHROPIC_API_KEY — start with --env", blocked: true };
     // An empty canvas builds, whatever the sentence: there is nothing else it could be about and
-    // nothing to lose, so "start a new app?" has no decision behind it (plan §3B).
+    // nothing to lose, so "start a new app?" has no decision behind it.
     if (!screenList().length) return build(ctx);
     // Jev's answer stands. When the thing it acts on is known already (the marked element the
     // sentence points at, or the one an escalated edit was aimed at), its top answer is taken when it
-    // is a change to this app (plan §3B).
+    // is a change to this app.
     const known = fallbackTarget || (marked && d.points != null && d.points >= POINTS);
     let job = d.jobConfidence >= ACT_JOB || (known && ["add", "rewrite", "several"].includes(d.job)) ? d.job : null;
     if (!job || job === "none") {
       // Unsure what kind of change it is: Jev's likeliest kind is done and the next offered — except
       // a new app, which replaces the whole mock, when Jev is torn between that and another kind; then
-      // the person says first (plan §3A). A new app is not an answer for a sentence about one of the
-      // app's own elements, and a part of a split sentence is not split again.
+      // the person says first. A new app is not an answer for a sentence about one of the app's own
+      // elements, and a part of a split sentence is not split again.
       const ranked = Object.entries(d.jobs ?? {})
         .filter(([j]) => j !== "none" && !(known && j === "new_app") && !(depth > 0 && j === "several"))
         .sort((a, b) => b[1] - a[1]);
@@ -715,7 +714,7 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     return landPiece(next, w, gap, { debug: `added ${gap.text}`, where: W.place(root, gap) });
   }
 
-  // ---- check before adding (plan §3B) -------------------------------------------------------------
+  // ---- check before adding ------------------------------------------------------------------------
   // Before anything is written for an addition, Jev says whether the thing is on the mock already —
   // "add our phone number" on a site that shows one — which element it is, on any page, and whether
   // the sentence names a page or a place for it:
@@ -1082,7 +1081,7 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
     return r;
   }
 
-  // ---- the toolbar and in-place words (plan §3C) ---------------------------------------------
+  // ---- the toolbar and in-place words --------------------------------------------------------
   // What the toolbar on a clicked element offers: each edit that would change it and, when it has
   // twins, each that would change at least one of them — shown once "All 5 like this" is on. `text`
   // is its words, for a double-click to edit in place (null for what has none to edit).
@@ -1144,7 +1143,7 @@ export function project({ root: start = null, apiKey = null, llmKey = null, mode
   }
 
   // Start again on an empty canvas; the app that was there is one click away, as after a new app
-  // replaced it. A project list keeps it for good (plan phase 4).
+  // replaced it. A project list would keep it for good; there is none yet.
   function startAgain() {
     if (busy) return { note: W.reply.busy(busy), changed: false };
     if (!screenList().length) return { note: W.reply.started(null), changed: false, choices: [] };
