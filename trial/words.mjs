@@ -459,6 +459,8 @@ export const web = {
   badEmail: "That doesn't look like an email address.",
   signingIn: "Signing you in…",
   signedIn: "Signed in.",
+  carryingOn: "Signed in. Carrying on…",
+  carriedOn: "Signed in. Your change is being made in the tab the email opened — you can close this one.",
   linkBad: "That link didn't work — it may have expired or been used already. Ask for a new one.",
   tooLong: "That's a lot at once. Say it in fewer words?",
   anonLimit: "That's today's mocks without an account. Sign in to keep going.",

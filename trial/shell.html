@@ -3,10 +3,12 @@
 <style>
   :root{--line:#e3e3e3;--faint:#8a8a8a}
   *{box-sizing:border-box}
-  body{margin:0;height:100vh;display:grid;grid-template-columns:1fr 360px;
+  /* The panel where you type sits on the left and the mock fills the rest, as in Lovable and Base44. */
+  body{margin:0;height:100vh;display:grid;grid-template-columns:360px 1fr;
        font:13px/1.45 system-ui,-apple-system,sans-serif;color:#111;background:#f6f6f6}
   iframe{width:100%;height:100vh;border:0;background:#fff}
-  aside{border-left:1px solid var(--line);background:#fff;display:flex;flex-direction:column;height:100vh}
+  aside{grid-column:1;grid-row:1;border-right:1px solid var(--line);background:#fff;display:flex;flex-direction:column;height:100vh}
+  #mock{grid-column:2;grid-row:1}
   header{padding:12px 14px;border-bottom:1px solid var(--line)}
   h1{margin:0;font-size:13px;font-weight:600}
   .sub{color:var(--faint);font-size:11px;margin-top:2px}
@@ -93,7 +95,7 @@
     <!-- Whatever the canvas needs the person to decide appears here, right under what they typed. -->
     <div class="note" id="note"></div>
     <!-- The web app: a change or an export that needs an account waits here while the person signs in. -->
-    <div class="signin web" id="signin" hidden>
+    <div class="signin web" id="signin" data-carrying="{{carryingOn}}" data-carried="{{carriedOn}}" hidden>
       <p>{{keepGoing}}</p>
       <form id="signinForm"><input id="email" type="email" placeholder="{{email}}" autocomplete="email" required><button class="go" type="submit">{{sendLink}}</button></form>
       <div class="note" id="signinNote"></div>
@@ -152,8 +154,13 @@ document.body.classList.toggle("debug", DEBUG);
 const WEB = "{{mode}}" === "web";
 document.body.classList.toggle("web", WEB);
 let signedIn = !WEB;
-// What waits for the person to sign in: it is done again once they have.
+// What waits for the person to sign in — a change ({ path, body }) or an export ({ click }) — done once
+// they have. It is kept in this browser's storage too, because the tab the email's link opens is
+// where the person is looking by then, and that tab does it; this one does only if no such tab
+// turns up (the link opened on another device).
 let held = null;
+const HELD = "ms-held:" + location.pathname.split("/")[2];
+const HANDOVER = 8000;
 const HINT = $("markedBox").textContent;
 
 // Every path is relative, so the page talks to its own project: /state at /, /p/<id>/state at
@@ -165,7 +172,7 @@ async function post(path, body) {
   if (res.status === 401) {
     const r = await res.json().catch(() => ({}));
     if (r.signin) {
-      held = async () => handle(await post(path, body));
+      held = { path, body };
       askSignIn();
       // The panel says why; the reply line stays empty.
       return { note: "", changed: false, signin: true };
@@ -236,7 +243,7 @@ function paint(f) {
   show(f.state);
 }
 
-async function load() { show(await fetch("state").then((r) => r.json())); }
+async function load() { const s = await fetch("state").then((r) => r.json()); show(s); return s; }
 function show(s) {
   els = s.elements;
   $("title").textContent = s.heading;
@@ -428,7 +435,7 @@ $("unselect").onclick = () => setMark(null);
 // Export: the mock as one file, the prompt for an AI site builder copied, or that prompt as a file.
 // The downloads are plain links; the copy fetches the prompt as the mock is now.
 $("exPrompt").onclick = async () => {
-  if (!signedIn) { $("export").open = false; held = () => $("exPrompt").click(); return askSignIn(); }
+  if (!signedIn) { $("export").open = false; held = { click: "exPrompt" }; return askSignIn(); }
   const text = await fetch("prompt").then((r) => r.text());
   let ok = false;
   try { await navigator.clipboard.writeText(text); ok = true; } catch {}
@@ -446,12 +453,13 @@ $("exPrompt").onclick = async () => {
 };
 for (const id of ["exHtml", "exMd"]) $(id).addEventListener("click", (e) => {
   $("export").open = false;
-  if (!signedIn) { e.preventDefault(); held = () => $(id).click(); askSignIn(); }
+  if (!signedIn) { e.preventDefault(); held = { click: id }; askSignIn(); }
 });
 
 // ---- signing in (the web app) -------------------------------------------------------------------
-// The first mock needs no account; the next change or an export does. The link in the email signs
-// this browser in, in whichever tab it opens; this page notices, and does what was waiting.
+// The first mock needs no account; the next change or an export does. The link in the email opens a
+// tab signed in; that tab finds what was waiting (HELD) and does it. This tab, told it is signed in
+// too, hands over: it says where the change is being made and follows the mock as it changes.
 function askSignIn() {
   $("signin").hidden = false;
   $("note").textContent = "";
@@ -463,8 +471,34 @@ $("signinForm").addEventListener("submit", async (e) => {
   $("signinNote").textContent = "…";
   const r = await fetch("/api/auth/link", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("email").value, back: location.pathname }) }).then((r) => r.json()).catch(() => ({}));
   $("signinNote").textContent = r.note || "";
-  if (r.ok) waitForSignIn();
+  if (!r.ok) return;
+  if (held) try { localStorage.setItem(HELD, JSON.stringify({ ...held, at: Date.now() })); } catch {}
+  waitForSignIn();
 });
+// What was waiting, taken out of storage so that only one tab does it.
+function take() {
+  let h = null;
+  try { h = JSON.parse(localStorage.getItem(HELD) || "null"); localStorage.removeItem(HELD); } catch {}
+  return h && Date.now() - h.at < 30 * 60 * 1000 ? h : null;
+}
+const waitingThere = () => { try { return localStorage.getItem(HELD) != null; } catch { return false; } };
+async function doHeld(h) {
+  held = null;
+  if (h.click) return $(h.click).click();
+  $("utterance").value = "";
+  $("note").className = "note";
+  $("note").textContent = $("signin").dataset.carrying;
+  handle(await post(h.path, h.body));
+}
+// This tab, once another has taken over: the mock here follows the change made there.
+function follow(rev) {
+  const until = Date.now() + 120000;
+  const t = setInterval(async () => {
+    const s = await fetch("state").then((r) => r.json()).catch(() => null);
+    if (s?.version && s.version.rev !== rev) { clearInterval(t); redraw(); }
+    if (Date.now() > until) clearInterval(t);
+  }, 2000);
+}
 let waiting = null;
 function waitForSignIn() {
   clearInterval(waiting);
@@ -475,11 +509,18 @@ function waitForSignIn() {
     signedIn = true;
     $("signin").hidden = true;
     $("signinNote").textContent = "";
-    const again = held;
+    const s = await load();
+    if (!held) return;
+    // Give the tab the email opened a moment to take what was waiting; if none does, do it here.
+    const until = Date.now() + HANDOVER;
+    while (waitingThere() && Date.now() < until) await new Promise((ok) => setTimeout(ok, 400));
+    const h = take();
+    if (h) return doHeld(h);
     held = null;
-    if (again && $("utterance").value) $("utterance").value = "";
-    await load();
-    if (again) again();
+    $("utterance").value = "";
+    $("note").className = "note";
+    $("note").textContent = $("signin").dataset.carried;
+    follow(s.version?.rev);
   }, 2500);
 }
 addEventListener("click", (e) => { if (!e.target.closest("#export")) $("export").open = false; });
@@ -512,12 +553,14 @@ if (!WEB) new EventSource("events").onmessage = (e) => {
   seen = now;
 };
 load();
-// Opened from the landing page: its sentence is said at once.
+// Opened from the landing page: its sentence is said at once. Opened by the email's link, signed in:
+// what was waiting for the sign-in is done here.
 if (WEB) {
   const key = "ms-first:" + location.pathname.split("/")[2];
   let first = null;
   try { first = sessionStorage.getItem(key); sessionStorage.removeItem(key); } catch {}
   if (first) send(first);
+  else if (waitingThere()) load().then((s) => { if (s.account?.signedIn) { const h = take(); if (h) doHeld(h); } });
 }
 </script>
 </body></html>

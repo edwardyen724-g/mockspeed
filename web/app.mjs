@@ -61,8 +61,9 @@ export function app(env) {
   // The words every page of ours fills in, and who is looking.
   const words = (who) => ({ ...W.web, account: who.user ? who.user.email : "", signedIn: who.user ? "yes" : "" });
 
-  // The page's state, as trial/server.mjs's /state, and who is looking.
-  const stateOf = (p, who) => ({ ...p.state(), out: "", account: { signedIn: Boolean(who.user), email: who.user?.email ?? null } });
+  // The page's state, as trial/server.mjs's /state, with its version (a tab that handed a change over
+  // to another follows it by that), and who is looking.
+  const stateOf = (p, who) => ({ ...p.state(), version: p.version, out: "", account: { signedIn: Boolean(who.user), email: who.user?.email ?? null } });
 
   return async function handle(req) {
     const url = new URL(req.url);
