@@ -60,7 +60,9 @@ export function ipHash(req, secret) {
 
 export const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Supabase Auth sends the email; its link comes back to `redirect` with the tokens after a #.
+// Supabase Auth sends the email. Its link is `redirect` itself with the link's token_hash after a #
+// (the email template, email/sign-in.html), so the button in the email points at this site; an older
+// email's link goes through Supabase and comes back to `redirect` with the tokens after a #.
 export async function sendLink({ SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY }, email, redirect) {
   const res = await fetch(`${SUPABASE_URL}/auth/v1/otp?redirect_to=${encodeURIComponent(redirect)}`, {
     method: "POST",
@@ -68,6 +70,21 @@ export async function sendLink({ SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY }, email
     body: JSON.stringify({ email, create_user: true }),
   });
   if (!res.ok) throw new Error(`sign-in link ${res.status}: ${(await res.text()).slice(0, 200)}`);
+}
+
+// Whose the email's token_hash is, as Supabase says once it has used it up: { id, email }, or null.
+// "email" covers both the first sign-in (a sign-up) and every later one.
+export const LINK_TYPES = new Set(["email", "magiclink", "signup"]);
+export async function verifyLink({ SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY }, tokenHash, type = "email") {
+  if (!LINK_TYPES.has(type)) return null;
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_PUBLISHABLE_KEY, "content-type": "application/json" },
+    body: JSON.stringify({ type, token_hash: tokenHash }),
+  });
+  if (!res.ok) return null;
+  const u = (await res.json())?.user;
+  return u?.id && u?.email ? { id: u.id, email: u.email } : null;
 }
 
 // Whose an access token is, as Supabase says: { id, email }, or null.

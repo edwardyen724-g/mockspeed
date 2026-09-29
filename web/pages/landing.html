@@ -45,7 +45,7 @@
 <script>
 // A sign-in link that Supabase sent back to the site's root rather than to /auth/callback (its list of
 // allowed return addresses did not match) still signs the person in.
-if (/[#&]access_token=/.test(location.hash)) location.replace("/auth/callback" + location.hash);
+if (/[#&](access_token|token_hash)=/.test(location.hash)) location.replace("/auth/callback" + location.hash);
 const $ = (id) => document.getElementById(id);
 const main = document.querySelector("main");
 const nav = $("projects");
