@@ -436,8 +436,9 @@ export const ui = {
 // working one until the product has its own.
 export const web = {
   product: "mockspeed",
-  headline: "Describe your website or app.",
-  subline: "A grey mock of it appears in seconds. Then say what to change.",
+  headline: "Mocks as fast as you can talk.",
+  subline: "Describe your website or app, and a grey mock of it appears in seconds. Then say what to change.",
+  describe: "Describe your website or app",
   prompt: "A website for my bakery: menu, hours, where to find us",
   make: "Make it",
   wordsOnly: "Words only — links and pictures aren't read yet.",
