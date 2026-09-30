@@ -46,7 +46,7 @@ async function rpc(method, params, { who = person, key = aiKey(who) } = {}) {
     body: JSON.stringify({ jsonrpc: "2.0", ...(method.startsWith("notifications/") ? {} : { id: ++n }), method, params }),
   }));
   const text = await res.text();
-  return { status: res.status, body: text ? JSON.parse(text) : null };
+  return { status: res.status, headers: res.headers, body: text ? JSON.parse(text) : null };
 }
 const tool = async (name, args, opts) => {
   const r = await rpc("tools/call", { name, arguments: args }, opts);
@@ -101,7 +101,7 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     assert.equal((await rpc("tools/list", {}, { key: forged })).status, 401);
   });
 
-  test("it connects: its protocol version, what mockspeed is for, and five tools", async () => {
+  test("it connects: its protocol version, what mockspeed is for, five tools and the panel's three", async () => {
     const init = await rpc("initialize", { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "test", version: "1" } });
     assert.equal(init.status, 200);
     assert.equal(init.body.result.protocolVersion, "2025-06-18");
@@ -109,7 +109,7 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     assert.match(init.body.result.instructions, /never write markup/);
     assert.equal((await rpc("notifications/initialized", {})).status, 202);
     const list = await rpc("tools/list", {});
-    assert.deepEqual(list.body.result.tools.map((t) => t.name), ["open_mock", "say", "take_offer", "undo", "look"]);
+    assert.deepEqual(list.body.result.tools.map((t) => t.name), ["open_mock", "say", "take_offer", "undo", "look", "panel_open", "panel_change", "panel_tools"]);
     // Nothing in any tool takes the mock's own format: the AI says sentences and points at ids.
     for (const t of list.body.result.tools) assert.ok(!Object.keys(t.inputSchema.properties).some((k) => /outline|spec|markup|html/.test(k)), t.name);
     assert.equal((await rpc("no/such", {})).body.error.code, -32601);
@@ -140,7 +140,9 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     await handle(new Request(`${BASE}/p/${id}/edit`, { method: "POST", headers: { "content-type": "application/json", cookie }, body: JSON.stringify({ op: "remove", target: "findus" }) })).then((r) => r.text());
     assert.ok(!(await tool("look", { mock: id })).text.includes("findus ·"));
     const undo = await tool("undo", { mock: id });
-    assert.ok(undo.text.startsWith(W.reply.undone));
+    // The AI hears first what the person did in their tab, then its own reply.
+    assert.match(undo.text, /^The person changed the mock themselves[^\n]*\n  said|^The person changed the mock themselves[^\n]*\n  → /);
+    assert.ok(undo.text.includes(`\n${W.reply.undone}`));
     assert.ok((await tool("look", { mock: id })).text.includes("findus ·"));
     const theirs = await tool("look", { mock: id }, { who: other });
     assert.equal(theirs.isError, true);
@@ -208,11 +210,79 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     }
   });
 
+  test("a host that shows panels gets the panel: its page, its tools hidden from the AI, and say and look drawn in it", async () => {
+    const tools = (await rpc("tools/list", {})).body.result.tools;
+    const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
+    assert.equal(byName.say._meta.ui.resourceUri, "ui://mockspeed/mock");
+    assert.equal(byName.look._meta.ui.resourceUri, "ui://mockspeed/mock");
+    assert.equal(byName.say._meta["openai/outputTemplate"], "ui://mockspeed/mock");
+    // The panel's own tools: hidden from the AI where panels are shown, and saying so where not.
+    for (const n of ["panel_open", "panel_change", "panel_tools"]) {
+      assert.deepEqual(byName[n]._meta.ui.visibility, ["app"], n);
+      assert.match(byName[n].description, /^Only the mockspeed panel calls this; not for you/);
+    }
+    // The page: an MCP App, allowed to reach Realtime and nothing else.
+    const read = (await rpc("resources/read", { uri: "ui://mockspeed/mock" })).body.result.contents[0];
+    assert.equal(read.mimeType, "text/html;profile=mcp-app");
+    assert.ok(read.text.includes("ui/initialize") && read.text.includes("panel_change"));
+    assert.ok(!/\{\{\w+\}\}/.test(read.text), "every word filled in");
+    assert.deepEqual(read._meta.ui.csp.connectDomains, [env.SUPABASE_URL, env.SUPABASE_URL.replace(/^http/, "ws")]);
+    const id = await bakeryOf(person);
+    const look = await tool("look", { mock: id });
+    const d = look._meta.mockspeed;
+    assert.equal(d.id, id);
+    assert.ok(d.html.includes("Bread baked every morning at 5"));
+    assert.equal(d.live.project, projectTopic(env.SESSION_SECRET, id));
+    assert.ok(d.at > 0);
+  });
+
+  test("a change in the panel goes straight to the engine, out live, and into the AI's next reply", async () => {
+    const id = await bakeryOf(person);
+    const tab = await listen(projectTopic(env.SESSION_SECRET, id));
+    try {
+      const open = await tool("panel_open", { mock: id });
+      assert.equal(open.structuredContent.mockspeed.id, id);
+      const bar = (await tool("panel_tools", { mock: id, id: "hero" })).structuredContent.tools;
+      assert.ok(bar.tools.some((t) => t.op === "remove") && bar.text === "Bread baked every morning at 5");
+      const r = await tool("panel_change", { mock: id, route: "/edit", body: { op: "rename", target: "hero", text: "Rye on Sundays" } });
+      const d = r.structuredContent.mockspeed;
+      assert.equal(d.reply.changed, true);
+      assert.ok(d.html.includes("Rye on Sundays"));
+      assert.ok((await tab.until((h) => h.done && h.html?.includes("Rye on Sundays"))), "a watching tab saw it");
+      // Nothing but the editor's own changes.
+      assert.equal((await tool("panel_change", { mock: id, route: "/new" })).isError, true);
+      // The AI's next call opens with what the person did; after its own change, that is not said again.
+      const look = await tool("look", { mock: id });
+      assert.match(look.text, /^The person changed the mock themselves since your last change/);
+      assert.ok(look.text.includes("Rye on Sundays"));
+      const undo = await tool("undo", { mock: id });
+      assert.match(undo.text, /^The person changed the mock themselves/);
+      const again = await tool("look", { mock: id });
+      assert.ok(!again.text.includes("The person changed"), again.text.slice(0, 200));
+      assert.ok(!again.text.includes("Rye on Sundays"));
+    } finally {
+      tab.close();
+    }
+  });
+
+  test("the key in the address works as the header does, for connectors that take only a link", async () => {
+    const res = await handle(new Request(`${BASE}/mcp/${aiKey(person)}`, {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+    }));
+    assert.equal(res.status, 200);
+    assert.ok((await res.json()).result.tools.length >= 5);
+    const forged = await handle(new Request(`${BASE}/mcp/${aiKey(person).replace(/\.[^.]+$/, ".AAAA")}`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }));
+    assert.equal(forged.status, 401);
+  });
+
   test("/connect shows the signed-in person their AI key and watch link, and asks anyone else to sign in", async () => {
     const cookie = A.sessionCookie(person, env.SESSION_SECRET, false).split(";")[0];
     const html = await (await page("/connect", cookie)).text();
     assert.ok(html.includes(`claude mcp add --transport http mockspeed ${BASE}/mcp --header &quot;Authorization: Bearer ${aiKey(person)}&quot;`));
     assert.ok(html.includes(`${BASE}/w/${watchKey(person)}`));
+    assert.ok(html.includes(`${BASE}/mcp/${aiKey(person)}`), "the connector link for Claude and ChatGPT");
     assert.ok(!/\{\{\w+\}\}/.test(html), "every word filled in");
     const out = await (await page("/connect")).text();
     assert.ok(!out.includes("msai_"));

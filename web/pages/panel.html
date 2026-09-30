@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{product}}</title>
+<!-- The panel inside Claude or ChatGPT (an MCP App, web/mcp.mjs `ui://mockspeed/mock`): the mock the
+     person's AI is drawing, live, and the person's own way to change it. It speaks to the host in
+     JSON-RPC over postMessage (MCP Apps, 2026-01-26); every change the person makes here goes to
+     mockspeed's engine through the panel's own tools (panel_change), with no turn of the AI's in
+     between, and the host is told what changed for the AI's next reply (ui/update-model-context).
+     Frames of every change, whoever makes it, arrive on the mock's Realtime channel (web/live.mjs).
+     The host allows no nested frame, so the mock is drawn into a shadow root, not an iframe. -->
+<style>
+  :root{--bg:var(--color-background-primary,#fff);--ink:var(--color-text-primary,#111);--faint:var(--color-text-secondary,#8a8a8a);
+    --line:var(--color-border-secondary,#e3e3e3);--soft:var(--color-background-secondary,#f6f6f6);--font:var(--font-sans,system-ui,-apple-system,sans-serif)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 var(--font)}
+  body{display:flex;flex-direction:column;height:560px}
+  body.fixed{height:100vh}
+  header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
+  header .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  header b{font-weight:600}
+  header .sub{color:var(--faint);margin-left:6px}
+  button{font:inherit;font-size:12px;padding:4px 9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;cursor:pointer}
+  button:hover:not(:disabled){background:var(--soft)}
+  button:disabled{opacity:.4;cursor:default}
+  button.go{border-color:#111;background:#111;color:#fff}
+  button.link{border:0;padding:2px 4px;text-decoration:underline;color:var(--faint);background:none}
+  #stage{position:relative;flex:1;min-height:0;overflow:auto;background:#fff}
+  #host{display:block}
+  #empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8a8a8a;padding:20px;text-align:center}
+  [hidden]{display:none !important}
+  footer{border-top:1px solid var(--line);padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+  .note{min-height:18px;color:var(--ink)}
+  .note.warn{color:#8a3a00}
+  .note .by{color:var(--faint)}
+  .row{display:flex;gap:6px;flex-wrap:wrap}
+  .row:empty{display:none}
+  .row button .n{display:inline-block;min-width:16px;height:16px;line-height:16px;margin-right:5px;border-radius:8px;background:#111;color:#fff;font-size:10px;text-align:center}
+  .row button.go .n{background:#fff;color:#111}
+  #next button{border-radius:14px;background:var(--soft)}
+  .marked{font-size:12px;color:var(--faint);display:flex;gap:6px;align-items:center}
+  .marked:empty{display:none}
+  form{display:flex;gap:6px}
+  input{flex:1;min-width:0;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+  input:focus{outline:1px solid #111;border-color:#111}
+  body.busy #go{opacity:.4}
+  /* The toolbar on the clicked element, and the word editor, drawn over the mock at true size. */
+  #bar{position:absolute;z-index:50;display:flex;gap:2px;padding:3px;background:#111;border-radius:6px;white-space:nowrap;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);font:12px/1 system-ui,-apple-system,sans-serif}
+  #bar button{font:inherit;color:#fff;background:transparent;border:0;border-radius:4px;padding:6px 8px}
+  #bar button:hover{background:#333}
+  #bar button.on{background:#fff;color:#111}
+  #bar .sep{width:1px;background:#444;margin:3px 2px}
+  #edit{position:absolute;z-index:60;margin:0;padding:0 2px;border:0;outline:2px solid #111;background:#fff;color:#111;border-radius:0}
+  /* Another panel further down the chat shows this mock now: this one folds to a line. */
+  #folded{display:none;padding:10px 12px;color:var(--faint);align-items:center;gap:8px}
+  body.folded{height:auto}
+  body.folded > :not(#folded){display:none}
+  body.folded #folded{display:flex}
+</style></head>
+<body>
+<header>
+  <div class="t"><b id="title">{{product}}</b><span class="sub" id="status"></span></div>
+  <button class="link" id="open" type="button" hidden>{{panelOpen}}</button>
+  <button id="full" type="button" hidden>{{panelFull}}</button>
+</header>
+<div id="stage"><div id="host"></div><div id="empty">{{panelWaiting}}</div></div>
+<footer>
+  <div class="note" id="note"></div>
+  <div class="row" id="ask"></div>
+  <div class="row" id="next"></div>
+  <div class="marked" id="marked"></div>
+  <form id="form"><input id="utterance" placeholder="{{panelSay}}" autocomplete="off"><button class="go" id="go" type="submit">{{say}}</button><button id="undo" type="button" disabled>{{undo}}</button></form>
+</footer>
+<div id="folded"><span>{{panelBelow}}</span><button id="here" type="button">{{panelShowHere}}</button></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+const WORDS = { yourAi: "{{yourAi}}", back: "{{panelBack}}", full: "{{panelFull}}", offline: "{{panelOffline}}", hint: "{{selectHint}}", unselect: "{{unselect}}" };
+
+// ---- the host: JSON-RPC over postMessage --------------------------------------------------------
+let nid = 0;
+const waiting = new Map();
+const toHost = (m) => window.parent.postMessage({ jsonrpc: "2.0", ...m }, "*");
+function request(method, params = {}) {
+  const id = ++nid;
+  toHost({ id, method, params });
+  return new Promise((ok, fail) => waiting.set(id, { ok, fail }));
+}
+const notify = (method, params = {}) => toHost({ method, params });
+const callTool = async (name, args) => {
+  const r = await request("tools/call", { name, arguments: args });
+  if (r?.isError) throw new Error(r.content?.[0]?.text || "failed");
+  return r;
+};
+const dataOf = (r) => r?._meta?.mockspeed ?? r?.structuredContent?.mockspeed ?? null;
+
+addEventListener("message", (e) => {
+  if (e.source !== window.parent) return;
+  const m = e.data;
+  if (!m || m.jsonrpc !== "2.0") return;
+  if (m.id != null && !m.method) {
+    const w = waiting.get(m.id);
+    if (!w) return;
+    waiting.delete(m.id);
+    if (m.error) w.fail(new Error(m.error.message || "error")); else w.ok(m.result);
+    return;
+  }
+  const p = m.params ?? {};
+  if (m.method === "ui/notifications/tool-input") toolInput(p.arguments ?? {}, true);
+  else if (m.method === "ui/notifications/tool-input-partial") toolInput(p.arguments ?? {}, false);
+  else if (m.method === "ui/notifications/tool-result") toolResult(p);
+  else if (m.method === "ui/notifications/tool-cancelled") { if (!MOCK) say(esc(p.reason || ""), true); }
+  else if (m.method === "ui/notifications/host-context-changed") context(p);
+  // Requests from the host get an answer, whatever they are.
+  if (m.id != null && m.method) toHost({ id: m.id, result: {} });
+});
+
+// ---- what the host says about where the panel is --------------------------------------------------
+let ctx = {};
+function context(more) {
+  ctx = { ...ctx, ...more };
+  const vars = ctx.styles?.variables ?? {};
+  for (const [k, v] of Object.entries(vars)) if (v) document.documentElement.style.setProperty(k, v);
+  if (ctx.theme) document.documentElement.style.colorScheme = ctx.theme;
+  const dims = ctx.containerDimensions ?? {};
+  document.body.classList.toggle("fixed", "height" in dims || ctx.displayMode === "fullscreen");
+  $("full").hidden = !(ctx.availableDisplayModes ?? []).includes("fullscreen");
+  $("full").textContent = ctx.displayMode === "fullscreen" ? WORDS.back : WORDS.full;
+  sized();
+  fit();
+}
+let lastSize = "";
+function sized() {
+  const s = `${document.documentElement.scrollWidth}x${document.body.offsetHeight}`;
+  if (s === lastSize) return;
+  lastSize = s;
+  notify("ui/notifications/size-changed", { width: document.documentElement.scrollWidth, height: document.body.offsetHeight });
+}
+new ResizeObserver(() => { sized(); fit(); }).observe(document.body);
+
+$("full").onclick = async () => {
+  const want = ctx.displayMode === "fullscreen" ? "inline" : "fullscreen";
+  try { const r = await request("ui/request-display-mode", { mode: want }); context({ displayMode: r?.mode ?? want }); } catch {}
+};
+$("open").onclick = () => { if (URL_) request("ui/open-link", { url: URL_ }).catch(() => {}); };
+
+// ---- which mock, from the tool call that opened the panel ---------------------------------------
+let MOCK = null, URL_ = null, AT = null, state = null, seq = -1;
+function toolInput(args, whole) {
+  // The AI's sentence as it writes it, then the mock it is about.
+  if (args.sentence) say(`<span class="by">${esc(WORDS.yourAi)}:</span> ${esc(args.sentence)}`);
+  if (whole && args.mock && !MOCK) openMock(String(args.mock));
+}
+function toolResult(r) {
+  const d = dataOf(r);
+  if (d) return take(d);
+  // A host that dropped what came with the result: the mock's id is in its words.
+  const m = /mock "?([a-z0-9]{8,40})/.exec(r?.content?.[0]?.text ?? "");
+  if (m) openMock(m[1]);
+}
+async function openMock(id) {
+  MOCK = id;
+  try { take(dataOf(await callTool("panel_open", { mock: id }))); } catch { say(WORDS.offline, true); }
+}
+function take(d) {
+  if (!d) return;
+  MOCK = d.id ?? MOCK;
+  if (d.url) { URL_ = d.url; $("open").hidden = false; }
+  if (d.at && !AT) { AT = d.at; announce(); }
+  if (d.state && (d.state.version?.seq ?? 0) >= seq) {
+    if (d.html) paint(d.html);
+    show(d.state);
+  }
+  if (d.reply) handle(d.reply);
+  if (d.live) listen(d.live);
+}
+
+// ---- drawing the mock ---------------------------------------------------------------------------
+const shadow = $("host").attachShadow({ mode: "open" });
+// The mock's page, into the shadow root: its styles scoped to it, its scripts left out (the panel
+// does their work below), its page-wide rules pointed at the root that stands for its body.
+const EXTRA = `.ms-doc .mock{min-height:0}
+  [data-id]{cursor:pointer} [data-id]:hover{outline:1px dashed #bbb;outline-offset:2px}
+  [data-id].marked{outline:2px solid #111;outline-offset:2px} [data-id].twin{outline:2px dashed #111;outline-offset:2px}
+  .pick{position:relative}
+  .pick::after{content:attr(data-pick);position:absolute;top:-10px;left:-10px;background:#111;color:#fff;
+    font:11px/18px system-ui;width:18px;height:18px;border-radius:9px;text-align:center;z-index:9;zoom:var(--unzoom,1)}`;
+// Each element's drawing as last painted, to find what a change changed.
+let drawnAs = null;
+function paint(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const css = [...doc.querySelectorAll("style")].map((s) => s.textContent).join("\n")
+    .replace(/(^|[}\s,])html,body\{/g, "$1.ms-doc{").replace(/(^|[}\s,])(html|body)\{/g, "$1.ms-doc{");
+  doc.querySelectorAll("script,style,#ms-bar,#ms-edit,.ms-drop").forEach((n) => n.remove());
+  shadow.innerHTML = `<style>${css}\n${EXTRA}</style><div class="ms-doc">${doc.body.innerHTML}</div>`;
+  $("empty").hidden = true;
+  fit();
+  if (marked) { if (byId(marked)) mark(marked, false); else setMark(null); }
+  showPicks();
+  // The panel is small and the change may be on another page: what changed is brought into view,
+  // so a build is followed as it draws.
+  const now = new Map([...shadow.querySelectorAll("[data-id]")].map((n) => [n.dataset.id, n.outerHTML]));
+  if (drawnAs) {
+    const changed = [...now.keys()].filter((k) => drawnAs.get(k) !== now.get(k));
+    const leaf = changed.map(byId).find((n) => n && !changed.some((k) => k !== n.dataset.id && n.contains(byId(k))));
+    if (leaf) reveal(leaf);
+  }
+  drawnAs = now;
+}
+function reveal(el) {
+  const st = $("stage"), at = where(el);
+  if (at.top >= st.scrollTop && at.top + Math.min(at.height, st.clientHeight) <= st.scrollTop + st.clientHeight) return;
+  st.scrollTo({ top: Math.max(0, at.top - 40), behavior: "smooth" });
+}
+const byId = (k) => shadow.querySelector(`[data-id="${CSS.escape(k)}"]`);
+// A web page is drawn at its real 1200 px and zoomed out to the panel's width.
+let zoom = 1;
+function fit() {
+  const d = shadow.querySelector(".ms-doc");
+  if (!d) return;
+  d.style.zoom = "1";
+  zoom = Math.min(1, ($("stage").clientWidth - 2) / Math.max(1, d.scrollWidth));
+  d.style.zoom = String(zoom);
+  d.style.setProperty("--unzoom", String(1 / zoom));
+  placeBar();
+}
+
+// ---- the page's state: title, reply, offers, next steps -----------------------------------------
+let choices = [], picked = [];
+function show(s) {
+  state = s;
+  seq = Math.max(seq, s.version?.seq ?? 0);
+  $("title").textContent = s.heading;
+  $("status").textContent = s.status ?? "";
+  $("undo").disabled = !s.canUndo;
+  document.body.classList.toggle("busy", Boolean(s.busy));
+  if (s.busy && s.working) say(esc(s.working));
+  const qs = s.question?.choices ?? (s.offer ?? []).map((o) => ({ ...o, offer: true }));
+  showChoices(qs, s.question?.pick ?? []);
+  if (s.question && !s.busy) say(esc(s.question.text));
+  showNext(s.busy || s.question ? [] : s.next ?? []);
+  showMarked();
+}
+function say(html, warn = false) {
+  $("note").innerHTML = html;
+  $("note").className = "note" + (warn ? " warn" : "");
+}
+function showChoices(list, pick = []) {
+  choices = list;
+  const at = list.some((c) => c.at);
+  picked = at ? list.map((c) => c.at?.pick ?? null) : pick;
+  $("ask").innerHTML = list.map((c, i) => `<button type="button" data-i="${i}" class="${c.primary ? "go" : ""}">${c.at || picked[i] ? `<span class="n">${i + 1}</span>` : ""}${esc(c.label)}</button>`).join("");
+  showPicks();
+}
+function showPicks() {
+  shadow.querySelectorAll(".pick").forEach((n) => { n.classList.remove("pick"); n.removeAttribute("data-pick"); });
+  picked.forEach((k, i) => { const n = k && byId(k); if (n) { n.classList.add("pick"); n.dataset.pick = i + 1; } });
+}
+function showNext(list) {
+  $("next").innerHTML = list.slice(0, 4).map((t) => `<button type="button" data-say="${esc(t)}">${esc(t)}</button>`).join("");
+}
+$("ask").addEventListener("click", (e) => {
+  const i = e.target.closest("button")?.dataset.i;
+  if (i != null) take_(+i);
+});
+function take_(i) {
+  const c = choices[i];
+  if (!c) return;
+  showChoices([]);
+  change(c.post.path, c.post.body ?? {}, { what: c.label });
+}
+$("next").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (b) send(b.dataset.say, true);
+});
+function handle(r) {
+  const offers = (r.offer ?? []).map((o) => ({ ...o, offer: true }));
+  showChoices(r.choices?.length ? r.choices : offers, r.pick ?? []);
+  say(esc(r.note ?? ""), r.changed === false && !r.choices?.length && !r.mark);
+  if (r.mark && byId(r.mark)) { setMark(r.mark); reveal(byId(r.mark)); }
+}
+
+// ---- pointing at the mock: a click marks, the toolbar edits, a double-click renames -------------
+let marked = null, bar = null, allOn = false;
+function showMarked() {
+  const e = marked && state?.elements?.find((x) => x.key === marked);
+  $("marked").innerHTML = e ? `<span>${esc(e.selected)}</span><button class="link" type="button" id="unmark">${esc(WORDS.unselect)}</button>` : "";
+  if (e) $("unmark").onclick = () => setMark(null);
+}
+function mark(key, fresh = true) {
+  shadow.querySelectorAll(".marked,.twin").forEach((n) => n.classList.remove("marked", "twin"));
+  if (key) byId(key)?.classList.add("marked");
+  if (fresh || !bar) toolsFor(key); else placeBar();
+}
+function setMark(key) {
+  if (key !== marked) { bar = null; allOn = false; }
+  marked = key;
+  mark(key);
+  showMarked();
+}
+async function toolsFor(key) {
+  $("bar")?.remove();
+  if (!key || !MOCK) return;
+  try {
+    const t = (await callTool("panel_tools", { mock: MOCK, id: key })).structuredContent?.tools;
+    if (key === marked) { bar = t; placeBar(); }
+  } catch {}
+}
+function placeBar() {
+  $("bar")?.remove();
+  shadow.querySelectorAll(".twin").forEach((n) => n.classList.remove("twin"));
+  const el = bar && marked === bar.id && byId(bar.id);
+  if (!el) return;
+  if (allOn) for (const k of bar.twins) if (k !== bar.id) byId(k)?.classList.add("twin");
+  const list = allOn ? bar.allTools : bar.tools;
+  if (!list.length && !bar.allLabel) return;
+  const b = document.createElement("div");
+  b.id = "bar";
+  const button = (label, on, act, title) => {
+    const x = document.createElement("button");
+    x.type = "button";
+    x.textContent = label;
+    if (on) x.className = "on";
+    if (title) x.title = title;
+    x.onclick = (e) => { e.preventDefault(); act(); };
+    b.appendChild(x);
+  };
+  if (bar.allLabel) {
+    button(bar.allLabel, allOn, () => { allOn = !allOn; placeBar(); });
+    if (list.length) b.appendChild(Object.assign(document.createElement("span"), { className: "sep" }));
+  }
+  for (const t of list) button(t.label, false, () => change("/edit", { op: t.op, target: bar.id, all: allOn }, { what: t.label }), bar.renameHint);
+  $("stage").appendChild(b);
+  const at = where(el);
+  const w = b.offsetWidth, h = b.offsetHeight, room = $("stage").clientWidth + $("stage").scrollLeft;
+  b.style.left = Math.max(4, Math.min(at.left, room - w - 4)) + "px";
+  b.style.top = (at.top - h - 8 >= $("stage").scrollTop ? at.top - h - 8 : at.top + at.height + 8) + "px";
+}
+// Where an element of the mock is, in the stage's own scrolled pixels.
+function where(el) {
+  const r = el.getBoundingClientRect(), s = $("stage").getBoundingClientRect();
+  return { left: r.left - s.left + $("stage").scrollLeft, top: r.top - s.top + $("stage").scrollTop, width: r.width, height: r.height };
+}
+shadow.addEventListener("click", (e) => {
+  const f = e.target.closest("[data-for]");
+  const n = f ? byId(f.dataset.for) : e.target.closest("[data-id]");
+  if (!n) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (n.classList.contains("pick")) return take_(Number(n.dataset.pick) - 1);
+  setMark(n.dataset.id);
+}, true);
+shadow.addEventListener("dblclick", (e) => {
+  const n = e.target.closest("[data-id]");
+  if (!n) return;
+  e.preventDefault();
+  const edit = () => { if (bar?.id === n.dataset.id && bar.text != null) editWords(n); };
+  if (bar?.id === n.dataset.id) edit();
+  else { setMark(n.dataset.id); setTimeout(edit, 400); }
+}, true);
+function editWords(el) {
+  $("edit")?.remove();
+  const at = where(el), cs = getComputedStyle(el);
+  const inp = document.createElement("input");
+  inp.id = "edit";
+  inp.value = bar.text;
+  Object.assign(inp.style, { left: at.left + "px", top: at.top + "px", width: Math.max(at.width, 140) + "px", height: Math.max(at.height, 22) + "px",
+    font: cs.font, fontSize: `${parseFloat(cs.fontSize) * zoom}px` });
+  $("stage").appendChild(inp);
+  inp.focus();
+  inp.select();
+  const key = el.dataset.id, was = bar.text;
+  let closed = false;
+  const done = (keep) => {
+    if (closed) return;
+    closed = true;
+    const v = inp.value.trim();
+    inp.remove();
+    if (keep && v && v !== was) change("/edit", { op: "rename", target: key, text: v }, { what: `renamed it "${v}"` });
+  };
+  inp.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); done(true); }
+    if (e.key === "Escape") { e.preventDefault(); done(false); }
+  });
+  inp.addEventListener("blur", () => done(true));
+}
+// The page the person is looking at: the one with the most of itself in view.
+function viewing() {
+  const s = $("stage").getBoundingClientRect();
+  let best = null, most = 0;
+  for (const n of shadow.querySelectorAll("[data-screen]")) {
+    const r = n.getBoundingClientRect();
+    const seen = Math.max(0, Math.min(r.bottom, s.bottom) - Math.max(r.top, s.top)) * Math.max(0, Math.min(r.right, s.right) - Math.max(r.left, s.left));
+    if (seen > most) { most = seen; best = n.dataset.screen; }
+  }
+  return best;
+}
+
+// ---- the person's own changes: straight to mockspeed, then the host is told ---------------------
+$("form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const t = $("utterance").value.trim();
+  if (t) send(t);
+});
+function send(utterance, chip = false) {
+  $("utterance").value = "";
+  showNext([]);
+  change("/ask", { utterance, marked, viewing: viewing(), chip }, { what: `said "${utterance}"` });
+}
+$("undo").onclick = () => change("/undo", {}, { what: "undo" });
+
+const mine = [];
+async function change(route, body, { what }) {
+  if (!MOCK) return;
+  showChoices([]);
+  say("…");
+  let r;
+  try {
+    const d = dataOf(await callTool("panel_change", { mock: MOCK, route, body }));
+    if (d?.state) { if (d.html) paint(d.html); show(d.state); }
+    r = d?.reply ?? { note: "", changed: false };
+  } catch (e) {
+    r = { note: WORDS.offline, changed: false };
+  }
+  handle(r);
+  if (r.changed) { mine.push(`${what} → ${r.note}`); tellHost(); }
+}
+// What the AI reads with the person's next message: every change made here, and the mock as it is.
+function tellHost() {
+  const lines = [
+    `In the mockspeed panel, the person changed mock ${MOCK} themselves (already done; build on it, don't redo it):`,
+    ...mine.slice(-12).map((t) => `- ${t}`),
+    `The mock now: "${state?.heading ?? ""}", ${state?.status ?? ""}. look shows its elements and their ids.`,
+  ];
+  request("ui/update-model-context", { content: [{ type: "text", text: lines.join("\n") }] }).catch(() => {});
+}
+
+// ---- live: every change's frames, whoever makes it (web/live.mjs) --------------------------------
+let LIVE = null;
+function listen(cfg) {
+  if (LIVE || !cfg?.url) return;
+  LIVE = cfg;
+  let ws, ref = 0, beat = null, tries = 0;
+  const send_ = (topic, event, payload) => ws.readyState === 1 && ws.send(JSON.stringify({ topic, event, payload, ref: String(++ref) }));
+  const topic = `realtime:${cfg.project}`;
+  shout = (event, payload) => send_(topic, "broadcast", { type: "broadcast", event, payload });
+  (function connect() {
+    ws = new WebSocket(`${cfg.url.replace(/^http/, "ws")}/realtime/v1/websocket?apikey=${encodeURIComponent(cfg.key)}&vsn=1.0.0`);
+    ws.onopen = () => {
+      tries = 0;
+      send_(topic, "phx_join", { config: { broadcast: { self: false }, presence: { key: "" }, private: false } });
+      beat = setInterval(() => send_("phoenix", "heartbeat", {}), 25000);
+      announce();
+    };
+    ws.onmessage = (e) => {
+      const m = JSON.parse(e.data);
+      if (m.event === "broadcast" && m.topic === topic && m.payload) heard(m.payload.event, m.payload.payload ?? {});
+    };
+    ws.onclose = () => { clearInterval(beat); setTimeout(connect, Math.min(10000, 500 * 2 ** tries++)); };
+  })();
+}
+window.msHeard = [];
+function heard(event, m) {
+  if (event === "panel") return other(m.at);
+  if (event !== "frame" || !m.state) return;
+  msHeard.push({ at: Date.now(), seq: m.state.version?.seq, mock: Boolean(m.html), done: Boolean(m.done) });
+  if ((m.state.version?.seq ?? 0) < seq) return;
+  if (m.html) paint(m.html);
+  show(m.state);
+  if (m.done && m.reply) handle(m.reply);
+}
+
+// ---- one open panel per mock: the newest; the ones above it in the chat fold to a line ------------
+let shout = () => {};
+const announce = () => { if (AT) shout("panel", { at: AT }); };
+function other(at) {
+  if (!AT || !at || at === AT) return;
+  if (at > AT) { document.body.classList.add("folded"); sized(); }
+  else announce();
+}
+$("here").onclick = () => { document.body.classList.remove("folded"); sized(); fit(); };
+
+// ---- start -----------------------------------------------------------------------------------------
+request("ui/initialize", {
+  protocolVersion: "2026-01-26",
+  appInfo: { name: "mockspeed", version: "0.2.0" },
+  appCapabilities: { availableDisplayModes: ["inline", "fullscreen"] },
+}).then((r) => {
+  context(r?.hostContext ?? {});
+  notify("ui/notifications/initialized");
+}).catch(() => {});
+</script>
+</body></html>

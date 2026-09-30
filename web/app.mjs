@@ -37,10 +37,13 @@ const PAGES = {
   callback: readFileSync(new URL("./pages/callback.html", import.meta.url), "utf8"),
   missing: readFileSync(new URL("./pages/missing.html", import.meta.url), "utf8"),
   connect: readFileSync(new URL("./pages/connect.html", import.meta.url), "utf8"),
+  panel: readFileSync(new URL("./pages/panel.html", import.meta.url), "utf8"),
 };
 const page = (name) => PAGES[name];
 const PROJECT = /^\/p\/([a-z0-9]{8,40})(\/.*)?$/;
 const WATCH = /^\/w\/(mswatch_[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/;
+// The AI's key in the address, for Claude's and ChatGPT's connectors, which take a link and no header.
+const MCP = /^\/mcp(?:\/(msai_[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+))?\/?$/;
 const CHANGES = new Set(["/ask", "/answer", "/swap", "/edit", "/undo", "/new"]);
 // What a browser with no account may do: its first mock, and the answers and swaps that come with it.
 const FIRST = new Set(["/ask", "/answer", "/swap"]);
@@ -103,7 +106,21 @@ export function app(env) {
     await live.send(accountTopic(secret, user.id), "open", { id });
     return { id };
   }
-  const forAi = mcp({ secret, db, open, change, start: startForAi, link: watchLink });
+  // The panel the chat shows (web/pages/panel.html): the page, what may connect from it (Realtime),
+  // and a mock as it draws one.
+  const realtime = env.SUPABASE_URL ? [env.SUPABASE_URL, env.SUPABASE_URL.replace(/^http/, "ws")] : [];
+  const panel = {
+    page: () => fill(page("panel"), W.web),
+    meta: () => ({
+      ui: { csp: { connectDomains: realtime, resourceDomains: [] }, prefersBorder: true },
+      "openai/widgetCSP": { connect_domains: realtime, resource_domains: [] },
+      "openai/widgetDescription": W.web.panelDescription,
+    }),
+    html: (p) => mockPage(p.root),
+    // The page's state without its long history: the panel shows the latest reply, not the log.
+    state: (p) => { const s = p.state(); return { ...s, log: s.log.slice(-8), version: p.version }; },
+  };
+  const forAi = mcp({ secret, db, open, change, start: startForAi, link: watchLink, panel, live: liveFor });
 
   return async function handle(req) {
     const url = new URL(req.url);
@@ -121,11 +138,12 @@ export function app(env) {
       // What the person adds to their AI, and the link to keep open while it draws.
       if (path === "/connect" && req.method === "GET") {
         const ai = who.user ? A.key("ai", who.user, secret) : "";
-        return html(fill(page("connect"), { ...words(who), command: ai ? `claude mcp add --transport http mockspeed ${url.origin}/mcp --header "Authorization: Bearer ${ai}"` : "", watch: ai ? `${url.origin}/w/${A.key("watch", who.user, secret)}` : "" }));
+        return html(fill(page("connect"), { ...words(who), command: ai ? `claude mcp add --transport http mockspeed ${url.origin}/mcp --header "Authorization: Bearer ${ai}"` : "", connector: ai ? `${url.origin}/mcp/${ai}` : "", watch: ai ? `${url.origin}/w/${A.key("watch", who.user, secret)}` : "" }));
       }
-      if (path === "/mcp") {
+      const m = path.match(MCP);
+      if (m) {
         if (req.method === "POST") warm();
-        return forAi(req, url);
+        return forAi(req, url, m[1] ?? null);
       }
       // The watch link: this browser may look at the account's mocks from now on; it opens the one
       // named, or the newest (an empty one when there is none), and follows the ones the AI opens.
@@ -237,11 +255,15 @@ export function app(env) {
   // model calls kept as usage rows, each with the site it was made on (`origin`: the deployed app, or
   // a local run against the same store). Each frame — a build draws a page at a time, a piece a few
   // lines at a time — goes out live to the tabs watching this mock, with the sentence's id so the tab
-  // that asked knows its own, and to `frame`, for the reply streamed to that tab. `extra` is what
-  // only the person's AI brings (web/mcp.mjs): `by: "ai"` and more of the conversation (`brief`).
+  // that asked knows its own, and to `frame`, for the reply streamed to that tab. `extra` says who
+  // made it through web/mcp.mjs — `by: "ai"`, whose history entries are marked so, so the AI can be
+  // told what the person changed since (mcp.mjs sinceAi); or `"panel"`, the person in the chat's
+  // panel — and what only the AI brings: more of the conversation (`brief`).
   // Returns the reply and the project as it is after.
   async function change(row, route, input, who, origin, { sentence = randomUUID(), frame = null, by = null, brief = "" } = {}) {
     const p = open(row.state);
+    const log = p.state().log;
+    const last = log.at(-1);
     const uses = [];
     const shared = () => ({ ...p.state(), version: p.version, out: "", sentence });
     const out = live.channel(projectTopic(secret, row.id), (mock) => ({ ...(mock ? { html: mockPage(p.root) } : {}), state: shared() }));
@@ -257,7 +279,7 @@ export function app(env) {
       r = await metered((u) => uses.push(u), async () => {
         if (route === "/ask") {
           if (brief) p.inform(brief);
-          return p.ask({ utterance: String(input.utterance ?? ""), marked: input.marked ?? null, viewing: input.viewing ?? null, chip: Boolean(input.chip), by });
+          return p.ask({ utterance: String(input.utterance ?? ""), marked: input.marked ?? null, viewing: input.viewing ?? null, chip: Boolean(input.chip), by: by === "ai" ? "ai" : null });
         }
         if (route === "/answer") return p.answer(input);
         if (route === "/swap") return p.swap(input);
@@ -269,6 +291,7 @@ export function app(env) {
       r = { note: W.reply.error, debug: e.message, changed: false, error: true };
     }
     off();
+    if (by === "ai") for (const e of log.slice(last ? log.lastIndexOf(last) + 1 : 0)) e.by = "ai";
     try {
       const s = p.state();
       const saved = await db.save(row.id, row.rev, p.save(), String(s.title ?? ""), s.screens);

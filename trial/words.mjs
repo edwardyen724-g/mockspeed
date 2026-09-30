@@ -474,10 +474,21 @@ export const web = {
   connectLink: "Use it from your AI",
   connectTitle: "Use mockspeed from your own AI",
   connectLead: "While you talk an idea over with your AI, it can draw what it proposes. You watch the mock come together in a tab, and each follow-up shows up there as it's said.",
+  connectConnector: "Or in Claude (the desktop app or claude.ai) or ChatGPT: add a custom connector with this link. The mock then draws right in the chat, and you can change it there yourself:",
   connectAdd: "Add mockspeed to Claude Code, in a terminal:",
   connectWatch: "Keep this link open in a tab. Every mock your AI starts shows up there as it's drawn:",
-  connectPrivate: "Both are yours alone. With the first, anyone can make mocks on your account; with the second, anyone can watch them.",
+  connectPrivate: "All three are yours alone. With either of the first two, anyone can make mocks on your account; with the last, anyone can watch them.",
   connectSignIn: "Sign in to connect your AI.",
+  // The panel inside Claude or ChatGPT (web/pages/panel.html).
+  panelDescription: "The grey mock being talked over, drawn live. The person can click it and say changes in it; the next reply from mockspeed says what they changed.",
+  panelSay: "Change it yourself: “make the prices bigger”",
+  panelWaiting: "The mock shows up here as it's drawn…",
+  panelOpen: "Open in a tab",
+  panelFull: "Full screen",
+  panelBack: "Back to the chat",
+  panelBelow: "This mock carries on further down.",
+  panelShowHere: "Show it here",
+  panelOffline: "Can't reach mockspeed from here. It will catch up on the next change.",
   copy: "Copy",
 };
 

@@ -54,6 +54,43 @@ mock: its tools are the engine's own actions, and Jev decides what every sentenc
 To try it with a local run, add the server to Claude Code with the key from `/connect` on that run
 (its own `SESSION_SECRET`), open the watch link in a tab, and talk an idea over.
 
+### The panel in Claude and ChatGPT (MCP Apps)
+
+Where the chat shows MCP Apps (Claude desktop and claude.ai, ChatGPT), `say` and `look` come with a
+panel, `ui://mockspeed/mock` (`pages/panel.html`): the mock drawn live right in the chat, and a place
+for the person to change it themselves.
+
+- **Connecting.** Their connectors take a link and no header, so `/connect` also shows
+  `<site>/mcp/msai_…`: the same key, in the address (a custom connector with no authentication).
+  Until sign-in from inside the AI (phase M3), that is how Claude and ChatGPT get in.
+- **Drawing live.** The panel learns its mock from the tool call (`tool-input`, then the result's
+  `_meta.mockspeed`: the mock, the page's state and its Realtime channel) and then hears every
+  change's frames on that channel, as a watching tab does. It paints them into a shadow root, since
+  the hosts allow no nested frame, zoomed to the panel's width, and scrolls to what changed. Only
+  the newest panel of a mock stays open; the ones above it in the chat fold to a line (they tell each
+  other over the same channel).
+- **The person's own changes** go straight to the engine through the panel's own tools,
+  `panel_open`, `panel_change` and `panel_tools` (`visibility: ["app"]`, hidden from the AI; listed
+  to every client with descriptions saying they are not the AI's, because hosts don't reliably
+  declare panel support). There is no AI turn in between: a click, the toolbar, a double-click
+  rename, a sentence, an offer or Undo, as in the editor.
+- **The AI hears what changed**, twice over. The panel sends the host its list of changes
+  (`ui/update-model-context`), which the host gives the model with the person's next message. And
+  every tool reply to the AI starts with what the person changed since the AI's own last change,
+  from the project's history (`mcp.mjs` `sinceAi`; `app.mjs` `change()` marks the AI's entries
+  `by: "ai"`). That also covers Claude Code and changes made in a browser tab.
+- **Checked** 2026-09-30 in the MCP Apps reference host (`ext-apps` `examples/basic-host`, the
+  spec's sandbox proxy and CSP) with a real browser against a local run:
+  - a toolbar edit in the panel answered in 290-360 ms;
+  - the person's "make the prices bigger" showed its first frame in 160-350 ms and was done in
+    about 2 s;
+  - the host held both as model context;
+  - the AI's `say` "what if the menu items were cards" showed its first frame in a new panel
+    340-380 ms after the call and was drawn in 2.5-3.3 s, while the older panel folded;
+  - the AI's reply opened with the person's two changes.
+- `/mcp` answers CORS, so MCP clients that run in a browser (the reference host, the MCP Inspector)
+  can reach it; a call is let in only by its key.
+
 ## Settings
 
 Environment variables; locally `web/.env.local` (never committed), in production Vercel's.
