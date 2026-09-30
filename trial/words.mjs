@@ -454,7 +454,7 @@ export const web = {
   signInFor: "Sign in to see your projects.",
   email: "you@example.com",
   sendLink: "Email me a link",
-  linkSent: "Check your email: the link signs you in and brings you back here.",
+  linkSent: "Check your email: the link signs you in and brings you back here. Not there in a minute? Look in your spam folder — it's from mockspeed@sealed.run.",
   linkFailed: "Couldn't send the link just now. Try again in a minute.",
   badEmail: "That doesn't look like an email address.",
   signingIn: "Signing you in…",
