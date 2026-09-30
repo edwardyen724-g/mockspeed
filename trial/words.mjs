@@ -473,6 +473,7 @@ export const web = {
   allowancePaid: "{used} of {n} changes today",
   paused: "mockspeed has paused new changes for a while. Your mock is saved; try again later.",
   paid: "Thanks — you're on the paid plan now. Carry on.",
+  paidElsewhere: "Thanks — you're on the paid plan now. Go back to your AI and carry on; it can keep drawing.",
   payClosed: "Paying isn't open yet. Come back tomorrow for more changes.",
   payFailed: "That payment didn't go through, so nothing was charged. Try again?",
   billing: "Billing",

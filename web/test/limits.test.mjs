@@ -155,9 +155,10 @@ group("a day's changes, paying for more, the kill switch", { skip: !ready && "no
     assert.equal((await db.gate(who.id)).plan, "free");
 
     stripe.sessions.get(cs).status = "complete";
+    // Paid in a browser that isn't the account's (the link came from the AI): a page that says so.
     const done = await handle(new Request(`${BASE}/upgrade/done?s=${cs}&back=/p/${id}/`));
-    assert.equal(done.status, 303);
-    assert.equal(done.headers.get("location"), `/p/${id}/?note=paid`);
+    assert.equal(done.status, 200);
+    assert.ok((await done.text()).includes(W.web.paidElsewhere.replace(/'/g, "'")));
     const acct = await db.account(who.id);
     assert.deepEqual([acct.plan, acct.stripe_customer, acct.stripe_subscription, acct.stripe_status], ["paid", "cus_fake", `sub_${cs}`, "active"]);
 
@@ -169,8 +170,10 @@ group("a day's changes, paying for more, the kill switch", { skip: !ready && "no
     assert.equal(full.limit, true);
     assert.equal(full.note, W.web.limitPaid.replace("{n}", "4"));
     assert.equal(full.upgrade, undefined);
-    // Paid already: the pay link goes back to the mock.
-    assert.equal((await handle(new Request(upgrade))).headers.get("location"), `/p/${id}/?note=paid`);
+    // Paid already: in the account's own browser the pay link, and coming back from Stripe, go back
+    // to the mock, which says so.
+    assert.equal((await get(new URL(upgrade).pathname + new URL(upgrade).search, who)).headers.get("location"), `/p/${id}/?note=paid`);
+    assert.equal((await get(`/upgrade/done?s=${cs}&back=/p/${id}/`, who)).headers.get("location"), `/p/${id}/?note=paid`);
   });
 
   test("Stripe's webhook keeps the plan in step with the subscription, and only Stripe's is heard", async () => {
@@ -221,7 +224,7 @@ group("a day's changes, paying for more, the kill switch", { skip: !ready && "no
 
   test("the admin page shows the switches and today's changes by where they were said", async () => {
     const admin = newPerson();
-    const h = app({ ...env, ANTHROPIC_API_KEY: "", TYPESAFE_API_KEY: "", ADMIN_EMAILS: admin.email, SPEND_CAP_USD: "25" });
+    const h = app({ ...env, ANTHROPIC_API_KEY: "", TYPESAFE_API_KEY: "", ADMIN_EMAILS: admin.email, SPEND_CAP_USD: "25", STRIPE_SECRET_KEY: "" });
     const html = await (await get("/admin", admin, h)).text();
     assert.match(html, /Changes a day: 20 free, 300 paid · spend cap \$25\.0000 a day · models on · paying: off/);
     assert.match(html, /changes today: editor \d+ · panel \d+ · ai \d+/);

@@ -147,6 +147,9 @@ export function app(env) {
     const path = url.pathname;
     const secure = url.protocol === "https:";
     const who = { user: A.person(req, secret), anon: A.anonOf(req), watch: A.watcher(req, secret) };
+    // Paid: back to the mock, saying so, in the account's own browser; anywhere else (the link came
+    // from the person's AI), a page that says so, since that browser can't open the mock.
+    const paidPage = (payer, back) => (who.user?.id === payer ? go(withNote(back, "paid")) : html(message(W.web.paidElsewhere, "/projects")));
     try {
       // ---- pages ---------------------------------------------------------------------------
       if (path === "/" && req.method === "GET") return html(fill(page("landing"), { ...words(who), starters: JSON.stringify(W.starters) }));
@@ -186,7 +189,7 @@ export function app(env) {
         if (!payer) return go(`/projects`);
         if (!pay.ready) return html(message(W.web.payClosed, back));
         const acct = await db.account(payer.id);
-        if (acct?.plan === "paid") return go(withNote(back, "paid"));
+        if (acct?.plan === "paid") return paidPage(payer.id, back);
         return go(await pay.checkout(payer, url.origin, back, acct?.stripe_customer ?? null));
       }
       if (path === "/upgrade/done" && req.method === "GET") {
@@ -195,7 +198,7 @@ export function app(env) {
         if (!done) return html(message(W.web.payFailed, back));
         await db.setPlan(done.user, done);
         await db.use([{ user_id: done.user, sentence: randomUUID(), provider: "mockspeed", model: "stripe", purpose: "paid", status: done.status, cost_usd: 0, origin: url.host }]);
-        return go(withNote(back, "paid"));
+        return paidPage(done.user, back);
       }
       if (path === "/billing" && req.method === "GET") {
         const acct = who.user && pay.ready ? await db.account(who.user.id) : null;
