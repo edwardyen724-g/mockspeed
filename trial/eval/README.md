@@ -32,6 +32,14 @@ the runner-up as a swap beside its reply. The script records each step's swaps (
 clicks none. "≈" is a change with a swap offered and "~" is nothing changed with a swap offered.
 The judges say `swap_right` when the change was not what was meant but one click on a swap is.
 
+## The person's own AI — `runs/2026-09-29-mcp-live`
+
+Phase M1 added a brief to the writer (unused here: the eval sends none, so its prompts are
+unchanged) and draws a piece a line at a time as the writer writes it, instead of all at once when
+it is done. This run checks that neither changed what the app does: 372 Jev decisions, builds 10/10,
+120 follow-ups, no errors, **0 questions asked first**, 98 changed the mock (52 with a swap offered),
+against 97 (49) in the last run. The judges were not re-run.
+
 ## Engine as a library — `runs/2026-09-27-engine-library`
 
 The canvas moved out of `trial/server.mjs` into `trial/engine.mjs`, one `project()` per canvas, with

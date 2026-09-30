@@ -118,3 +118,23 @@ group("two projects from one mock", () => {
     assert.equal(p.state().llm, null);
   });
 });
+
+group("what the person talked over with their own AI", () => {
+  test("the brief is the project's: kept when saved and opened again, added to, and only the newest kept when long", () => {
+    const p = project({ root: bakery, brief: "Crumb, a bakery on Elm Street." });
+    const q = project();
+    p.inform("Rye on Sundays, $9.");
+    p.inform("   ");
+    assert.equal(p.brief, "Crumb, a bakery on Elm Street.\nRye on Sundays, $9.");
+    assert.equal(q.brief, "");
+    const again = project({ saved: p.save() });
+    assert.equal(again.brief, p.brief);
+    // A project saved before there was a brief opens with none.
+    const old = p.save();
+    delete old.brief;
+    assert.equal(project({ saved: old }).brief, "");
+    again.inform("x".repeat(7000));
+    assert.equal(again.brief.length, 6000);
+    assert.ok(again.brief.endsWith("xxx"));
+  });
+});

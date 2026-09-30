@@ -47,6 +47,31 @@ export function sessionCookie({ id, email }, secret, secure) {
 }
 export const signedOut = (secure) => cookie("ms_session", "", 0, secure);
 
+// Two keys for one account, signed like the session: `ai`, which the person's own AI sends with each
+// call to web/mcp.mjs (Authorization: Bearer …) and which may change their mocks; and `watch`, the
+// link that shows their mocks as the AI draws them, which may only look. Neither expires; a new
+// SESSION_SECRET ends every one.
+export function key(kind, { id, email }, secret) {
+  const body = b64(JSON.stringify({ u: id, e: email }));
+  return `ms${kind}_${body}.${sign(`${kind}:${body}`, secret)}`;
+}
+// The account a key is for, { id, email }, or null.
+export function keyed(kind, token, secret) {
+  const m = /^ms([a-z]+)_([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/.exec(String(token ?? "").trim());
+  if (!m || m[1] !== kind || !secret) return null;
+  const want = Buffer.from(sign(`${kind}:${m[2]}`, secret));
+  const got = Buffer.from(m[3]);
+  if (want.length !== got.length || !timingSafeEqual(want, got)) return null;
+  try {
+    const s = JSON.parse(Buffer.from(m[2], "base64url").toString("utf8"));
+    return s.u ? { id: s.u, email: s.e ?? null } : null;
+  } catch { return null; }
+}
+export const bearer = (req) => (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+// A browser that opened a watch link: whose mocks it may look at.
+export const watcher = (req, secret) => keyed("watch", cookies(req).ms_watch, secret);
+export const watchCookie = (token, secure) => cookie("ms_watch", token, 365 * DAY, secure);
+
 export const anonOf = (req) => (/^[a-f0-9]{32}$/.test(cookies(req).ms_anon ?? "") ? cookies(req).ms_anon : null);
 export const newAnon = () => randomBytes(16).toString("hex");
 export const anonCookie = (id, secure) => cookie("ms_anon", id, 365 * DAY, secure);

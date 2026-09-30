@@ -227,10 +227,15 @@ export function nextSteps(text) {
 }
 const withNext = (r) => ({ ...r, ...nextSteps(r.text) });
 
+// What the person has already talked over with their own AI, when the mock is drawn for that
+// conversation (web/mcp.mjs): its names, words and numbers go on the mock instead of made-up ones.
+// Nothing is added when there is none, so a mock made in the editor is written as before.
+const briefing = (brief) => (brief ? `What the person has talked over with their AI, for this mock. Use its real names, words, numbers and pages exactly as they are; make up only what it leaves out:\n${brief}\n\n` : "");
+
 // A new app, streamed a line at a time onto an empty canvas. `frame` is decided before the writer
 // is called (Jev, or the person); when it is set, the app line must carry it.
-export async function writeApp({ utterance, frame = null, apiKey, model = BUILD_MODEL, provider, onLine = () => {}, signal }) {
-  const context = `${frame ? `It runs on: ${frame}. Write the app line with that frame.\n\n` : ""}The person says: ${utterance}`;
+export async function writeApp({ utterance, frame = null, brief = "", apiKey, model = BUILD_MODEL, provider, onLine = () => {}, signal }) {
+  const context = `${briefing(brief)}${frame ? `It runs on: ${frame}. Write the app line with that frame.\n\n` : ""}The person says: ${utterance}`;
   return withNext(await stream({ system: APP, context, apiKey, model, provider, purpose: "build", onLine: (l) => { if (!NEXT.test(l)) onLine(l); }, signal }));
 }
 
@@ -238,7 +243,8 @@ export async function writeApp({ utterance, frame = null, apiKey, model = BUILD_
 // gap in words; `replacing` is the outline of the element being replaced, when it is a rewrite.
 // `screen` says the piece must be a whole screen (start with a screen line); false says it must not
 // contain one. `retry` is set on the second attempt after the first came back the wrong shape.
-export async function writePiece({ utterance, outline, where, replacing = null, screen = false, retry = false, apiKey, model, provider, signal }) {
+// `onLine` hears each line of the piece as it is written, so the mock can show it coming together.
+export async function writePiece({ utterance, outline, where, replacing = null, screen = false, retry = false, brief = "", apiKey, model, provider, onLine = () => {}, signal }) {
   const shape = screen
     ? " It is a whole new screen: start with a screen line."
     : " It goes on a screen that already exists: do not write a screen line.";
@@ -250,7 +256,7 @@ export async function writePiece({ utterance, outline, where, replacing = null, 
     "",
     `The person says: ${utterance}`,
   ].join("\n");
-  return withNext(await stream({ system: PIECE, context, apiKey, model, provider, purpose: replacing ? "rewrite" : "piece", signal, maxTokens: 4000 }));
+  return withNext(await stream({ system: PIECE, context: briefing(brief) + context, apiKey, model, provider, purpose: replacing ? "rewrite" : "piece", onLine: (l) => { if (!NEXT.test(l)) onLine(l); }, signal, maxTokens: 4000 }));
 }
 
 // Several changes → one per line. The writer is not shown the mockup: cutting a sentence needs

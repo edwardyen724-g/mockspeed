@@ -468,6 +468,17 @@ export const web = {
   notFound: "There's no mock here. It may belong to another account.",
   home: "Start a new one",
   starting: "Starting…",
+  // Your own AI drawing mocks (web/mcp.mjs, /connect), and a tab watching it.
+  yourAi: "Your AI",
+  watching: "Your AI is drawing this. Sign in to change it yourself.",
+  connectLink: "Use it from your AI",
+  connectTitle: "Use mockspeed from your own AI",
+  connectLead: "While you talk an idea over with your AI, it can draw what it proposes. You watch the mock come together in a tab, and each follow-up shows up there as it's said.",
+  connectAdd: "Add mockspeed to Claude Code, in a terminal:",
+  connectWatch: "Keep this link open in a tab. Every mock your AI starts shows up there as it's drawn:",
+  connectPrivate: "Both are yours alone. With the first, anyone can make mocks on your account; with the second, anyone can watch them.",
+  connectSignIn: "Sign in to connect your AI.",
+  copy: "Copy",
 };
 
 // The line under the app's name: how many pages it has.

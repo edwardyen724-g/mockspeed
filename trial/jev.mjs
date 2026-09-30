@@ -10,7 +10,7 @@
 import { spans, unquoted } from "../canvas/jev.mjs";
 import { meter } from "./meter.mjs";
 
-const ENDPOINT = "https://api.typesafe.ai/v1/systemone";
+export const ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 const MODEL = "jev-latest";
 
 // Jev's API answers 429 and 529 ("system_overloaded") under load, and TypeSafe's own SDK retries

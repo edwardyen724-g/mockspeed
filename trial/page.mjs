@@ -217,4 +217,5 @@ export function fill(html, more = {}) {
 }
 
 // The canvas's page, as trial/server.mjs serves it; the web app adds its own words and mode.
-export const shell = (more = {}) => fill(readFileSync(new URL("./shell.html", import.meta.url), "utf8"), { mode: "trial", ...W.web, title: W.ui.title, ...more });
+// `live` is where a web page listens for changes made elsewhere (web/live.mjs); the trial has none.
+export const shell = (more = {}) => fill(readFileSync(new URL("./shell.html", import.meta.url), "utf8"), { mode: "trial", ...W.web, title: W.ui.title, live: "", ...more });

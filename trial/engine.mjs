@@ -92,9 +92,11 @@ export const blank = () => parse('app "new" web').root;
 // earlier project's save() returned, to carry on from where it was. The keys and the writer — its
 // provider (writer.mjs PROVIDERS), the model that writes a new app (`buildModel`) and the one that
 // writes pieces and cuts sentences (`model`) — are the process's, passed in; `llmKey` is that
-// provider's key. Nothing here reads the environment, the disk or the network except through
-// jev.mjs and writer.mjs.
-export function project({ root: start = null, saved = null, apiKey = null, llmKey = null, model = MODEL, buildModel = BUILD_MODEL, provider = "anthropic" } = {}) {
+// provider's key. `brief` is what the person has talked over with their own AI when the mock is
+// drawn for that conversation (web/mcp.mjs): the writer uses its words, and `inform` adds to it.
+// Jev is not shown it; it decides from the sentence, as for a person typing. Nothing here reads the
+// environment, the disk or the network except through jev.mjs and writer.mjs.
+export function project({ root: start = null, saved = null, apiKey = null, llmKey = null, model = MODEL, buildModel = BUILD_MODEL, provider = "anthropic", brief: startBrief = "" } = {}) {
   const LLM = model;
   const WHO = LLM.replace(/^claude-/, "").replace(/-\d+(-\d+)*$/, "");
 
@@ -122,6 +124,9 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
   const nextSteps = () => (screenList().length ? W.chips(root, nextFor.get(root) ?? []) : W.starters);
   // Who hears about each change: the page's event stream, once per open tab.
   const listeners = new Set();
+  // What the person has talked over with their AI, for the writer (above); the newest kept when long.
+  const BRIEF = 6000;
+  let brief = String(startBrief ?? "").slice(-BRIEF);
 
   function announce(specChanged = true) {
     if (specChanged) rev += 1;
@@ -218,7 +223,8 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
   }
 
   // ---- routing -----------------------------------------------------------------------------
-  async function ask({ utterance, marked, viewing, chip = false }) {
+  // `by: "ai"` is a sentence the person's own AI said for them (web/mcp.mjs), shown as its.
+  async function ask({ utterance, marked, viewing, chip = false, by = null }) {
     if (busy) return { note: W.reply.busy(busy), changed: false };
     if (!apiKey) return { note: W.reply.notSetUp, debug: "no TYPESAFE_API_KEY — start with --env", blocked: true };
     // A next step the person clicked is not offered again.
@@ -227,7 +233,7 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
     settle();
     offer = null;
     turn = new Turn(root, past.length);
-    note({ note: utterance, op: "ask", source: "you", say: utterance });
+    note({ note: utterance, op: "ask", source: by === "ai" ? "your AI" : "you", say: utterance, ...(by === "ai" ? { by } : {}) });
     let r;
     try {
       r = await handle({ utterance, marked, viewing, started: Date.now(), depth: 0 });
@@ -541,7 +547,7 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
     let t;
     try {
       t = await writeApp({
-        utterance, frame, apiKey: llmKey, model: buildModel, provider,
+        utterance, frame, brief, apiKey: llmKey, model: buildModel, provider,
         onLine: (line) => {
           if (/^\s*\/\//.test(line)) { replies.push(line.replace(/^\s*\/\/\s*/, "")); return; }
           const { node } = stream.push(line);
@@ -710,9 +716,10 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
     let w = ctx.piece?.whole === whole ? ctx.piece : null;
     if (w) note({ op: "said", note: "the same piece, put where the swap says", source: "canvas" });
     else {
-      w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, apiKey: llmKey, model: LLM, provider });
+      const args = { utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, brief, apiKey: llmKey, model: LLM, provider };
+      w = await writeLive(args, gap);
       // The piece must be the shape Jev decided on. Once more with the shape spelled out, and then no.
-      if (wrongShape(w.text, whole)) w = await writePiece({ utterance: ctx.utterance, outline: serialize(root, { ids: false }), where: gap.text, screen: whole, retry: true, apiKey: llmKey, model: LLM, provider });
+      if (wrongShape(w.text, whole)) w = await writeLive({ ...args, retry: true }, gap);
       if (wrongShape(w.text, whole)) {
         note({ op: "said", note: `${WHO} wrote ${whole ? "no screen line" : "a whole screen"} twice — nothing changed`, source: "canvas", refused: true });
         return { note: W.reply.missed, debug: `the writer did not write ${whole ? "a screen" : "a piece for a screen"}`, changed: false };
@@ -789,6 +796,33 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
   // "Keep both": the one there put back where it was, and a new one written for the place it went to.
   const keepBoth = (ctx, gap) => doubt(ctx, 0, [swapFor(W.offer.keepBoth, { kind: "keep", anchor: gap.anchor, position: gap.position, text: gap.text })], true);
 
+  // A piece drawn as the writer writes it: each line lands where the piece goes, so the page shows it
+  // coming together — the first line at once, then at most five times a second, as a build draws.
+  // When the writing is done or breaks off the mock goes back to how it was, and what was written is
+  // put in once, as one change with its undo (landPiece), or not at all.
+  async function writeLive(args, at) {
+    const base = root;
+    let text = "", timer = null, drawn = false;
+    const draw = () => {
+      timer = null;
+      const placed = placeEverywhere(base, at.anchor, at.position, text);
+      if (!placed) return;
+      try { root = applyPatch(base, placed.patch).root; } catch { return; }
+      drawn = true;
+      announce();
+    };
+    try {
+      return await writePiece({ ...args, onLine: (line) => {
+        if (/^\s*\/\//.test(line)) return;
+        text += line + "\n";
+        if (!drawn) draw(); else timer ??= setTimeout(draw, 200);
+      } });
+    } finally {
+      clearTimeout(timer);
+      if (drawn) { root = base; announce(); }
+    }
+  }
+
   // A piece written as a whole screen starts with a screen line; one for an existing screen has none.
   function wrongShape(text, whole) {
     if (/^\s*\/\//.test(text)) return false;
@@ -808,9 +842,10 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
     const hit = find(root, target);
     if (!hit) return { note: W.reply.gone, changed: false };
     const isScreen = hit.node.type === "screen";
-    const args = { utterance, outline: serialize(root, { ids: false }), replacing: serialize(hit.node, { ids: false }), screen: isScreen, apiKey: llmKey, model: LLM, provider };
-    let w = await writePiece(args);
-    if (wrongShape(w.text, isScreen)) w = await writePiece({ ...args, retry: true });
+    const args = { utterance, outline: serialize(root, { ids: false }), replacing: serialize(hit.node, { ids: false }), screen: isScreen, brief, apiKey: llmKey, model: LLM, provider };
+    const at = { anchor: target, position: "replace" };
+    let w = await writeLive(args, at);
+    if (wrongShape(w.text, isScreen)) w = await writeLive({ ...args, retry: true }, at);
     // A screen's replacement that still arrives without its screen line keeps the screen, with the
     // piece inside it: structure, so that a rewrite never dissolves a screen into its neighbours.
     let text = w.text;
@@ -1201,7 +1236,7 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
           steps: p.steps.map((s) => ({ redo: s.redo.spec, entry: s.entry })),
         })),
       },
-      log, rev, seq, on, qn, pending, question, offer,
+      log, rev, seq, on, qn, pending, question, offer, brief,
     };
     data.next = trees.flatMap((t, i) => (nextFor.has(t) ? [[i, nextFor.get(t)]] : []));
     data.trees = pack(trees);
@@ -1216,6 +1251,7 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
     past.push(...saved.past.map((i) => trees[i]));
     log.push(...saved.log);
     ({ rev, seq, on, qn, pending, question, offer } = saved);
+    brief = String(saved.brief ?? "");
     for (const [i, list] of saved.next) nextFor.set(trees[i], list);
     if (saved.turn) {
       turn = new Turn(root, past.length);
@@ -1229,6 +1265,9 @@ export function project({ root: start = null, saved = null, apiKey = null, llmKe
 
   return {
     ask, answer: onAnswer, swap, edit: toolEdit, undo, startAgain, tools: toolsFor, state, save,
+    // What the person has talked over with their AI, and more of it: kept with the project.
+    get brief() { return brief; },
+    inform(more) { const t = String(more ?? "").trim(); if (t) brief = (brief ? `${brief}\n${t}` : t).slice(-BRIEF); },
     // The mock as it is now, for the shell to draw, save and export. Read it; change it only here.
     get root() { return root; },
     get version() { return { rev, seq }; },

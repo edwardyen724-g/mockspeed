@@ -44,6 +44,7 @@
   ol li .said{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#555;
               white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   ol li.you{border-bottom:0;padding-top:10px;font-weight:600;color:#111}
+  ol li.you .by{font-weight:400;color:var(--faint)}
   ol li.done{color:var(--faint);font-size:11px;border-bottom:1px solid #ddd}
   ol li.refused{color:#8a3a00}
   ol li.route{border-bottom:0;padding:0 0 4px;font-size:11px;color:#333}
@@ -88,7 +89,8 @@
 <iframe id="mock" src="mock"></iframe>
 <aside>
   <header><h1 id="title">{{title}}</h1><div class="sub" id="status">…</div>
-    <div class="acct web"><a href="/projects">{{projects}}</a><span id="acct"></span><button id="acctIn" type="button" hidden>{{signIn}}</button></div></header>
+    <div class="acct web"><a href="/projects">{{projects}}</a><span id="acct"></span><button id="acctIn" type="button" hidden>{{signIn}}</button></div>
+    <div class="sub" id="watching" hidden>{{watching}}</div></header>
   <div class="marked" id="markedBox"><span class="none">{{selectHint}}</span></div>
   <div class="say">
     <form id="form"><input id="utterance" placeholder="{{placeholder}}" autocomplete="off"><button id="mic" type="button" title="{{voice}}">●</button><button class="go" id="go" type="submit">{{say}}</button></form>
@@ -192,6 +194,7 @@ async function post(path, body) {
       buf = buf.slice(nl + 1);
       if (!line) continue;
       const m = JSON.parse(line);
+      if (m.sentence) asked.add(m.sentence);
       if (m.frame) paint(m.frame);
       if (m.result) result = m.result;
     }
@@ -257,6 +260,7 @@ function show(s) {
     signedIn = s.account.signedIn;
     $("acct").textContent = s.account.email || "";
     $("acctIn").hidden = signedIn;
+    $("watching").hidden = signedIn || !FOLLOW;
   }
   document.body.classList.toggle("busy", Boolean(s.busy));
   if (s.busy) $("note").textContent = DEBUG ? `building "${s.busy}" · ${s.log.length && s.log[s.log.length - 1].note || ""}` : s.working;
@@ -265,7 +269,7 @@ function show(s) {
   $("log").innerHTML = s.log.slice().reverse().map((e) => {
     if (!DEBUG) {
       if (!e.say) return "";
-      if (e.op === "ask") return `<li class="you">${esc(e.say)}</li>`;
+      if (e.op === "ask") return `<li class="you">${e.by === "ai" ? `<span class="by">${esc(AI)}:</span> ` : ""}${esc(e.say)}</li>`;
       if (e.op === "human") return `<li class="route">→ ${esc(e.say)}</li>`;
       return `<li class="${e.refused ? "refused" : ""}">${esc(e.say)}</li>`;
     }
@@ -525,6 +529,56 @@ function waitForSignIn() {
 }
 addEventListener("click", (e) => { if (!e.target.closest("#export")) $("export").open = false; });
 
+// ---- live (the web app) -------------------------------------------------------------------------
+// A change made elsewhere — by the person's own AI (web/mcp.mjs), or in another tab — arrives here as
+// it is drawn, on a Supabase Realtime channel only this mock's page is told the name of (web/live.mjs).
+// A change this tab asked for comes back in its own reply, so its frames are skipped here (`asked`).
+// A tab opened from the watch link follows the AI: when it opens another mock, the tab goes there.
+// `msHeard` keeps when each frame arrived, for checking how soon a change shows up.
+const AI = "{{yourAi}}";
+const asked = new Set();
+const HERE = location.pathname.split("/")[2];
+let LIVE = null, FOLLOW = false;
+// (Filled in by the server, which escapes it as HTML; read back as text.)
+try { LIVE = JSON.parse(new DOMParser().parseFromString("{{live}}", "text/html").body.textContent || "null"); } catch {}
+try {
+  if (new URLSearchParams(location.search).has("follow")) { sessionStorage.setItem("ms-follow", "1"); history.replaceState(null, "", location.pathname); }
+  FOLLOW = sessionStorage.getItem("ms-follow") === "1";
+} catch {}
+window.msHeard = [];
+function heard(topic, event, m) {
+  if (topic === LIVE.account && event === "open") {
+    if (FOLLOW && m.id && m.id !== HERE) location.href = `/p/${m.id}/`;
+    return;
+  }
+  if (topic !== LIVE.project || event !== "frame" || !m.state) return;
+  msHeard.push({ at: Date.now(), rev: m.state.version?.rev, mock: Boolean(m.html), done: Boolean(m.done), busy: m.state.busy ?? null });
+  if (asked.has(m.state.sentence)) return;
+  if (m.html) paint({ html: m.html, state: m.state });
+  else if (m.reload) { show(m.state); redraw(); }
+  else show(m.state);
+  if (m.done && m.reply) { $("note").className = "note"; $("note").textContent = m.reply.note || ""; }
+}
+function listen() {
+  const topics = [LIVE.project, LIVE.account].filter(Boolean);
+  let ws, ref = 0, beat = null, tries = 0;
+  const send = (topic, event, payload) => ws.send(JSON.stringify({ topic, event, payload, ref: String(++ref) }));
+  (function connect() {
+    ws = new WebSocket(`${LIVE.url.replace(/^http/, "ws")}/realtime/v1/websocket?apikey=${encodeURIComponent(LIVE.key)}&vsn=1.0.0`);
+    ws.onopen = () => {
+      tries = 0;
+      for (const t of topics) send(`realtime:${t}`, "phx_join", { config: { broadcast: { self: false }, presence: { key: "" }, private: false } });
+      beat = setInterval(() => send("phoenix", "heartbeat", {}), 25000);
+    };
+    ws.onmessage = (e) => {
+      const m = JSON.parse(e.data);
+      if (m.event === "broadcast" && m.payload) heard(m.topic.replace(/^realtime:/, ""), m.payload.event, m.payload.payload ?? {});
+    };
+    // Back again after a dropped connection, and the mock as it is by then.
+    ws.onclose = () => { clearInterval(beat); setTimeout(() => { connect(); redraw(); }, Math.min(10000, 500 * 2 ** tries++)); };
+  })();
+}
+
 // Voice, where the browser has it: interim words land in the box, the final one is sent.
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (SR) {
@@ -544,7 +598,7 @@ if (SR) {
 mock.onload = () => { fitMock(); showPicks(); if (marked) { mock.contentWindow.postMessage({ type: "mark", key: marked }, "*"); tools(marked); } };
 
 // Changes can arrive from outside this page — Claude appending a screen, an element at a time. (In
-// the web app each change brings its own frames back instead.)
+// the web app each change brings its own frames back, and the others' arrive live, below.)
 let seen = null;
 if (!WEB) new EventSource("events").onmessage = (e) => {
   const now = JSON.parse(e.data);
@@ -553,6 +607,7 @@ if (!WEB) new EventSource("events").onmessage = (e) => {
   seen = now;
 };
 load();
+if (WEB && LIVE) listen();
 // Opened from the landing page: its sentence is said at once. Opened by the email's link, signed in:
 // what was waiting for the sign-in is done here.
 if (WEB) {

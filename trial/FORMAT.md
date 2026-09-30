@@ -248,10 +248,11 @@ same plain-words rule as `words.mjs`.
 ### `trial/engine.mjs` — one project's canvas
 
 ```js
-export function project({ root, apiKey, llmKey, model })   // → a project; root defaults to an empty canvas
+export function project({ root, saved, apiKey, llmKey, model, buildModel, provider, brief })   // → a project; root defaults to an empty canvas
 export const blank                                          // () → the empty canvas's tree
 
-p.ask({ utterance, marked, viewing, chip })   // → reply (async): Jev decides, the writer writes, code applies
+p.ask({ utterance, marked, viewing, chip, by })   // → reply (async): Jev decides, the writer writes, code applies
+p.brief  p.inform(text)                       // what the person talked over with their own AI; more of it
 p.answer(body)  p.swap(body)                  // → reply (async): a question answered, an offered swap taken
 p.edit({ op, target, all, text })             // → reply: the toolbar and double-click rename, no model
 p.undo({ on })  p.startAgain()                // → reply: one change, or the whole sentence with `on`; empty the canvas
@@ -259,6 +260,11 @@ p.tools(id)  p.state()                        // → what the toolbar and the pa
 p.root  p.version                             // the tree as it is now; { rev, seq }
 p.subscribe(fn)                               // fn({ rev, seq }) after every change → a function that stops it
 ```
+
+`brief` is what the person has talked over with their own AI when the mock is drawn for that
+conversation (web/mcp.mjs): the writer uses its names, words and numbers; Jev is not shown it. `by:
+"ai"` marks a sentence the AI said, shown as its in the history. A piece the writer writes is drawn
+as it arrives, a line at a time, like a build; it lands as one change once it is written.
 
 Everything a canvas holds — the tree, the undo stack, the question waiting on the person, the
 offers, the next steps, the log, whether it is busy — lives inside the project, so two projects in
