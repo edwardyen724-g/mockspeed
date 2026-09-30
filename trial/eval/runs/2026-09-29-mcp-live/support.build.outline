@@ -1,0 +1,88 @@
+app #n1 "Support Chat" web
+  screen #n2 "Conversation"
+    row #n3 share=nav w=200 fill=light pad=3 gap=2
+      text #n4 "Inbox" bold
+      text #n5 "Assigned to me" shade=mid
+      text #n6 "Mentions" shade=mid
+      text #n7 "Resolved" shade=mid
+      line #n8
+      text #n9 "Snoozed" shade=mid
+    col #n10 grow
+      row #n11 pad=3 border justify=between
+        col #n12
+          text #n13 "Priya Nathan" bold size=l
+          text #n14 "Order #48213 · billing issue" shade=mid size=s
+        row #n15 gap=2
+          button #n16 "Snooze" ghost
+          button #n17 "Resolve" primary
+      col #n18 grow pad=3 gap=3
+        col #n19 gap=2
+          row #n20 gap=2
+            shape #n21 circle w=28 h=28
+            col #n22
+              text #n23 "Priya Nathan" bold size=s
+              text #n24 "My card was charged twice for the same order, can someone check?" data
+              text #n25 "9:02 AM" shade=mid size=xs
+        col #n26 gap=2 align=end
+          row #n27 gap=2 align=end
+            col #n28 align=end
+              text #n29 "Looking into it now — I can see two charges of $84.50 on Oct 3." data
+              text #n30 "9:05 AM · Dana R." shade=mid size=xs
+            shape #n31 circle w=28 h=28
+        col #n32 gap=2
+          row #n33 gap=2
+            shape #n34 circle w=28 h=28
+            col #n35
+              text #n36 "Priya Nathan" bold size=s
+              text #n37 "Thank you! When can I expect the refund?" data
+              text #n38 "9:06 AM" shade=mid size=xs
+        col #n39 gap=2 align=end
+          row #n40 gap=2 align=end
+            col #n41 align=end
+              text #n42 "Refund initiated, 3-5 business days. Sorry for the trouble!" data
+              text #n43 "9:11 AM · Dana R." shade=mid size=xs
+            shape #n44 circle w=28 h=28
+      row #n45 pad=3 border gap=2
+        input #n46 "Message" grow value=""
+        button #n47 "Send" primary
+    col #n48 w=280 fill=light pad=3 gap=3 border
+      row #n49 gap=2 align=center
+        shape #n50 circle w=48 h=48
+        col #n51
+          text #n52 "Priya Nathan" bold
+          text #n53 "priya.nathan@gmail.com" shade=mid size=s
+      line #n54
+      col #n55 gap=1
+        text #n56 "Customer since" size=s shade=mid
+        text #n57 "Feb 2022" size=s
+      col #n58 gap=1
+        text #n59 "Plan" size=s shade=mid
+        text #n60 "Pro — $29/mo" size=s
+      col #n61 gap=1
+        text #n62 "Last order" size=s shade=mid
+        text #n63 "#48213 · $84.50" size=s data
+      col #n64 gap=1
+        text #n65 "Open tickets" size=s shade=mid
+        text #n66 "2" size=s data
+      line #n67
+      text #n68 "Tags" size=s shade=mid
+      row #n69 gap=1
+        text #n70 "billing" pill size=xs
+        text #n71 "vip" pill size=xs
+  screen #n72 "Inbox"
+    row #n73 share=nav w=200 fill=light pad=3 gap=2
+      text #n74 "Inbox" bold
+      text #n75 "Assigned to me" shade=mid
+      text #n76 "Mentions" shade=mid
+      text #n77 "Resolved" shade=mid
+      line #n78
+      text #n79 "Snoozed" shade=mid
+    col #n80 grow pad=3 gap=2
+      text #n81 "Inbox" bold size=xl
+      table #n82
+        tr #n83 "Customer | Last message | Waiting | Status"
+        tr #n84 "Priya Nathan | Thank you! When can I expect... | 6 min | open" data
+        tr #n85 "Marcus Webb | Still no shipping confirmation | 22 min | open" data
+        tr #n86 "Elena Ruiz | Appreciate the quick help! | 1 hr | resolved" data
+        tr #n87 "Tom Okafor | This is the third time I've asked... | 4 hr | overdue" data
+        tr #n88 "Sana Iqbal | (no messages yet) | — | empty" data

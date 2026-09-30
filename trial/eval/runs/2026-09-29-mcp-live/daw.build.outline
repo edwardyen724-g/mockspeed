@@ -1,0 +1,121 @@
+app #n1 "Waveform Studio" panel
+  screen #n2 "Project"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Waveform Studio" bold
+        text #n6 "Project" bold
+        text #n7 "Mixer" shade=mid
+        text #n8 "Library" shade=mid
+        text #n9 "Export" shade=mid
+      col #n10 grow
+        row #n11 justify=between pad=3 border
+          col #n12
+            text #n13 "Midnight Drive" size=l bold
+            text #n14 "128 BPM · 4/4 · Key: A minor" shade=mid size=s
+          row #n15 gap=2
+            button #n16 "Split"
+            button #n17 "Quantize"
+            button #n18 "Render" primary
+        row #n19 pad=2 gap=4 border
+          text #n20 "00:00" mono size=s shade=mid
+          text #n21 "00:08" mono size=s shade=mid
+          text #n22 "00:16" mono size=s shade=mid
+          text #n23 "00:24" mono size=s shade=mid
+          text #n24 "00:32" mono size=s shade=mid
+          text #n25 "00:40" mono size=s shade=mid
+        col #n26 grow pad=2 gap=2
+          row #n27 gap=2 align=center
+            col #n28 w=140 pad=2 fill=light border
+              text #n29 "Drums" bold size=s
+              text #n30 "Kit: Amber 909" shade=mid size=xs
+            row #n31 grow h=64 fill=light border
+              shape #n32 "waveform" w=fill h=fill data
+          row #n33 gap=2 align=center
+            col #n34 w=140 pad=2 fill=light border
+              text #n35 "Bass" bold size=s
+              text #n36 "Synth: Deep Sub" shade=mid size=xs
+            row #n37 grow h=64 fill=light border
+              shape #n38 "waveform" w=fill h=fill data
+          row #n39 gap=2 align=center
+            col #n40 w=140 pad=2 fill=mid border
+              text #n41 "Lead" bold size=s
+              text #n42 "muted" shade=mid size=xs
+            row #n43 grow h=64 fill=light border
+              shape #n44 "waveform" w=fill h=fill data
+          row #n45 gap=2 align=center
+            col #n46 w=140 pad=2 fill=light border
+              text #n47 "Vocals" bold size=s
+              text #n48 "Take 4 · comped" shade=mid size=xs
+            row #n49 grow h=64 fill=light border
+              shape #n50 "waveform" w=fill h=fill data
+          row #n51 gap=2 align=center
+            col #n52 w=140 pad=2 fill=light border
+              text #n53 "Pad" bold size=s
+              text #n54 "Synth: Glass Choir" shade=mid size=xs
+            row #n55 grow h=64 fill=light border
+              shape #n56 "waveform" w=fill h=fill data
+        row #n57 pad=2 gap=3 border justify=between
+          text #n58 "Bar 12 of 64" size=s shade=mid
+          progress #n59 "playback" value=19
+          text #n60 "-6.2 dB" size=s mono shade=mid
+  screen #n61 "Mixer"
+    row #n62 h=fill
+      col #n63 share=nav w=200 fill=light pad=3 gap=2
+        text #n64 "Waveform Studio" bold
+        text #n65 "Project" shade=mid
+        text #n66 "Mixer" bold
+        text #n67 "Library" shade=mid
+        text #n68 "Export" shade=mid
+      col #n69 grow pad=3 gap=3
+        text #n70 "Channel Strips" size=l bold
+        row #n71 gap=3
+          col #n72 border pad=3 gap=2 w=140
+            text #n73 "Drums" bold size=s
+            input #n74 "Volume" toggle on
+            text #n75 "-3.5 dB" mono size=s
+            text #n76 "Pan: C" shade=mid size=xs
+          col #n77 border pad=3 gap=2 w=140
+            text #n78 "Bass" bold size=s
+            input #n79 "Volume" toggle on
+            text #n80 "-2.0 dB" mono size=s
+            text #n81 "Pan: L8" shade=mid size=xs
+          col #n82 border pad=3 gap=2 w=140
+            text #n83 "Lead" bold size=s
+            input #n84 "Mute" toggle
+            text #n85 "-inf dB" mono size=s
+            text #n86 "muted" shade=mid size=xs
+          col #n87 border pad=3 gap=2 w=140
+            text #n88 "Vocals" bold size=s
+            input #n89 "Volume" toggle on
+            text #n90 "-1.2 dB" mono size=s
+            text #n91 "Pan: C" shade=mid size=xs
+          col #n92 border pad=3 gap=2 w=140
+            text #n93 "Pad" bold size=s
+            input #n94 "Volume" toggle on
+            text #n95 "-8.0 dB" mono size=s
+            text #n96 "Pan: R6" shade=mid size=xs
+          col #n97 border pad=3 gap=2 w=140 fill=dark
+            text #n98 "Master" bold size=s
+            input #n99 "Volume" toggle on
+            text #n100 "-0.4 dB" mono size=s
+            text #n101 "Limiter: on" size=xs
+  screen #n102 "Export"
+    row #n103 h=fill
+      col #n104 share=nav w=200 fill=light pad=3 gap=2
+        text #n105 "Waveform Studio" bold
+        text #n106 "Project" shade=mid
+        text #n107 "Mixer" shade=mid
+        text #n108 "Library" shade=mid
+        text #n109 "Export" bold
+      col #n110 grow pad=3 gap=3
+        text #n111 "Render Queue" size=l bold
+        table #n112
+          tr #n113 "File | Format | Length | Status"
+          tr #n114 "midnight_drive_master.wav | WAV 24-bit | 3:42 | done" data
+          tr #n115 "midnight_drive_master.mp3 | MP3 320k | 3:42 | done" data
+          tr #n116 "midnight_drive_stems.zip | WAV stems | — | rendering" data
+          tr #n117 "midnight_drive_radio_edit.wav | WAV 24-bit | 2:58 | failed" data
+        row #n118 gap=3
+          input #n119 "Format" select value="WAV 24-bit"
+          input #n120 "Include stems" check
+          button #n121 "Render New" primary

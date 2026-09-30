@@ -1,0 +1,104 @@
+app #n1 "Splitwise Home" phone
+  screen #n2 "Home"
+    row #n3 share=topbar justify=between pad=3 border
+      text #n4 "Maple House" bold
+      shape #n5 circle w=28 h=28
+    col #n6 pad=3 gap=3
+      col #n7 border pad=3 gap=1
+        text #n8 "You are owed" size=s shade=mid
+        text #n9 "$142.50" size=xxl bold
+      row #n10 gap=2
+        button #n11 "Add expense" primary grow
+        button #n12 "Settle up" grow
+      text #n13 "Recent activity" bold size=l
+      col #n14 gap=2
+        row #n15 border pad=2 justify=between
+          col #n16
+            text #n17 "Electric bill" bold
+            text #n18 "Paid by Dana · Feb 3" size=s shade=mid
+          text #n19 "+$38.20" size=s bold
+        row #n20 border pad=2 justify=between
+          col #n21
+            text #n22 "Internet" bold
+            text #n23 "Paid by You · Feb 2" size=s shade=mid
+          text #n24 "-$24.00" size=s bold
+        row #n25 border pad=2 justify=between
+          col #n26
+            text #n27 "Costco run" bold
+            text #n28 "Paid by Marcus · Jan 30" size=s shade=mid
+          text #n29 "+$61.75" size=s bold
+        row #n30 border pad=2 justify=between
+          col #n31
+            text #n32 "Trash service" bold
+            text #n33 "Paid by Dana · Jan 28" size=s shade=mid
+          text #n34 "+$12.00" size=s bold
+    row #n35 share=tabs justify=between pad=3 border
+      text #n36 "Home" bold under
+      text #n37 "Balances" shade=mid
+      text #n38 "Groups" shade=mid
+      text #n39 "Activity" shade=mid
+  screen #n40 "Balances"
+    row #n41 share=topbar justify=between pad=3 border
+      text #n42 "Maple House" bold
+      shape #n43 circle w=28 h=28
+    col #n44 pad=3 gap=3
+      text #n45 "Who owes what" bold size=l
+      col #n46 border pad=3 gap=2
+        row #n47 justify=between
+          text #n48 "Dana Nguyen" bold
+          text #n49 "owes you $56.20" size=s
+        row #n50 justify=between
+          text #n51 "Marcus Reid" bold
+          text #n52 "owes you $86.30" size=s
+        row #n53 justify=between
+          text #n54 "You" bold
+          text #n55 "owe Dana $0.00" size=s shade=mid
+      line #n56
+      text #n57 "By bill" bold
+      table #n58
+        tr #n59 "Bill | Total | Your share"
+        tr #n60 "Rent | $2,400.00 | $800.00" data
+        tr #n61 "Electric | $114.60 | $38.20" data
+        tr #n62 "Internet | $72.00 | $24.00" data
+        tr #n63 "Trash | $36.00 | $12.00" data
+        tr #n64 "Groceries (shared) | $185.25 | $61.75" data
+    row #n65 share=tabs justify=between pad=3 border
+      text #n66 "Home" shade=mid
+      text #n67 "Balances" bold under
+      text #n68 "Groups" shade=mid
+      text #n69 "Activity" shade=mid
+  screen #n70 "Groups"
+    row #n71 share=topbar justify=between pad=3 border
+      text #n72 "Maple House" bold
+      shape #n73 circle w=28 h=28
+    col #n74 pad=3 gap=3
+      text #n75 "Maple House" size=xl bold
+      text #n76 "3 members · rent + utilities" size=s shade=mid
+      row #n77 gap=2
+        col #n78 border pad=2 align=center w=fill
+          shape #n79 circle w=40 h=40
+          text #n80 "Dana" size=s
+        col #n81 border pad=2 align=center w=fill
+          shape #n82 circle w=40 h=40
+          text #n83 "Marcus" size=s
+        col #n84 border pad=2 align=center w=fill
+          shape #n85 circle w=40 h=40
+          text #n86 "You" size=s bold
+      line #n87
+      text #n88 "Monthly recurring" bold
+      col #n89 gap=2
+        row #n90 border pad=2 justify=between
+          text #n91 "Rent" bold
+          text #n92 "$2,400.00" size=s
+        row #n93 border pad=2 justify=between
+          text #n94 "Electric (avg)" bold
+          text #n95 "$110.00" size=s
+        row #n96 border pad=2 justify=between
+          text #n97 "Internet" bold
+          text #n98 "$72.00" size=s
+      button #n99 "Add roommate" ghost
+    row #n100 share=tabs justify=between pad=3 border
+      text #n101 "Home" shade=mid
+      text #n102 "Balances" shade=mid
+      text #n103 "Groups" bold under
+      text #n104 "Activity" shade=mid

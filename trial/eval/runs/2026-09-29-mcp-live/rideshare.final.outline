@@ -1,0 +1,147 @@
+app #n1 "DriveShift" phone
+  screen #n2 "Home"
+    row #n3 share=topbar justify=between pad=3 border
+      text #n4 "DriveShift" bold size=xl
+      row #n90 share=topbar justify=between pad=3 border
+        text #n91 "DriveShift" bold size=xl
+        input #n92 "Search trips" search grow w=120
+        shape #n93 circle w=28 h=28
+        input #n153 "Filter" search w=40
+      shape #n5 circle w=28 h=28
+      input #n152 "Filter" search w=40
+      button #n11 "Go Online" primary size=l
+    col #n6 grow pad=3 gap=3
+      col #n7 border pad=3 gap=1 fill=dark
+        text #n8 "Today's earnings" shade=light
+        text #n9 "$187.40" size=xxl bold
+        text #n10 "6 trips · 5h 12m online" shade=light
+      row #n12 gap=3
+        col #n13 border pad=3 gap=1 grow
+          text #n14 "This week" size=s shade=mid
+          text #n15 "$942.10" size=l bold
+        col #n16 border pad=3 gap=1 grow
+          text #n17 "Acceptance rate" size=s shade=mid
+          text #n18 "94%" size=l bold
+      col #n19 gap=2
+        text #n145 "Recent trips" bold
+        table #n146
+          tr #n147 "Passenger | Fare"
+          tr #n148 "Maribel Ortiz | $14.20" data
+          tr #n149 "Dennis Watts | $9.80" data
+          tr #n150 "Yuki Tanaka | $22.50" data
+          tr #n151 "Cancelled — no rider | $0.00" data shade=mid
+    row #n33 share=tabs justify=between pad=3 border fill=light
+      text #n34 "Home" bold under
+      text #n35 "Trips" shade=mid
+      text #n36 "Earnings" shade=mid
+      text #n37 "Account" shade=mid
+  screen #n38 "Active Trip"
+    row #n39 share=topbar justify=between pad=3 border
+      text #n40 "DriveShift" bold size=xl
+      row #n94 share=topbar justify=between pad=3 border
+        text #n95 "DriveShift" bold size=xl
+        input #n96 "Search trips" search grow w=120
+        shape #n97 circle w=28 h=28
+        input #n155 "Filter" search w=40
+      shape #n41 circle w=28 h=28
+      input #n154 "Filter" search w=40
+    col #n42 grow
+      shape #n43 "map" w=fill h=320
+      col #n44 pad=3 gap=3
+        row #n45 justify=between
+          text #n46 "Picking up" size=s shade=mid
+          text #n47 "3 min away" size=s bold
+        text #n48 "Priya Nakamura" size=l bold
+        text #n49 "412 Elm Street, Apt 3B" shade=mid
+        line #n50
+        row #n51 justify=between
+          text #n52 "Trip fare" size=s shade=mid
+          text #n53 "$18.60" size=l bold
+        row #n54 gap=3
+          button #n55 "Navigate" primary grow
+    row #n57 share=tabs justify=between pad=3 border fill=light
+      text #n58 "Home" shade=mid
+      text #n59 "Trips" bold under
+      text #n60 "Earnings" shade=mid
+      text #n61 "Account" shade=mid
+  screen #n62 "Earnings"
+    row #n63 share=topbar justify=between pad=3 border
+      text #n64 "DriveShift" bold size=xl
+      row #n98 share=topbar justify=between pad=3 border
+        text #n99 "DriveShift" bold size=xl
+        input #n100 "Search trips" search grow w=120
+        shape #n101 circle w=28 h=28
+        input #n157 "Filter" search w=40
+      shape #n65 circle w=28 h=28
+      input #n156 "Filter" search w=40
+    col #n66 grow pad=3 gap=3
+      text #n67 "Earnings" size=xl bold
+      chart #n68 "Last 7 days" bar values=62,88,41,120,95,73,110 h=140
+      row #n69 gap=3
+        col #n70 border pad=3 gap=1 grow
+          text #n71 "Total" size=s shade=mid
+          text #n72 "$589.00" size=l bold
+        col #n73 border pad=3 gap=1 grow
+          text #n74 "Hours online" size=s shade=mid
+          text #n75 "34h 20m" size=l bold
+      table #n76
+        tr #n77 "Day | Trips | Total"
+        tr #n78 "Mon | 8 | $62.00" data
+        tr #n79 "Tue | 11 | $88.00" data
+        tr #n80 "Wed | 5 | $41.00" data
+        tr #n81 "Thu | 14 | $120.00" data
+        tr #n82 "Fri | 10 | $95.00" data
+        tr #n83 "Sat | 9 | $73.00" data
+        tr #n84 "Sun | 13 | $110.00" data
+    row #n85 share=tabs justify=between pad=3 border fill=light
+      text #n86 "Home" shade=mid
+      text #n87 "Trips" shade=mid
+      text #n88 "Earnings" bold under
+      text #n89 "Account" shade=mid
+  screen #n102 "Account"
+    row #n103 share=topbar justify-between pad=3 border
+      text #n104 "DriveShift" bold size=xl
+      shape #n105 circle w=28 h=28
+      input #n158 "Filter" search w=40
+    col #n106 grow pad=3 gap=3
+      text #n107 "Account" size=xl bold
+      col #n108 gap=2
+        text #n109 "Profile" size=s shade=mid bold
+        row #n110 justify=between border pad=2
+          text #n111 "Name"
+          text #n112 "Marcus Johnson" shade=mid
+        row #n113 justify=between border pad=2
+          text #n114 "Phone"
+          text #n115 "+1 (555) 742-8931" shade=mid
+        row #n116 justify=between border pad=2
+          text #n117 "Email"
+          text #n118 "marcus.j@email.com" shade=mid
+      col #n119 gap=2
+        text #n120 "Vehicle" size=s shade=mid bold
+        row #n121 justify=between border pad=2
+          text #n122 "Make & model"
+          text #n123 "2019 Honda Civic" shade=mid
+        row #n124 justify=between border pad=2
+          text #n125 "License plate"
+          text #n126 "KM7 4NX" shade=mid
+      col #n127 gap=2
+        text #n128 "Settings" size=s shade=mid bold
+        row #n129 justify=between border pad=2
+          text #n130 "Notifications"
+          text #n131 "On" shade=mid
+        row #n132 justify=between border pad=2
+          text #n133 "Dark mode"
+          text #n134 "Off" shade=mid
+        row #n135 justify=between border pad=2
+          text #n136 "Ride sharing"
+          text #n137 "Enabled" shade=mid
+      button #n138 "Sign out" ghost grow
+      col #n159 gap=2
+        text #n160 "Notes" size=s shade=mid bold
+        col #n161 border pad=3 gap=2 fill=light
+          text #n162 "Vehicle inspection due on March 15. Schedule appointment with certified mechanic." size=s shade=mid
+    row #n139 share=tabs justify=between pad=3 border fill=light
+      text #n140 "Home" shade=mid
+      text #n141 "Trips" shade=mid
+      text #n142 "Earnings" shade=mid
+      text #n143 "Account" bold under

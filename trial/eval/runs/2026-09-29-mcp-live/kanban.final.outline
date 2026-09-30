@@ -1,0 +1,148 @@
+app #n1 "Studio Board" web
+  screen #n2 "Board"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Studio Board" bold
+        text #n6 "Board" bold
+        text #n7 "Clients" shade=mid
+        text #n8 "Timesheets" shade=mid
+        text #n9 "Files" shade=mid
+        text #n10 "Team" shade=mid
+      col #n11 grow pad=3 gap=3
+        button #n206 "Clear" ghost size=s
+        input #n15 "Search cards" search w=220
+        row #n12 justify=between align=center
+          text #n13 "Q2 Campaigns Board" size=xxl bold
+          row #n14 gap=2
+        row #n17 gap=3 grow
+          col #n189 pad=2 gap=2
+            text #n190 "All Tasks" bold shade=mid
+            table #n191
+              tr #n192 "Task | Client | Status | Owner | Due"
+              tr #n193 "Moodboard — Halden Coffee rebrand | Halden Coffee Co. | Backlog | — | Jun 14" data
+              tr #n194 "Icon set — Fintra app v2 | Fintra | Backlog | — | Jun 20" data
+              tr #n195 "Packaging concepts — Loop Snacks | Loop Snacks | Backlog | — | unscheduled" data
+              tr #n196 "Deck redesign — Northline pitch | Northline Realty | In Progress | Reya | Jun 10" data
+              tr #n197 "Website type system | Arbor & Vine | In Progress | Marcus | Jun 12" data
+              tr #n198 "Logo suite — Summit Gear | Summit Gear | Client Review | Priya | Jun 8" data
+              tr #n199 "Business cards — Halden Coffee | Halden Coffee Co. | Done | — | shipped Jun 2" data
+              tr #n200 "Social templates — Loop Snacks | Loop Snacks | Done | — | shipped May 29" data
+        row #n201 gap=2 align=center
+          text #n202 "Filter" size=s shade=mid
+          input #n203 "Status" select
+          input #n204 "Owner" select
+          input #n205 "Client" select
+  screen #n77 "Card Detail"
+    row #n78 h=fill
+      col #n79 share=nav w=200 fill=mid pad=3 gap=2
+        text #n80 "Studio Board" bold
+        text #n81 "Board" bold
+        text #n82 "Clients" shade=mid
+        text #n83 "Timesheets" shade=mid
+        text #n84 "Files" shade=mid
+        text #n85 "Team" shade=mid
+      col #n86 grow pad=3 gap=3
+        text #n87 "Deck redesign — Northline Realty pitch" size=xl bold
+        row #n88 gap=2
+          text #n89 "In Progress" pill shade=mid
+          text #n90 "due Jun 10" pill shade=mid
+          text #n91 "priority: high" pill shade=mid
+        line #n92
+        row #n93 gap=4
+          col #n94 grow gap=2
+            text #n95 "Description" bold
+            text #n96 "Redo the 40-slide investor deck with new brand type and a cleaner data section. Client wants three concept directions before locking layout." shade=mid
+            text #n97 "Checklist" bold
+            table #n98
+              tr #n99 "Task | Owner | Status"
+              tr #n100 "Concept A layout | Reya" data
+              tr #n101 "Concept B layout | Marcus" data
+              tr #n102 "Data viz redraw | Priya" data
+              tr #n103 "Client walkthrough call | Reya" data
+            text #n104 "Comments" bold
+            col #n105 gap=2
+              row #n106 gap=2
+                shape #n107 circle w=28 h=28
+                col #n108
+                  text #n109 "Priya Nathan" bold size=s
+                  text #n110 "Pushed revised chart styles to shared drive, ready for review." size=s
+              row #n111 gap=2
+                shape #n112 circle w=28 h=28
+                col #n113
+                  text #n114 "Marcus Ohl" bold size=s
+                  text #n115 "Client asked to push kickoff call by one day, now Jun 9." size=s
+          col #n116 w=220 gap=2
+            text #n117 "Assignees" bold shade=mid
+            row #n118 gap=1
+              shape #n119 circle w=24 h=24
+              text #n120 "Reya Kessler" size=s
+            row #n121 gap=1
+              shape #n122 circle w=24 h=24
+              text #n123 "Marcus Ohl" size=s
+            text #n124 "Client" bold shade=mid
+            text #n125 "Northline Realty" size=s
+            text #n126 "Budget" bold shade=mid
+            text #n127 "$18,400 of $22,000 used" size=s shade=mid
+  screen #n128 "Settings"
+    row #n129 h=fill
+      col #n130 share=nav w=200 fill=mid pad=3 gap=2
+        text #n131 "Studio Board" bold
+        text #n132 "Board" bold
+        text #n133 "Clients" shade=mid
+        text #n134 "Timesheets" shade=mid
+        text #n135 "Files" shade=mid
+        text #n136 "Team" shade=mid
+      col #n137 grow pad=3 gap=4
+        text #n138 "Settings" size=xxl bold
+        col #n207 gap=2 pad=3 fill=light border
+          text #n208 "Note" bold size=s shade=mid
+          text #n209 "Changes to workspace settings require admin approval and may take up to 24 hours to take effect." size=s shade=mid
+        col #n139 gap=3
+          col #n140 gap=2
+            text #n141 "Account" bold shade=mid
+            row #n142 justify=between align=center pad=3 border
+              col #n143 gap=1
+                text #n144 "Email" bold size=s
+                text #n145 "maya@studiomake.co" size=s shade=mid
+              text #n146 "Change" size=s shade=mid
+            row #n147 justify=between align=center pad=3 border
+              col #n148 gap=1
+                text #n149 "Password" bold size=s
+                text #n150 "Last changed 3 months ago" size=s shade=mid
+              text #n151 "Update" size=s shade=mid
+          col #n152 gap=2
+            text #n153 "Notifications" bold shade=mid
+            row #n154 justify=between align=center pad=3 border
+              text #n155 "Email digests" bold size=s
+              input #n156 check on
+            row #n157 justify=between align=center pad=3 border
+              text #n158 "Task assignments" bold size=s
+              input #n159 check on
+            row #n160 justify=between align=center pad=3 border
+              text #n161 "Client feedback" bold size=s
+              input #n162 check on
+            row #n163 justify=between align=center pad=3 border
+              text #n164 "Weekly team summary" bold size=s
+              input #n165 check
+          col #n166 gap=2
+            text #n167 "Workspace" bold shade=mid
+            row #n168 justify=between align=center pad=3 border
+              col #n169 gap=1
+                text #n170 "Team members" bold size=s
+                text #n171 "5 active" size=s shade=mid
+              text #n172 "Manage" size=s shade=mid
+            row #n173 justify=between align=center pad=3 border
+              col #n174 gap=1
+                text #n175 "Storage" bold size=s
+                text #n176 "847 GB of 1 TB used" size=s shade=mid
+              text #n177 "Upgrade" size=s shade=mid
+          col #n178 gap=2
+            text #n179 "Preferences" bold shade=mid
+            row #n180 justify=between align=center pad=3 border
+              text #n181 "Dark mode" bold size=s
+              input #n182 toggle
+            row #n183 justify=between align=center pad=3 border
+              col #n184 gap=1
+                text #n185 "Default view" bold size=s
+                text #n186 "Board" size=s shade=mid
+              text #n187 "Change" size=s shade=mid

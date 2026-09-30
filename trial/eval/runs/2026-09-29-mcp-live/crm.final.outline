@@ -1,0 +1,148 @@
+app #n1 "Realty Pipeline" web
+  screen #n2 "Pipeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Realty Pipeline" bold
+        text #n6 "Pipeline" bold
+        text #n7 "Buyers" shade=mid
+        text #n8 "Listings" shade=mid
+        text #n9 "Showings" shade=mid
+        text #n10 "Reports" shade=mid
+      col #n11 grow pad=3 gap=3
+        button #n14 "Add Buyer" primary size=l
+        row #n116 gap=2 align=center
+          input #n117 "Search buyers..." search grow
+        row #n12 justify=between
+          text #n13 "Buyer Pipeline" size=xxl bold
+        row #n176 justify=between align=center
+          text #n177 "All Buyers" size=m bold
+          row #n178 gap=2
+            input #n179 "Filter..." search
+            button #n180 "Add Buyer" primary
+        table #n181
+          tr #n182 "Name | Budget | Status | Notes"
+          tr #n183 "Marcus Feldt | $450k | New Lead | Condo, downtown" data
+          tr #n184 "Priya Anand | $620k | New Lead | 3BR, school district" data
+          tr #n185 "Wendell Cho | $300k | New Lead | First-time buyer" data
+          tr #n186 "Renata Silva | $780k | Qualified | Pre-approved, Chase" data
+          tr #n187 "Tobias Klein | $525k | Qualified | Pre-approved, Wells Fargo" data
+          tr #n188 "Alina Gorman | $410k | Touring | 6 homes toured" data
+          tr #n189 "Devon Okafor | $950k | Touring | Waterfront only" data
+          tr #n190 "Sana Malik | $535k | Offer Made | Awaiting response" data
+          tr #n191 "Harold Beaumont | $612k | Closed | Escrow finished" data
+  screen #n62 "Buyer Detail"
+    row #n63 h=fill
+      col #n64 share=nav w=200 fill=mid pad=3 gap=2
+        text #n65 "Realty Pipeline" bold
+        text #n66 "Pipeline" shade=mid
+        text #n67 "Buyers" bold
+        text #n68 "Listings" shade=mid
+        text #n69 "Showings" shade=mid
+        text #n70 "Reports" shade=mid
+      col #n71 grow pad=3 gap=3
+        row #n72 justify=between align=center
+          col #n73 gap=1
+            text #n74 "Renata Silva" size=xl bold
+            text #n75 "Qualified · Budget $780k" shade=mid
+          row #n76 gap=2
+            button #n77 "Log Call"
+        row #n79 gap=3
+          col #n80 w=fill border pad=3 gap=2
+            text #n81 "Contact" bold
+            text #n82 "renata.silva@webmail.com" size=s mono
+            text #n83 "(415) 555-0148" size=s mono
+            text #n84 "Pre-approved: Chase, $800k cap" size=s
+          col #n85 w=fill border pad=3 gap=2
+            text #n86 "Preferences" bold
+            text #n87 "3BR+, 2 bath, garage" size=s
+            text #n88 "Neighborhoods: Elmhurst, Ridgeview" size=s
+            text #n89 "Timeline: move within 60 days" size=s
+        text #n90 "Activity" bold
+        table #n91
+          tr #n92 "Date | Type | Notes"
+          tr #n93 "Mar 2 | Call | Discussed financing options" data
+          tr #n94 "Mar 9 | Showing | 214 Ridgeview Ln, liked layout" data
+          tr #n95 "Mar 15 | Email | Sent 3 new listings" data
+          tr #n96 "Mar 22 | Showing | 88 Elmhurst Ct, no response yet" data
+  screen #n97 "Showings"
+    row #n98 h=fill
+      col #n99 share=nav w=200 fill=mid pad=3 gap=2
+        text #n100 "Realty Pipeline" bold
+        text #n101 "Pipeline" shade=mid
+        text #n102 "Buyers" shade=mid
+        text #n103 "Listings" shade=mid
+        text #n104 "Showings" bold
+        text #n105 "Reports" shade=mid
+      col #n106 grow pad=3 gap=3
+        text #n107 "This Week's Showings" size=xl bold
+        table #n108
+          tr #n109 "Time | Buyer | Property | Status"
+          tr #n110 "Mon 10:00am | Priya Anand | 40 Cedar St | Confirmed" data
+          tr #n111 "Mon 2:30pm | Devon Okafor | 12 Harbor View | Confirmed" data
+          tr #n112 "Tue 11:00am | Wendell Cho | 305 Maple Ave | Pending" data
+          tr #n113 "Wed 9:00am | Alina Gorman | 77 Birchwood Dr | Confirmed" data
+          tr #n114 "Thu 4:00pm | Sana Malik | 214 Ridgeview Ln | Cancelled" data
+          tr #n115 "Fri 1:00pm | Tobias Klein | 9 Lakeview Terrace | Confirmed" data
+  screen #n118 "Settings"
+    row #n119 h=fill
+      col #n120 share=nav w=200 fill=mid pad=3 gap=2
+        text #n121 "Realty Pipeline" bold
+        text #n122 "Pipeline" shade=mid
+        text #n123 "Buyers" shade=mid
+        text #n124 "Listings" shade=mid
+        text #n125 "Showings" shade=mid
+        text #n126 "Reports" shade=mid
+      col #n127 grow pad=3 gap=3
+        text #n128 "Settings" size=xxl bold
+        col #n192 gap=2
+          text #n193 "Notes" bold
+          col #n194 border pad=3 gap=2
+            text #n195 "Agent notes and reminders" size=s shade=mid
+            input #n196 "Add a note..." area h=80
+        col #n129 gap=4
+          col #n130 gap=2
+            text #n131 "Account" bold
+            col #n132 border pad=3 gap=2
+              row #n133 justify=between align=center
+                col #n134 gap=1
+                  text #n135 "Email" bold
+                  text #n136 "james.morrison@realty.com" size=s shade=mid
+                button #n137 "Change" ghost
+              row #n138 justify=between align=center
+                col #n139 gap=1
+                  text #n140 "Name" bold
+                  text #n141 "James Morrison" size=s shade=mid
+                button #n142 "Edit" ghost
+              row #n143 justify=between align=center
+                col #n144 gap=1
+                  text #n145 "Phone" bold
+                  text #n146 "(415) 555-0127" size=s shade=mid
+                button #n147 "Edit" ghost
+          col #n148 gap=2
+            text #n149 "Notifications" bold
+            col #n150 border pad=3 gap=2
+              row #n151 justify=between align=center
+                text #n152 "New leads" bold
+                input #n153 on toggle
+              row #n154 justify=between align=center
+                text #n155 "Showing reminders" bold
+                input #n156 on toggle
+              row #n157 justify=between align=center
+                text #n158 "Offer updates" bold
+                input #n159 on toggle
+          col #n160 gap=2
+            text #n161 "Preferences" bold
+            col #n162 border pad=3 gap=2
+              row #n163 justify=between align=center
+                col #n164 gap=1
+                  text #n165 "Default currency" bold
+                  text #n166 "USD" size=s shade=mid
+                button #n167 "Change" ghost
+              row #n168 justify=between align=center
+                col #n169 gap=1
+                  text #n170 "Time zone" bold
+                  text #n171 "Pacific (PT)" size=s shade=mid
+                button #n172 "Change" ghost
+          col #n173 gap=2
+            col #n174 border pad=3 gap=2
+              button #n175 "Sign Out" ghost

@@ -1,0 +1,135 @@
+app #n1 "Recipe & Meal Planner" phone
+  screen #n2 "Recipes"
+    row #n3 share=topbar justify=between pad=3 border
+      text #n4 "Recipes" bold size=xxl
+      row #n142 pad=3 gap=2
+        text #n143 "💡" size=l
+        col #n144 grow
+          text #n145 "Tip: Export your meal history to save recipes and plans." size=s shade=mid
+      input #n6 "Search recipes" search value=chicken
+      shape #n5 "search" w=20 h=20
+      shape #n134 "filter" w=20 h=20
+    row #n7 gap=2
+      text #n8 "All" bold under
+      text #n9 "Breakfast" shade=mid
+      text #n10 "Dinner" shade=mid
+      text #n11 "Vegan" shade=mid
+      text #n12 "Quick (<20m)" shade=mid
+    table #n13
+      tr #n129 "Recipe | Time | Calories"
+      tr #n130 "Miso Butter Salmon | 25 min | 480" data
+      tr #n131 "Chickpea Tikka Masala | 35 min | 410" data
+      tr #n132 "Overnight Oats | 5 min | 320" data
+      tr #n133 "Spatchcock Roast Chicken | 1 hr 15 min | 610" data
+    row #n30 share=tabs justify=between pad=3 border
+      text #n31 "Recipes" bold
+      text #n32 "Planner" shade=mid
+      text #n33 "Groceries" shade=mid
+      text #n34 "Saved" shade=mid
+  screen #n35 "Planner"
+    row #n36 share=topbar justify=between pad=3 border
+      text #n37 "This Week" bold size=xxl
+      row #n146 pad=3 gap=2
+        text #n147 "💡" size=l
+        col #n148 grow
+          text #n149 "Tip: Export your meal history to save recipes and plans." size=s shade=mid
+      text #n38 "Oct 14–20" size=s shade=mid
+      shape #n135 "filter" w=20 h=20
+    col #n39 gap=2 pad=3
+      row #n40 border pad=2 justify=between
+        col #n41
+          text #n42 "Monday" bold
+          text #n43 "Overnight Oats" size=s shade=mid
+          text #n44 "Chickpea Tikka Masala" size=s shade=mid
+        text #n45 "2" size=xl shade=light
+      row #n46 border pad=2 justify=between
+        col #n47
+          text #n48 "Tuesday" bold
+          text #n49 "Miso Butter Salmon" size=s shade=mid
+        text #n50 "1" size=xl shade=light
+      row #n51 border pad=2 justify=between
+        col #n52
+          text #n53 "Wednesday" bold
+          text #n54 "No meals planned" size=s shade=mid
+        text #n55 "0" size=xl shade=light
+      row #n56 border pad=2 justify=between
+        col #n57
+          text #n58 "Thursday" bold
+          text #n59 "Spatchcock Roast Chicken" size=s shade=mid
+          text #n60 "Overnight Oats" size=s shade=mid
+        text #n61 "2" size=xl shade=light
+      row #n62 border pad=2 justify=between
+        col #n63
+          text #n64 "Friday" bold
+          text #n65 "Chickpea Tikka Masala" size=s shade=mid
+        text #n66 "1" size=xl shade=light
+    row #n68 share=tabs justify=between pad=3 border
+      text #n69 "Recipes" shade=mid
+      text #n70 "Planner" bold
+      text #n71 "Groceries" shade=mid
+      text #n72 "Saved" shade=mid
+  screen #n73 "Groceries"
+    row #n74 share=topbar justify=between pad=3 border
+      text #n75 "Groceries" bold size=xxl
+      row #n150 pad=3 gap=2
+        text #n151 "💡" size=l
+        col #n152 grow
+          text #n153 "Tip: Export your meal history to save recipes and plans." size=s shade=mid
+      text #n76 "Clear checked" size=s shade=mid
+      shape #n136 "filter" w=20 h=20
+    text #n77 "Generated from 6 planned meals" size=s shade=mid pad=3
+    col #n78 gap=1 pad=3
+      text #n79 "Produce" bold shade=mid
+      input #n80 "Yellow onion (3)" check
+      input #n81 "Garlic (1 head)" check
+      input #n82 "Cilantro (1 bunch)" check on
+      line #n83
+      text #n84 "Protein" bold shade=mid
+      input #n85 "Salmon fillets (4)" check
+      input #n86 "Whole chicken (1)" check
+      input #n87 "Chickpeas, canned (3)" check on
+      line #n88
+      text #n89 "Pantry" bold shade=mid
+      input #n90 "Miso paste" check
+      input #n91 "Rolled oats" check
+      input #n92 "Garam masala" check
+    row #n93 share=tabs justify=between pad=3 border
+      text #n94 "Recipes" shade=mid
+      text #n95 "Planner" shade=mid
+      text #n96 "Groceries" bold
+      text #n97 "Saved" shade=mid
+  screen #n98 "Settings"
+    row #n99 share=topbar justify=between pad=3 border
+      text #n100 "Settings" bold size=xxl
+      row #n138 pad=3 gap=2
+        text #n139 "💡" size=l
+        col #n140 grow
+          text #n141 "Tip: Export your meal history to save recipes and plans." size=s shade=mid
+      shape #n101 "close" w=20 h=20
+      shape #n137 "filter" w=20 h=20
+      button #n121 "Export meal history" ghost
+    col #n102 gap=3 pad=3
+      col #n103 gap=2
+        text #n104 "Dietary Preferences" bold shade=mid size=s
+        input #n105 "Vegetarian" toggle
+        input #n106 "Gluten-free" toggle
+        input #n107 "Dairy-free" toggle
+      line #n108
+      col #n109 gap=2
+        text #n110 "Notifications" bold shade=mid size=s
+        input #n111 "Meal reminders" toggle on
+        input #n112 "Grocery updates" toggle on
+      line #n113
+      col #n114 gap=2
+        text #n115 "Display" bold shade=mid size=s
+        input #n116 "Dark mode" toggle
+        input #n117 "Metric units" toggle
+      line #n118
+      col #n119 gap=2
+        text #n120 "Account" bold shade=mid size=s
+        button #n122 "Clear all data" ghost
+    row #n123 share=tabs justify=between pad=3 border
+      text #n124 "Recipes" shade=mid
+      text #n125 "Planner" shade=mid
+      text #n126 "Groceries" shade=mid
+      text #n127 "Saved" shade=mid

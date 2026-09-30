@@ -1,0 +1,144 @@
+app #n1 "Postmark" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Postmark" bold size=l
+        text #n6 "Compose" pill
+        line #n7
+        text #n8 "Inbox" bold
+        text #n9 "Starred" shade=mid
+        text #n10 "Snoozed" shade=mid
+        text #n11 "Sent" shade=mid
+        text #n12 "Drafts" shade=mid
+        text #n13 "Archive" shade=mid
+        text #n14 "Spam" shade=mid
+        line #n15
+        text #n16 "Work" shade=mid
+        text #n17 "Personal" shade=mid
+        text #n18 "Receipts" shade=mid
+      col #n19 grow
+        row #n20 justify=between pad=3 border
+          text #n21 "Inbox" bold size=l
+          input #n22 "Search mail" search w=320
+        col #n23
+          row #n24 pad=3 border gap=3
+            shape #n25 circle w=28 h=28
+            col #n26 grow
+              row #n27 justify=between
+                text #n28 "Maria Chen" bold
+                text #n29 "9:42 AM" shade=mid data
+              text #n30 "Re: Q3 budget review" bold
+              text #n31 "Attached the updated spreadsheet, let me know if the numbers on..." shade=mid
+          row #n32 pad=3 border gap=3 fill=light
+            shape #n33 circle w=28 h=28
+            col #n34 grow
+              row #n35 justify=between
+                text #n36 "GitHub" bold
+                text #n37 "8:15 AM" shade=mid data
+              text #n38 "[postmark/web] 3 new pull requests"
+              text #n39 "octopus-bot opened PR #482: fix search debounce" shade=mid
+          row #n40 pad=3 border gap=3
+            shape #n41 circle w=28 h=28
+            col #n42 grow
+              row #n43 justify=between
+                text #n44 "Devon Park" bold
+                text #n45 "Yesterday" shade=mid data
+              text #n46 "Lunch next week?"
+              text #n47 "Are you free Tuesday or Thursday for the design sync?" shade=mid
+          row #n48 pad=3 border gap=3
+            shape #n49 circle w=28 h=28
+            col #n50 grow
+              row #n51 justify=between
+                text #n52 "Amazon" shade=mid
+                text #n53 "Yesterday" shade=mid data
+              text #n54 "Your package has shipped" shade=mid
+              text #n55 "Arriving Thursday, June 12" shade=mid
+          row #n56 pad=3 border gap=3
+            shape #n57 circle w=28 h=28
+            col #n58 grow
+              row #n59 justify=between
+                text #n60 "Priya Nair" bold
+                text #n61 "Mon" shade=mid data
+              text #n62 "Contract renewal - action needed" bold
+              text #n63 "This is a reminder that the vendor contract expires June 30 and we..." shade=mid
+          row #n64 pad=3 border gap=3
+            shape #n65 circle w=28 h=28
+            col #n66 grow
+              row #n67 justify=between
+                text #n68 "No Reply" shade=mid
+                text #n69 "Mon" shade=mid data
+              text #n70 "Your invoice #10432 is overdue" shade=mid
+              text #n71 "" shade=mid
+  screen #n72 "Read"
+    row #n73 h=fill
+      col #n74 share=nav w=200 fill=light pad=3 gap=2
+        text #n75 "Postmark" bold size=l
+        text #n76 "Compose" pill
+        line #n77
+        text #n78 "Inbox" bold
+        text #n79 "Starred" shade=mid
+        text #n80 "Snoozed" shade=mid
+        text #n81 "Sent" shade=mid
+        text #n82 "Drafts" shade=mid
+        text #n83 "Archive" shade=mid
+        text #n84 "Spam" shade=mid
+        line #n85
+        text #n86 "Work" shade=mid
+        text #n87 "Personal" shade=mid
+        text #n88 "Receipts" shade=mid
+      col #n89 grow pad=4 gap=3
+        row #n90 justify=between
+          text #n91 "Re: Q3 budget review" bold size=xl
+          row #n92 gap=2
+            button #n93 "Archive" ghost
+            button #n94 "Delete" ghost
+        row #n95 gap=3 pad=3 border
+          shape #n96 circle w=36 h=36
+          col #n97 grow
+            text #n98 "Maria Chen" bold
+            text #n99 "maria.chen@northfield.io" shade=mid mono
+          text #n100 "9:42 AM" shade=mid data
+        col #n101 pad=3 gap=2
+          text #n102 "Hi team,"
+          text #n103 "Attached is the updated spreadsheet with the revised Q3 numbers. Marketing spend came in about 8% under forecast, and we reallocated the difference toward the platform migration line item."
+          text #n104 "Can everyone review before Friday's meeting? I want to lock the final version before it goes to Priya."
+          text #n105 "Thanks,"
+          text #n106 "Maria"
+        row #n107 pad=3 border gap=2
+          shape #n108 w=32 h=32
+          text #n109 "Q3_Budget_Revised_v3.xlsx" mono shade=mid
+        row #n110 gap=2
+          button #n111 "Reply" primary
+          button #n112 "Reply all" ghost
+          button #n113 "Forward" ghost
+  screen #n114 "Compose"
+    row #n115 h=fill
+      col #n116 share=nav w=200 fill=light pad=3 gap=2
+        text #n117 "Postmark" bold size=l
+        text #n118 "Compose" pill
+        line #n119
+        text #n120 "Inbox" bold
+        text #n121 "Starred" shade=mid
+        text #n122 "Snoozed" shade=mid
+        text #n123 "Sent" shade=mid
+        text #n124 "Drafts" shade=mid
+        text #n125 "Archive" shade=mid
+        text #n126 "Spam" shade=mid
+        line #n127
+        text #n128 "Work" shade=mid
+        text #n129 "Personal" shade=mid
+        text #n130 "Receipts" shade=mid
+      col #n131 grow pad=4 gap=3
+        text #n132 "New Message" bold size=xl
+        col #n133 border pad=3 gap=2 grow
+          input #n134 "To" value=devon.park@northfield.io
+          line #n135
+          input #n136 "Subject" value="Lunch next week"
+          line #n137
+          input #n138 "" area value="Tuesday works well for me, does 12:30 at the usual place sound good? Happy to move to Thursday if something comes up." h=280
+        row #n139 justify=between
+          row #n140 gap=2
+            button #n141 "Attach" ghost
+            button #n142 "Insert link" ghost
+            button #n143 "Discard" ghost
+          button #n144 "Send" primary

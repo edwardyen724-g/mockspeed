@@ -1,0 +1,178 @@
+app #n1 "Postmark" web
+  screen #n2 "Inbox"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Postmark" bold size=l
+        text #n6 "Compose" pill
+        line #n7
+        text #n8 "Inbox" bold
+        text #n9 "Starred" shade=mid
+        text #n10 "Snoozed" shade=mid
+        text #n11 "Sent" shade=mid
+        text #n12 "Drafts" shade=mid
+        text #n13 "Archive" shade=mid
+        text #n14 "Spam" shade=mid
+        line #n15
+        text #n16 "Work" shade=mid
+        text #n17 "Personal" shade=mid
+        text #n18 "Receipts" shade=mid
+      col #n19 grow
+        row #n20 justify=between pad=3 border
+          button #n220 "Has attachment" ghost size=s
+          input #n22 "Search mail" search w=320
+          text #n21 "Inbox" bold size=xxl
+          row #n218 gap=2 pad=0
+            text #n219 "Filter" shade=mid size=s
+            button #n221 "Unread" ghost size=s
+            button #n222 "From: Work" ghost size=s
+        col #n23
+          table #n210
+            tr #n211 "From | Subject | Time"
+            tr #n212 "Maria Chen | Re: Q3 budget review | 9:42 AM" data
+            tr #n213 "GitHub | [postmark/web] 3 new pull requests | 8:15 AM" data
+            tr #n214 "Devon Park | Lunch next week? | Yesterday" data
+            tr #n215 "Amazon | Your package has shipped | Yesterday" data
+            tr #n216 "Priya Nair | Contract renewal - action needed | Mon" data
+            tr #n217 "No Reply | Your invoice #10432 is overdue | Mon" data
+  screen #n72 "Read"
+    row #n73 h=fill
+      col #n74 share=nav w=200 fill=mid pad=3 gap=2
+        text #n75 "Postmark" bold size=l
+        text #n76 "Compose" pill
+        line #n77
+        text #n78 "Inbox" bold
+        text #n79 "Starred" shade=mid
+        text #n80 "Snoozed" shade=mid
+        text #n81 "Sent" shade=mid
+        text #n82 "Drafts" shade=mid
+        text #n83 "Archive" shade=mid
+        text #n84 "Spam" shade=mid
+        line #n85
+        text #n86 "Work" shade=mid
+        text #n87 "Personal" shade=mid
+        text #n88 "Receipts" shade=mid
+      col #n89 grow pad=4 gap=3
+        row #n90 justify=between
+          text #n91 "Re: Q3 budget review" bold size=xl
+          row #n92 gap=2
+            button #n93 "Archive" ghost size=l
+            button #n94 "Delete" ghost
+        row #n95 gap=3 pad=3 border
+          shape #n96 circle w=36 h=36
+          col #n97 grow
+            text #n98 "Maria Chen" bold
+            text #n99 "maria.chen@northfield.io" shade=mid mono
+          text #n100 "9:42 AM" shade=mid data
+        col #n101 pad=3 gap=2
+          text #n102 "Hi team,"
+          text #n103 "Attached is the updated spreadsheet with the revised Q3 numbers. Marketing spend came in about 8% under forecast, and we reallocated the difference toward the platform migration line item."
+          text #n104 "Can everyone review before Friday's meeting? I want to lock the final version before it goes to Priya."
+          text #n105 "Thanks,"
+          text #n106 "Maria"
+        row #n107 pad=3 border gap=2
+          shape #n108 w=32 h=32
+          text #n109 "Q3_Budget_Revised_v3.xlsx" mono shade=mid
+        row #n110 gap=2
+          button #n111 "Reply" primary
+          button #n112 "Reply all" ghost
+          button #n113 "Forward" ghost
+  screen #n114 "Compose"
+    row #n115 h=fill
+      col #n116 share=nav w=200 fill=mid pad=3 gap=2
+        text #n117 "Postmark" bold size=l
+        text #n118 "Compose" pill
+        line #n119
+        text #n120 "Inbox" bold
+        text #n121 "Starred" shade=mid
+        text #n122 "Snoozed" shade=mid
+        text #n123 "Sent" shade=mid
+        text #n124 "Drafts" shade=mid
+        text #n125 "Archive" shade=mid
+        text #n126 "Spam" shade=mid
+        line #n127
+        text #n128 "Work" shade=mid
+        text #n129 "Personal" shade=mid
+        text #n130 "Receipts" shade=mid
+      col #n131 grow pad=4 gap=3
+        text #n132 "New Message" bold size=xl
+        col #n133 border pad=3 gap=2 grow
+          input #n134 "To" value=devon.park@northfield.io
+          line #n135
+          input #n136 "Subject" value="Lunch next week"
+          line #n137
+          input #n138 "" area value="Tuesday works well for me, does 12:30 at the usual place sound good? Happy to move to Thursday if something comes up." h=280
+        row #n139 justify=between
+          row #n140 gap=2
+            button #n141 "Attach" ghost
+            button #n142 "Insert link" ghost
+            button #n143 "Discard" ghost
+  screen #n145 "Settings"
+    row #n146 h=fill
+      col #n147 share=nav w=200 fill=mid pad=3 gap=2
+        text #n148 "Postmark" bold size=l
+        text #n149 "Compose" pill
+        line #n150
+        text #n151 "Inbox" bold
+        text #n152 "Starred" shade=mid
+        text #n153 "Snoozed" shade=mid
+        text #n154 "Sent" shade=mid
+        text #n155 "Drafts" shade=mid
+        text #n156 "Archive" shade=mid
+        text #n157 "Spam" shade=mid
+        line #n158
+        text #n159 "Work" shade=mid
+        text #n160 "Personal" shade=mid
+        text #n161 "Receipts" shade=mid
+      col #n162 grow pad=4 gap=4
+        text #n163 "Settings" bold size=xl
+        col #n223 gap=2
+          text #n224 "About" bold
+          col #n225 border pad=3 gap=2
+            text #n226 "Postmark" shade=mid size=s
+            text #n227 "Version 2.1.4" shade=mid size=s
+            text #n228 "Last updated: March 15, 2024" shade=mid size=s
+        col #n164 gap=4
+          col #n165 gap=2
+            text #n166 "Account" bold
+            col #n167 border pad=3 gap=3
+              row #n168 justify=between align=center
+                text #n169 "Email address"
+                text #n170 "maria.chen@northfield.io" shade=mid mono
+              row #n171 justify=between align=center
+                text #n172 "Full name"
+                text #n173 "Maria Chen" shade=mid
+              row #n174 justify=between align=center
+                text #n175 "Password"
+                button #n176 "Change" ghost
+          col #n177 gap=2
+            text #n178 "Notifications" bold
+            col #n179 border pad=3 gap=3
+              row #n180 justify=between align=center
+                col #n181
+                  text #n182 "Email notifications"
+                  text #n183 "New messages and replies" shade=mid size=s
+                input #n184 on toggle
+              row #n185 justify=between align=center
+                col #n186
+                  text #n187 "Digest emails"
+                  text #n188 "Weekly summary of activity" shade=mid size=s
+                input #n189 on toggle
+              row #n190 justify=between align=center
+                col #n191
+                  text #n192 "Read receipts"
+                  text #n193 "Let others know when you read messages" shade=mid size=s
+                input #n194 off toggle
+          col #n195 gap=2
+            text #n196 "Display" bold
+            col #n197 border pad=3 gap=3
+              row #n198 justify=between align=center
+                text #n199 "Theme"
+                input #n200 select value=Light
+              row #n201 justify=between align=center
+                text #n202 "Text size"
+                input #n203 select value=Regular
+          col #n204 gap=2
+            text #n205 "Danger Zone" bold
+            col #n206 border pad=3 gap=3 fill=light
+              button #n207 "Export all mail" ghost
+              button #n208 "Delete account" ghost

@@ -1,0 +1,92 @@
+app #n1 "OrchestraAI" web
+  screen #n2 "Pipeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "OrchestraAI" bold
+        text #n6 "Pipeline" bold
+        text #n7 "Runs" shade=mid
+        text #n8 "Agents" shade=mid
+        text #n9 "Logs" shade=mid
+        text #n10 "Settings" shade=mid
+      col #n11 grow pad=3 gap=3
+        row #n12 justify=between align=center
+          text #n13 "Support Ticket Router" size=xl bold
+          button #n14 "Run Pipeline" primary
+        graph #n15 dir=right h=340
+          node #intake "Intake Agent" sub="classifies ticket"
+          node #kb "Knowledge Agent" sub="searches docs"
+          node #billing "Billing Agent" sub="checks account"
+          node #escalate "Escalation Agent" sub="human handoff"
+          node #reply "Reply Agent" sub="drafts response"
+          edge #n16 intake -> kb "general question"
+          edge #n17 intake -> billing "billing issue"
+          edge #n18 kb -> reply "found answer"
+          edge #n19 billing -> escalate "refund > $500"
+          edge #n20 billing -> reply "resolved"
+          edge #n21 escalate -> reply "after review"
+        row #n22 gap=3
+          col #n23 border pad=3 gap=1 w=fill
+            text #n24 "Active Runs" shade=mid size=s
+            text #n25 "12" size=xl bold
+          col #n26 border pad=3 gap=1 w=fill
+            text #n27 "Avg Latency" shade=mid size=s
+            text #n28 "1.8s" size=xl bold
+          col #n29 border pad=3 gap=1 w=fill
+            text #n30 "Failure Rate" shade=mid size=s
+            text #n31 "3.2%" size=xl bold
+  screen #n32 "Runs"
+    row #n33 h=fill
+      col #n34 share=nav w=200 fill=light pad=3 gap=2
+        text #n35 "OrchestraAI" bold
+        text #n36 "Pipeline" shade=mid
+        text #n37 "Runs" bold
+        text #n38 "Agents" shade=mid
+        text #n39 "Logs" shade=mid
+        text #n40 "Settings" shade=mid
+      col #n41 grow pad=3 gap=3
+        text #n42 "Run History" size=xl bold
+        table #n43
+          tr #n44 "Run ID | Pipeline | Started | Duration | Status"
+          tr #n45 "run_8841 | Support Ticket Router | 09:41:02 | 2.1s | complete" data
+          tr #n46 "run_8840 | Support Ticket Router | 09:40:47 | 1.4s | complete" data
+          tr #n47 "run_8839 | Refund Approval | 09:39:12 | 6.7s | escalated" data
+          tr #n48 "run_8838 | Support Ticket Router | 09:38:55 | 0.9s | complete" data
+          tr #n49 "run_8837 | Content Moderation | 09:37:30 | 14.2s | failed" data
+          tr #n50 "run_8836 | Support Ticket Router | 09:36:04 | 1.7s | complete" data
+        text #n51 "run_8837 — Content Moderation" bold size=l
+        row #n52 gap=3
+          col #n53 border pad=3 gap=2 w=fill
+            row #n54 justify=between
+              text #n55 "Classifier Agent" bold
+              text #n56 "ok" shade=mid
+            row #n57 justify=between
+              text #n58 "Policy Agent" bold
+              text #n59 "ok" shade=mid
+            row #n60 justify=between
+              text #n61 "Reviewer Agent" bold
+              text #n62 "failed" shade=dark
+            text #n63 "timeout waiting for model response after 12s" mono shade=mid size=s
+          col #n64 border pad=3 gap=2 w=fill
+            text #n65 "Retry Policy" shade=mid size=s
+            text #n66 "2 of 3 attempts used" size=m
+            progress #n67 "retries" value=66
+            button #n68 "Retry Now" primary
+  screen #n69 "Agents"
+    row #n70 h=fill
+      col #n71 share=nav w=200 fill=light pad=3 gap=2
+        text #n72 "OrchestraAI" bold
+        text #n73 "Pipeline" shade=mid
+        text #n74 "Runs" shade=mid
+        text #n75 "Agents" bold
+        text #n76 "Logs" shade=mid
+        text #n77 "Settings" shade=mid
+      col #n78 grow pad=3 gap=3
+        text #n79 "Agent Registry" size=xl bold
+        table #n80
+          tr #n81 "Agent | Model | Role | Calls Today | Status"
+          tr #n82 "Intake Agent | gpt-4o-mini | classifier | 4,210 | healthy" data
+          tr #n83 "Knowledge Agent | gpt-4o | retriever | 3,884 | healthy" data
+          tr #n84 "Billing Agent | gpt-4o-mini | tool-caller | 1,502 | healthy" data
+          tr #n85 "Escalation Agent | claude-3-opus | router | 96 | healthy" data
+          tr #n86 "Reviewer Agent | gpt-4o | moderator | 2,730 | degraded" data
+          tr #n87 "Reply Agent | gpt-4o-mini | generator | 4,006 | healthy" data

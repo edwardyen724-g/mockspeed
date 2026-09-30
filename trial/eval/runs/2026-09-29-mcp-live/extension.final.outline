@@ -1,0 +1,82 @@
+app #n1 "Page Summarizer" panel
+  screen #n2 "Summary"
+    row #n3 share=topbar justify=between pad=2 border fill=light
+      text #n4 "Summarizer" bold size=s
+      row #n70 gap=2 grow align=center
+        input #n71 "Search summaries..." w=fill search
+      shape #n5 "settings" w=16 h=16
+      shape #n83 "filter" w=16 h=16
+      button #n23 "Copy" ghost size=l
+    col #n6 pad=3 gap=3
+      row #n7 gap=2 align=center
+        shape #n8 "favicon" w=16 h=16
+        text #n9 "nytimes.com/2024/06/12/tech/ai-regulation-eu.html" size=xs shade=mid mono
+      text #n10 "EU Reaches Deal on Landmark AI Regulation Law" size=xxl bold
+      row #n11 gap=2
+        text #n12 "pill" pill size=xs shade=mid
+        text #n13 "4 min read" pill size=xs shade=mid
+        text #n14 "updated 2h ago" pill size=xs shade=mid
+      line #n15
+      text #n16 "Summary" size=s bold shade=mid
+      col #n17 gap=2 pad=2 fill=light
+        table #n77
+          tr #n78 "Point | Details"
+          tr #n79 "Finalization | EU lawmakers finalized the AI Act, the first comprehensive AI law worldwide, after three years of negotiation." data
+          tr #n80 "High-risk uses | The law bans certain high-risk uses like real-time biometric surveillance in public spaces, with narrow exceptions for law enforcement." data
+          tr #n81 "Penalties | Companies violating rules face fines up to 7% of global annual revenue." data
+          tr #n82 "Enforcement | Full enforcement begins in 2026; some provisions take effect as early as this year." data
+      row #n22 gap=2
+        button #n24 "Regenerate" ghost
+        input #n25 "" select value=Concise w=120
+      line #n26
+      text #n27 "Ask about this page" size=s bold shade=mid
+      row #n28 gap=2
+        input #n29 "Ask a question..." w=fill grow
+  screen #n31 "History"
+    row #n32 share=topbar justify=between pad=2 border fill=light
+      text #n33 "Summarizer" bold size=s
+      row #n72 gap=2 grow align=center
+        input #n73 "Search summaries..." w=fill search
+      shape #n34 "settings" w=16 h=16
+      shape #n84 "filter" w=16 h=16
+    col #n35 pad=3 gap=2
+      text #n36 "Recent Pages" size=l bold
+      table #n37
+        tr #n38 "Page | Summarized | Length"
+        tr #n39 "EU Reaches Deal on Landmark AI Regulation Law | 2h ago | 4 min read" data
+        tr #n40 "How to Fix a Leaky Faucet in 20 Minutes | Yesterday | 3 min read" data
+        tr #n41 "Q2 Earnings: Cloud Growth Slows at Major Tech Firms | Yesterday | 6 min read" data
+        tr #n42 "The Best Budget Laptops of 2024 | 3 days ago | 5 min read" data
+        tr #n43 "Untitled page (no readable content found) | 4 days ago | — " data
+      button #n44 "Clear history" ghost
+  screen #n45 "Settings"
+    row #n46 share=topbar justify=between pad=2 border fill=light
+      text #n47 "Summarizer" bold size=s
+      row #n74 gap=2 grow align=center
+        input #n75 "Search summaries..." w=fill search
+      shape #n48 "settings" w=16 h=16
+      shape #n85 "filter" w=16 h=16
+    col #n49 pad=3 gap=3
+      text #n50 "Preferences" size=l bold
+      col #n51 gap=2
+        row #n52 justify=between align=center
+          text #n53 "Default summary length"
+          input #n54 "" select value=Concise
+        row #n55 justify=between align=center
+          text #n56 "Auto-summarize on open"
+          input #n57 "" toggle on
+        row #n58 justify=between align=center
+          text #n59 "Include quotes from page"
+          input #n60 "" toggle
+        row #n61 justify=between align=center
+          text #n62 "Dark mode"
+          input #n63 "" toggle
+      line #n64
+      text #n65 "Data" size=s bold shade=mid
+      row #n66 justify=between align=center
+        text #n67 "Save summaries to history"
+        input #n68 "" toggle on
+      button #n69 "Delete all history" ghost
+      col #n86 gap=2
+        text #n87 "Note: summary length can also be adjusted per-summary using the dropdown on the Summary screen." size=xs shade=mid
+        line #n88

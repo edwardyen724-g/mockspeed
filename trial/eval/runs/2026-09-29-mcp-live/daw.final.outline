@@ -1,0 +1,156 @@
+app #n1 "Waveform Studio" panel
+  screen #n2 "Project"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "Waveform Studio" bold
+        text #n6 "Project" bold
+        text #n7 "Mixer" shade=mid
+        text #n8 "Library" shade=mid
+        text #n9 "Export" shade=mid
+      row #n179 justify=between pad=3 border
+        button #n186 "Split" size=l
+        row #n180 pad=3 border
+          input #n181 "Search projects" search
+        col #n182
+          text #n183 "Midnight Drive" size=xxl bold
+          text #n184 "128 BPM · 4/4 · Key: A minor" shade=mid size=s
+        row #n185 gap=2
+          button #n187 "Quantize"
+      row #n188 pad=2 gap=4 border
+        text #n189 "00:00" mono size=s shade=mid
+        text #n190 "00:08" mono size=s shade=mid
+        text #n191 "00:16" mono size=s shade=mid
+        text #n192 "00:24" mono size=s shade=mid
+        text #n193 "00:32" mono size=s shade=mid
+        text #n194 "00:40" mono size=s shade=mid
+      col #n195 grow pad=2
+        table #n196
+          tr #n197 "Track | Device | Pan | Level | Status"
+          tr #n198 "Drums | Kit: Amber 909 | C | -3.5 dB | active" data
+          tr #n199 "Bass | Synth: Deep Sub | L8 | -2.0 dB | active" data
+          tr #n200 "Lead | — | C | -inf dB | muted" data
+          tr #n201 "Vocals | Take 4 · comped | C | -1.2 dB | active" data
+          tr #n202 "Pad | Synth: Glass Choir | R6 | -8.0 dB | active" data
+      row #n203 pad=2 gap=3 border justify=between
+        text #n204 "Bar 12 of 64" size=s shade=mid
+        progress #n205 "playback" value=19
+        text #n206 "-6.2 dB" size=s mono shade=mid
+  screen #n61 "Mixer"
+    row #n62 h=fill
+      col #n63 share=nav w=200 fill=mid pad=3 gap=2
+        text #n64 "Waveform Studio" bold
+        text #n65 "Project" shade=mid
+        text #n66 "Mixer" bold
+        text #n67 "Library" shade=mid
+        text #n68 "Export" shade=mid
+      col #n69 grow pad=3 gap=3
+        text #n70 "Channel Strips" size=l bold
+        row #n71 gap=3
+          col #n72 border pad=3 gap=2 w=140
+            text #n73 "Drums" bold size=s
+            input #n74 "Volume" toggle on
+            text #n75 "-3.5 dB" mono size=s
+            text #n76 "Pan: C" shade=mid size=xs
+          col #n77 border pad=3 gap=2 w=140
+            text #n78 "Bass" bold size=s
+            input #n79 "Volume" toggle on
+            text #n80 "-2.0 dB" mono size=s
+            text #n81 "Pan: L8" shade=mid size=xs
+          col #n82 border pad=3 gap=2 w=140
+            text #n83 "Lead" bold size=s
+            input #n84 "Mute" toggle
+            text #n85 "-inf dB" mono size=s
+            text #n86 "muted" shade=mid size=xs
+          col #n87 border pad=3 gap=2 w=140
+            text #n88 "Vocals" bold size=s
+            input #n89 "Volume" toggle on
+            text #n90 "-1.2 dB" mono size=s
+            text #n91 "Pan: C" shade=mid size=xs
+          col #n92 border pad=3 gap=2 w=140
+            text #n93 "Pad" bold size=s
+            input #n94 "Volume" toggle on
+            text #n95 "-8.0 dB" mono size=s
+            text #n96 "Pan: R6" shade=mid size=xs
+          col #n97 border pad=3 gap=2 w=140 fill=dark
+            text #n98 "Master" bold size=s
+            input #n99 "Volume" toggle on
+            text #n100 "-0.4 dB" mono size=s
+            text #n101 "Limiter: on" size=xs
+  screen #n102 "Export"
+    row #n103 h=fill
+      col #n104 share=nav w=200 fill=mid pad=3 gap=2
+        text #n105 "Waveform Studio" bold
+        text #n106 "Project" shade=mid
+        text #n107 "Mixer" shade=mid
+        text #n108 "Library" shade=mid
+        text #n109 "Export" bold
+      col #n110 grow pad=3 gap=3
+        text #n111 "Render Queue" size=l bold
+        table #n112
+          tr #n113 "File | Format | Length | Status"
+          tr #n114 "midnight_drive_master.wav | WAV 24-bit | 3:42 | done" data
+          tr #n115 "midnight_drive_master.mp3 | MP3 320k | 3:42 | done" data
+          tr #n116 "midnight_drive_stems.zip | WAV stems | — | rendering" data
+          tr #n117 "midnight_drive_radio_edit.wav | WAV 24-bit | 2:58 | failed" data
+        row #n118 gap=3
+          input #n119 "Format" select value="WAV 24-bit"
+          input #n120 "Include stems" check
+          button #n121 "Render New" primary
+  screen #n124 "Settings"
+    row #n125 h=fill
+      col #n126 share=nav w=200 fill=mid pad=3 gap=2
+        text #n127 "Waveform Studio" bold
+        text #n128 "Project" shade=mid
+        text #n129 "Mixer" shade=mid
+        text #n130 "Library" shade=mid
+        text #n131 "Export" shade=mid
+        text #n132 "Settings" bold
+      col #n133 grow pad=3 gap=4
+        text #n134 "Settings" size=l bold
+        col #n207 gap=2 border pad=3 fill=light
+          text #n208 "Project Notes" bold size=m
+          text #n209 "A minor key with heavy synth layers. Vocals need compression pass. Radio edit stems exported successfully." size=s shade=mid
+        col #n135 gap=3
+          col #n136 gap=2
+            text #n137 "Audio" bold size=m
+            row #n138 gap=2 align=center
+              col #n139 grow
+                text #n140 "Sample Rate" size=s
+                text #n141 "48 kHz" shade=mid size=xs
+              input #n142 "Sample Rate" select value="48 kHz"
+            row #n143 gap=2 align=center
+              col #n144 grow
+                text #n145 "Buffer Size" size=s
+                text #n146 "256 samples" shade=mid size=xs
+              input #n147 "Buffer Size" select value="256"
+            row #n148 gap=2 align=center
+              col #n149 grow
+                text #n150 "Audio Device" size=s
+                text #n151 "Built-in Output" shade=mid size=xs
+              input #n152 "Audio Device" select value="Built-in Output"
+          line #n153
+          col #n154 gap=2
+            text #n155 "Appearance" bold size=m
+            row #n156 gap=2 align=center
+              col #n157 grow
+                text #n158 "Theme" size=s
+                text #n159 "Dark" shade=mid size=xs
+              input #n160 "Theme" select value=Dark
+            row #n161 gap=2 align=center
+              col #n162 grow
+                text #n163 "Zoom Level" size=s
+                text #n164 "100%" shade=mid size=xs
+              input #n165 "Zoom Level" select value=100%
+          line #n166
+          col #n167 gap=2
+            text #n168 "General" bold size=m
+            row #n169 gap=2 align=center
+              col #n170 grow
+                text #n171 "Auto-save" size=s
+                text #n172 "enabled" shade=mid size=xs
+              input #n173 "Auto-save" toggle on
+            row #n174 gap=2 align=center
+              col #n175 grow
+                text #n176 "Check for Updates" size=s
+                text #n177 "last checked 2 days ago" shade=mid size=xs
+              button #n178 "Check Now" ghost

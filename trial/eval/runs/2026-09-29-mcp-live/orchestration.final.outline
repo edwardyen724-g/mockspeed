@@ -1,0 +1,138 @@
+app #n1 "OrchestraAI" web
+  screen #n2 "Pipeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=mid pad=3 gap=2
+        text #n5 "OrchestraAI" bold
+        text #n6 "Pipeline" bold
+        text #n7 "Runs" shade=mid
+        text #n8 "Agents" shade=mid
+        text #n9 "Logs" shade=mid
+        text #n10 "Settings" shade=mid
+      col #n11 grow pad=3 gap=3
+        button #n152 "Filter" ghost
+        row #n150 gap=2 align=center pad=2 border
+          input #n151 "Search pipelines..." search w=fill
+        text #n153 "Support Ticket Router" size=xxl bold
+        button #n154 "Run Pipeline" primary size=l
+        table #n155
+          tr #n156 "Pipeline | Active Runs | Avg Latency | Failure Rate | Last Run"
+          tr #n157 "Support Ticket Router | 12 | 1.8s | 3.2% | 09:41:02" data
+          tr #n158 "Refund Approval | 3 | 4.2s | 1.1% | 09:39:12" data
+          tr #n159 "Content Moderation | 8 | 2.9s | 5.7% | 09:37:30" data
+          tr #n160 "Email Classification | 5 | 1.2s | 0.8% | 09:35:18" data
+  screen #n32 "Runs"
+    row #n33 h=fill
+      col #n34 share=nav w=200 fill=mid pad=3 gap=2
+        text #n35 "OrchestraAI" bold
+        text #n36 "Pipeline" shade=mid
+        text #n37 "Runs" bold
+        text #n38 "Agents" shade=mid
+        text #n39 "Logs" shade=mid
+        text #n40 "Settings" shade=mid
+      col #n41 grow pad=3 gap=3
+        text #n42 "Run History" size=xl bold
+        table #n43
+          tr #n44 "Run ID | Pipeline | Started | Duration | Status"
+          tr #n45 "run_8841 | Support Ticket Router | 09:41:02 | 2.1s | complete" data
+          tr #n46 "run_8840 | Support Ticket Router | 09:40:47 | 1.4s | complete" data
+          tr #n47 "run_8839 | Refund Approval | 09:39:12 | 6.7s | escalated" data
+          tr #n48 "run_8838 | Support Ticket Router | 09:38:55 | 0.9s | complete" data
+          tr #n49 "run_8837 | Content Moderation | 09:37:30 | 14.2s | failed" data
+          tr #n50 "run_8836 | Support Ticket Router | 09:36:04 | 1.7s | complete" data
+        text #n51 "run_8837 — Content Moderation" bold size=l
+        row #n52 gap=3
+          col #n53 border pad=3 gap=2 w=fill
+            row #n54 justify=between
+              text #n55 "Classifier Agent" bold
+              text #n56 "ok" shade=mid
+            row #n57 justify=between
+              text #n58 "Policy Agent" bold
+              text #n59 "ok" shade=mid
+            row #n60 justify=between
+              text #n61 "Reviewer Agent" bold
+              text #n62 "failed" shade=dark
+            text #n63 "timeout waiting for model response after 12s" mono shade=mid size=s
+          col #n64 border pad=3 gap=2 w=fill
+            text #n65 "Retry Policy" shade=mid size=s
+            text #n66 "2 of 3 attempts used" size=m
+            progress #n67 "retries" value=66
+  screen #n69 "Agents"
+    row #n70 h=fill
+      col #n71 share=nav w=200 fill=mid pad=3 gap=2
+        text #n72 "OrchestraAI" bold
+        text #n73 "Pipeline" shade=mid
+        text #n74 "Runs" shade=mid
+        text #n75 "Agents" bold
+        text #n76 "Logs" shade=mid
+        text #n77 "Settings" shade=mid
+      col #n78 grow pad=3 gap=3
+        text #n79 "Agent Registry" size=xl bold
+        table #n80
+          tr #n81 "Agent | Model | Role | Calls Today | Status"
+          tr #n82 "Intake Agent | gpt-4o-mini | classifier | 4,210 | healthy" data
+          tr #n83 "Knowledge Agent | gpt-4o | retriever | 3,884 | healthy" data
+          tr #n84 "Billing Agent | gpt-4o-mini | tool-caller | 1,502 | healthy" data
+          tr #n85 "Escalation Agent | claude-3-opus | router | 96 | healthy" data
+          tr #n86 "Reviewer Agent | gpt-4o | moderator | 2,730 | degraded" data
+          tr #n87 "Reply Agent | gpt-4o-mini | generator | 4,006 | healthy" data
+  screen #n91 "Settings"
+    row #n92 h=fill
+      col #n93 share=nav w=200 fill=mid pad=3 gap=2
+        text #n94 "OrchestraAI" bold
+        text #n95 "Pipeline" shade=mid
+        text #n96 "Runs" shade=mid
+        text #n97 "Agents" shade=mid
+        text #n98 "Logs" shade=mid
+        text #n99 "Settings" bold
+      col #n100 grow pad=3 gap=4
+        text #n101 "Settings" size=xl bold
+        col #n161 border pad=3 gap=2 fill=light
+          text #n162 "Support" bold size=m
+          text #n163 "Need help? Contact our support team at support@orchestraai.com or visit our docs." shade=mid size=s
+        col #n102 gap=3
+          col #n103 border pad=3 gap=2
+            text #n104 "API Keys" bold size=l
+            row #n105 justify=between align=center
+              text #n106 "Production Key" shade=mid
+              button #n107 "Reveal" ghost
+            row #n108 justify=between align=center
+              text #n109 "Staging Key" shade=mid
+              button #n110 "Reveal" ghost
+            button #n111 "Rotate Keys" ghost
+          col #n112 border pad=3 gap=2
+            text #n113 "Model Configuration" bold size=l
+            row #n114 justify=between align=center
+              col #n115 gap=1
+                text #n116 "Default LLM" bold
+                text #n117 "gpt-4o" shade=mid size=s
+              button #n118 "Change" ghost
+            row #n119 justify-between align=center
+              col #n120 gap=1
+                text #n121 "Fallback Model" bold
+                text #n122 "gpt-4o-mini" shade=mid size=s
+              button #n123 "Change" ghost
+            row #n124 justify-between align=center
+              col #n125 gap=1
+                text #n126 "Temperature" bold
+                text #n127 "0.7" shade=mid size=s
+              button #n128 "Change" ghost
+          col #n129 border pad=3 gap=2
+            text #n130 "Alerts & Notifications" bold size=l
+            row #n131 justify=between align=center
+              text #n132 "Pipeline Failures" bold
+              input #n133 on toggle
+            row #n134 justify=between align=center
+              text #n135 "High Latency (>5s)" bold
+              input #n136 on toggle
+            row #n137 justify=between align=center
+              text #n138 "Failed Retries" bold
+              input #n139 on toggle
+          col #n140 border pad=3 gap=2
+            text #n141 "Usage & Billing" bold size=l
+            row #n142 justify=between align=center
+              col #n143 gap=1
+                text #n144 "Monthly API Calls" bold
+                text #n145 "847,200 of 1,000,000" shade=mid size=s
+              text #n146 shade=mid
+            progress #n147 "usage" value=85
+            text #n148 "Next billing cycle: Jan 15, 2025" shade=mid size=s

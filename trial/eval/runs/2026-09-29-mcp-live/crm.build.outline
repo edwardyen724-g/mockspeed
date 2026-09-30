@@ -1,0 +1,115 @@
+app #n1 "Realty Pipeline" web
+  screen #n2 "Pipeline"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Realty Pipeline" bold
+        text #n6 "Pipeline" bold
+        text #n7 "Buyers" shade=mid
+        text #n8 "Listings" shade=mid
+        text #n9 "Showings" shade=mid
+        text #n10 "Reports" shade=mid
+      col #n11 grow pad=3 gap=3
+        row #n12 justify=between
+          text #n13 "Buyer Pipeline" size=xl bold
+          button #n14 "Add Buyer" primary
+        grid #n15 cols=5 gap=3
+          col #n16 w=fill fill=light pad=2 gap=2
+            text #n17 "New Lead" bold shade=mid
+            col #n18 border pad=2 gap=1
+              text #n19 "Marcus Feldt" bold
+              text #n20 "Budget $450k" size=s shade=mid
+              text #n21 "Condo, downtown" size=s shade=mid
+            col #n22 border pad=2 gap=1
+              text #n23 "Priya Anand" bold
+              text #n24 "Budget $620k" size=s shade=mid
+              text #n25 "3BR, school district" size=s shade=mid
+            col #n26 border pad=2 gap=1
+              text #n27 "Wendell Cho" bold
+              text #n28 "Budget $300k" size=s shade=mid
+              text #n29 "First-time buyer" size=s shade=mid
+          col #n30 w=fill fill=light pad=2 gap=2
+            text #n31 "Qualified" bold shade=mid
+            col #n32 border pad=2 gap=1
+              text #n33 "Renata Silva" bold
+              text #n34 "Budget $780k" size=s shade=mid
+              text #n35 "Pre-approved, Chase" size=s shade=mid
+            col #n36 border pad=2 gap=1
+              text #n37 "Tobias Klein" bold
+              text #n38 "Budget $525k" size=s shade=mid
+              text #n39 "Pre-approved, Wells Fargo" size=s shade=mid
+          col #n40 w=fill fill=light pad=2 gap=2
+            text #n41 "Touring" bold shade=mid
+            col #n42 border pad=2 gap=1
+              text #n43 "Alina Gorman" bold
+              text #n44 "Budget $410k" size=s shade=mid
+              text #n45 "6 homes toured" size=s shade=mid
+            col #n46 border pad=2 gap=1
+              text #n47 "Devon Okafor" bold
+              text #n48 "Budget $950k" size=s shade=mid
+              text #n49 "Waterfront only" size=s shade=mid
+          col #n50 w=fill fill=light pad=2 gap=2
+            text #n51 "Offer Made" bold shade=mid
+            col #n52 border pad=2 gap=1
+              text #n53 "Sana Malik" bold
+              text #n54 "Offer $535k" size=s shade=mid
+              text #n55 "Awaiting response" size=s shade=mid
+          col #n56 w=fill fill=light pad=2 gap=2
+            text #n57 "Closed" bold shade=mid
+            col #n58 border pad=2 gap=1
+              text #n59 "Harold Beaumont" bold
+              text #n60 "Closed $612k" size=s shade=mid
+              text #n61 "Escrow finished" size=s shade=mid
+  screen #n62 "Buyer Detail"
+    row #n63 h=fill
+      col #n64 share=nav w=200 fill=light pad=3 gap=2
+        text #n65 "Realty Pipeline" bold
+        text #n66 "Pipeline" shade=mid
+        text #n67 "Buyers" bold
+        text #n68 "Listings" shade=mid
+        text #n69 "Showings" shade=mid
+        text #n70 "Reports" shade=mid
+      col #n71 grow pad=3 gap=3
+        row #n72 justify=between align=center
+          col #n73 gap=1
+            text #n74 "Renata Silva" size=xl bold
+            text #n75 "Qualified · Budget $780k" shade=mid
+          row #n76 gap=2
+            button #n77 "Log Call"
+            button #n78 "Schedule Showing" primary
+        row #n79 gap=3
+          col #n80 w=fill border pad=3 gap=2
+            text #n81 "Contact" bold
+            text #n82 "renata.silva@webmail.com" size=s mono
+            text #n83 "(415) 555-0148" size=s mono
+            text #n84 "Pre-approved: Chase, $800k cap" size=s
+          col #n85 w=fill border pad=3 gap=2
+            text #n86 "Preferences" bold
+            text #n87 "3BR+, 2 bath, garage" size=s
+            text #n88 "Neighborhoods: Elmhurst, Ridgeview" size=s
+            text #n89 "Timeline: move within 60 days" size=s
+        text #n90 "Activity" bold
+        table #n91
+          tr #n92 "Date | Type | Notes"
+          tr #n93 "Mar 2 | Call | Discussed financing options" data
+          tr #n94 "Mar 9 | Showing | 214 Ridgeview Ln, liked layout" data
+          tr #n95 "Mar 15 | Email | Sent 3 new listings" data
+          tr #n96 "Mar 22 | Showing | 88 Elmhurst Ct, no response yet" data
+  screen #n97 "Showings"
+    row #n98 h=fill
+      col #n99 share=nav w=200 fill=light pad=3 gap=2
+        text #n100 "Realty Pipeline" bold
+        text #n101 "Pipeline" shade=mid
+        text #n102 "Buyers" shade=mid
+        text #n103 "Listings" shade=mid
+        text #n104 "Showings" bold
+        text #n105 "Reports" shade=mid
+      col #n106 grow pad=3 gap=3
+        text #n107 "This Week's Showings" size=xl bold
+        table #n108
+          tr #n109 "Time | Buyer | Property | Status"
+          tr #n110 "Mon 10:00am | Priya Anand | 40 Cedar St | Confirmed" data
+          tr #n111 "Mon 2:30pm | Devon Okafor | 12 Harbor View | Confirmed" data
+          tr #n112 "Tue 11:00am | Wendell Cho | 305 Maple Ave | Pending" data
+          tr #n113 "Wed 9:00am | Alina Gorman | 77 Birchwood Dr | Confirmed" data
+          tr #n114 "Thu 4:00pm | Sana Malik | 214 Ridgeview Ln | Cancelled" data
+          tr #n115 "Fri 1:00pm | Tobias Klein | 9 Lakeview Terrace | Confirmed" data

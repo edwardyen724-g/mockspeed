@@ -1,0 +1,89 @@
+app #n1 "DriveShift" phone
+  screen #n2 "Home"
+    row #n3 share=topbar justify=between pad=3 border
+      text #n4 "DriveShift" bold
+      shape #n5 circle w=28 h=28
+    col #n6 grow pad=3 gap=3
+      col #n7 border pad=3 gap=1 fill=dark
+        text #n8 "Today's earnings" shade=light
+        text #n9 "$187.40" size=xxl bold
+        text #n10 "6 trips · 5h 12m online" shade=light
+      button #n11 "Go Online" primary
+      row #n12 gap=3
+        col #n13 border pad=3 gap=1 grow
+          text #n14 "This week" size=s shade=mid
+          text #n15 "$942.10" size=l bold
+        col #n16 border pad=3 gap=1 grow
+          text #n17 "Acceptance rate" size=s shade=mid
+          text #n18 "94%" size=l bold
+      col #n19 gap=2
+        text #n20 "Recent trips" bold
+        row #n21 justify=between border pad=2
+          text #n22 "Maribel Ortiz" data
+          text #n23 "$14.20" data
+        row #n24 justify=between border pad=2
+          text #n25 "Dennis Watts" data
+          text #n26 "$9.80" data
+        row #n27 justify=between border pad=2
+          text #n28 "Yuki Tanaka" data
+          text #n29 "$22.50" data
+        row #n30 justify=between border pad=2
+          text #n31 "Cancelled — no rider" data shade=mid
+          text #n32 "$0.00" data shade=mid
+    row #n33 share=tabs justify=between pad=3 border
+      text #n34 "Home" bold under
+      text #n35 "Trips" shade=mid
+      text #n36 "Earnings" shade=mid
+      text #n37 "Account" shade=mid
+  screen #n38 "Active Trip"
+    row #n39 share=topbar justify=between pad=3 border
+      text #n40 "DriveShift" bold
+      shape #n41 circle w=28 h=28
+    col #n42 grow
+      shape #n43 "map" w=fill h=320
+      col #n44 pad=3 gap=3
+        row #n45 justify=between
+          text #n46 "Picking up" size=s shade=mid
+          text #n47 "3 min away" size=s bold
+        text #n48 "Priya Nakamura" size=l bold
+        text #n49 "412 Elm Street, Apt 3B" shade=mid
+        line #n50
+        row #n51 justify=between
+          text #n52 "Trip fare" size=s shade=mid
+          text #n53 "$18.60" size=l bold
+        row #n54 gap=3
+          button #n55 "Navigate" primary grow
+          button #n56 "Cancel Trip" ghost grow
+    row #n57 share=tabs justify=between pad=3 border
+      text #n58 "Home" shade=mid
+      text #n59 "Trips" bold under
+      text #n60 "Earnings" shade=mid
+      text #n61 "Account" shade=mid
+  screen #n62 "Earnings"
+    row #n63 share=topbar justify=between pad=3 border
+      text #n64 "DriveShift" bold
+      shape #n65 circle w=28 h=28
+    col #n66 grow pad=3 gap=3
+      text #n67 "Earnings" size=xl bold
+      chart #n68 "Last 7 days" bar values=62,88,41,120,95,73,110 h=140
+      row #n69 gap=3
+        col #n70 border pad=3 gap=1 grow
+          text #n71 "Total" size=s shade=mid
+          text #n72 "$589.00" size=l bold
+        col #n73 border pad=3 gap=1 grow
+          text #n74 "Hours online" size=s shade=mid
+          text #n75 "34h 20m" size=l bold
+      table #n76
+        tr #n77 "Day | Trips | Total"
+        tr #n78 "Mon | 8 | $62.00" data
+        tr #n79 "Tue | 11 | $88.00" data
+        tr #n80 "Wed | 5 | $41.00" data
+        tr #n81 "Thu | 14 | $120.00" data
+        tr #n82 "Fri | 10 | $95.00" data
+        tr #n83 "Sat | 9 | $73.00" data
+        tr #n84 "Sun | 13 | $110.00" data
+    row #n85 share=tabs justify=between pad=3 border
+      text #n86 "Home" shade=mid
+      text #n87 "Trips" shade=mid
+      text #n88 "Earnings" bold under
+      text #n89 "Account" shade=mid

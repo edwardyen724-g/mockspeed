@@ -1,0 +1,127 @@
+app #n1 "Studio Board" web
+  screen #n2 "Board"
+    row #n3 h=fill
+      col #n4 share=nav w=200 fill=light pad=3 gap=2
+        text #n5 "Studio Board" bold
+        text #n6 "Board" bold
+        text #n7 "Clients" shade=mid
+        text #n8 "Timesheets" shade=mid
+        text #n9 "Files" shade=mid
+        text #n10 "Team" shade=mid
+      col #n11 grow pad=3 gap=3
+        row #n12 justify=between align=center
+          text #n13 "Q2 Campaigns Board" size=xl bold
+          row #n14 gap=2
+            input #n15 "Search cards" search w=220
+            button #n16 "New Card" primary
+        row #n17 gap=3
+          col #n18 w=260 fill=light pad=2 gap=2
+            text #n19 "Backlog" bold shade=mid
+            col #n20 border pad=3 gap=1
+              text #n21 "Moodboard — Halden Coffee rebrand" bold
+              text #n22 "client: Halden Coffee Co." shade=mid size=s
+              row #n23 justify=between
+                shape #n24 circle w=24 h=24
+                text #n25 "due Jun 14" size=s shade=mid
+            col #n26 border pad=3 gap=1
+              text #n27 "Icon set — Fintra app v2" bold
+              text #n28 "client: Fintra" shade=mid size=s
+              row #n29 justify=between
+                shape #n30 circle w=24 h=24
+                text #n31 "due Jun 20" size=s shade=mid
+            col #n32 border pad=3 gap=1
+              text #n33 "Packaging concepts — Loop Snacks" bold
+              text #n34 "client: Loop Snacks" shade=mid size=s
+              row #n35 justify=between
+                shape #n36 circle w=24 h=24
+                text #n37 "unscheduled" size=s shade=mid
+          col #n38 w=260 fill=light pad=2 gap=2
+            text #n39 "In Progress" bold shade=mid
+            col #n40 border pad=3 gap=1
+              text #n41 "Deck redesign — Northline pitch" bold
+              text #n42 "client: Northline Realty" shade=mid size=s
+              progress #n43 "70%" value=70
+              row #n44 justify=between
+                shape #n45 circle w=24 h=24
+                text #n46 "due Jun 10" size=s shade=mid
+            col #n47 border pad=3 gap=1
+              text #n48 "Website type system" bold
+              text #n49 "client: Arbor & Vine" shade=mid size=s
+              progress #n50 "35%" value=35
+              row #n51 justify=between
+                shape #n52 circle w=24 h=24
+                text #n53 "due Jun 12" size=s shade=mid
+          col #n54 w=260 fill=light pad=2 gap=2
+            text #n55 "Client Review" bold shade=mid
+            col #n56 border pad=3 gap=1
+              text #n57 "Logo suite — Summit Gear" bold
+              text #n58 "client: Summit Gear" shade=mid size=s
+              text #n59 "awaiting feedback — 6 days" size=s shade=mid
+              row #n60 justify=between
+                shape #n61 circle w=24 h=24
+                text #n62 "due Jun 8" size=s shade=mid
+          col #n63 w=260 fill=light pad=2 gap=2
+            text #n64 "Done" bold shade=mid
+            col #n65 border pad=3 gap=1
+              text #n66 "Business cards — Halden Coffee" bold
+              text #n67 "client: Halden Coffee Co." shade=mid size=s
+              row #n68 justify=between
+                shape #n69 circle w=24 h=24
+                text #n70 "shipped Jun 2" size=s shade=mid
+            col #n71 border pad=3 gap=1
+              text #n72 "Social templates — Loop Snacks" bold
+              text #n73 "client: Loop Snacks" shade=mid size=s
+              row #n74 justify=between
+                shape #n75 circle w=24 h=24
+                text #n76 "shipped May 29" size=s shade=mid
+  screen #n77 "Card Detail"
+    row #n78 h=fill
+      col #n79 share=nav w=200 fill=light pad=3 gap=2
+        text #n80 "Studio Board" bold
+        text #n81 "Board" bold
+        text #n82 "Clients" shade=mid
+        text #n83 "Timesheets" shade=mid
+        text #n84 "Files" shade=mid
+        text #n85 "Team" shade=mid
+      col #n86 grow pad=3 gap=3
+        text #n87 "Deck redesign — Northline Realty pitch" size=xl bold
+        row #n88 gap=2
+          text #n89 "In Progress" pill shade=mid
+          text #n90 "due Jun 10" pill shade=mid
+          text #n91 "priority: high" pill shade=mid
+        line #n92
+        row #n93 gap=4
+          col #n94 grow gap=2
+            text #n95 "Description" bold
+            text #n96 "Redo the 40-slide investor deck with new brand type and a cleaner data section. Client wants three concept directions before locking layout." shade=mid
+            text #n97 "Checklist" bold
+            table #n98
+              tr #n99 "Task | Owner | Status"
+              tr #n100 "Concept A layout | Reya" data
+              tr #n101 "Concept B layout | Marcus" data
+              tr #n102 "Data viz redraw | Priya" data
+              tr #n103 "Client walkthrough call | Reya" data
+            text #n104 "Comments" bold
+            col #n105 gap=2
+              row #n106 gap=2
+                shape #n107 circle w=28 h=28
+                col #n108
+                  text #n109 "Priya Nathan" bold size=s
+                  text #n110 "Pushed revised chart styles to shared drive, ready for review." size=s
+              row #n111 gap=2
+                shape #n112 circle w=28 h=28
+                col #n113
+                  text #n114 "Marcus Ohl" bold size=s
+                  text #n115 "Client asked to push kickoff call by one day, now Jun 9." size=s
+          col #n116 w=220 gap=2
+            text #n117 "Assignees" bold shade=mid
+            row #n118 gap=1
+              shape #n119 circle w=24 h=24
+              text #n120 "Reya Kessler" size=s
+            row #n121 gap=1
+              shape #n122 circle w=24 h=24
+              text #n123 "Marcus Ohl" size=s
+            text #n124 "Client" bold shade=mid
+            text #n125 "Northline Realty" size=s
+            text #n126 "Budget" bold shade=mid
+            text #n127 "$18,400 of $22,000 used" size=s shade=mid
