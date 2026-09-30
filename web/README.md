@@ -106,9 +106,30 @@ Environment variables; locally `web/.env.local` (never committed), in production
 | `WRITER_BUILD_MODEL`, `WRITER_MODEL` | the model that writes a new app (Sonnet 5) and the one that writes pieces (Haiku 4.5) |
 | `ADMIN_EMAILS` | who sees `/admin`, comma-separated |
 | `ANON_BUILDS_PER_DAY` | mocks made without an account per address per day (3) |
+| `FREE_CHANGES_PER_DAY`, `PAID_CHANGES_PER_DAY` | an account's changes a day, free (20) and paid (300) |
+| `MODELS_OFF` | the kill switch: `1` stops every sentence before any model call, the AI's included |
+| `SPEND_CAP_USD` | the same, on its own, once the day's model spend (all accounts, UTC) reaches it |
+| `STRIPE_SECRET_KEY` | paying (`billing.mjs`); without it the limit offers no way to pay |
+| `STRIPE_WEBHOOK_SECRET` | checks `/api/stripe`'s events |
+| `STRIPE_PRICE`, `PRICE_USD_MONTH` | the monthly price: a Stripe price id, else the amount in dollars (12) |
 
 Supabase Auth sends the sign-in email. Its URL configuration must allow
 `<site>/auth/callback` as a redirect, or the link lands on the Site URL instead.
+
+## Changes a day, and paying for more
+
+A change is one sentence said to a mock, wherever it is said: typed in the editor or the chat's
+panel, or sent by the person's AI with `say`. Each leaves a usage row of its own (`purpose` change,
+`via` editor, panel or ai; `db/003_allowance.sql`), and the day's count, from midnight UTC, is those
+rows'. Toolbar edits, undo, offers taken and answers carry on a change already counted and are
+free, as are `open_mock` and `look`. A sentence refused before the engine (too long, over the
+limit, the kill switch) is not counted.
+
+At the limit the reply says so and carries `upgrade`, the account's pay link (`/upgrade/mspay_…`,
+signed like the AI key, so it works from a browser nobody signed into, or passed on by the AI).
+It opens a Stripe Checkout for a monthly subscription; `/upgrade/done` asks Stripe about it and
+marks the account paid at once, and `/api/stripe` (the webhook: `checkout.session.completed`,
+`customer.subscription.*`) keeps it in step. `/billing` opens Stripe's customer portal.
 
 ## The sign-in email
 

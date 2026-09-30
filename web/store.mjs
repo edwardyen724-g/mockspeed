@@ -29,5 +29,11 @@ export function store({ SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, MS_SERVER_KEY })
     anonBuilds: (ip) => rpc("ms_anon_builds", { p_ip: ip }),
     use: (rows) => (rows.length ? rpc("ms_use", { p_rows: rows }) : 0),
     usage: (since) => rpc("ms_usage", { p_since: since }),
+    // Before a change: { plan, changes (the account's today), spend (every call's today, in USD) }.
+    gate: async (user) => { const g = (await rpc("ms_gate", { p_user: user ?? null }))[0]; return { plan: g.plan, changes: g.changes, spend: Number(g.spend) }; },
+    account: async (user) => (await rpc("ms_account", { p_user: user }))[0] ?? null,
+    // What Stripe says of an account's subscription; the plan that makes it ('paid' or 'free').
+    setPlan: (user, { customer = null, subscription = null, status }) => rpc("ms_set_plan", { p_user: user, p_customer: customer, p_subscription: subscription, p_status: status }),
+    subscriber: (subscription) => rpc("ms_subscriber", { p_subscription: subscription }),
   };
 }

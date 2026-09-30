@@ -46,7 +46,9 @@ Use it while you and the person are talking an idea over. When you propose a sha
 
 mockspeed's own engine decides what each sentence means and draws it; you never write markup, layout or code for the mock. When it offers something instead ("Put it on Classes instead"), take_offer takes it if that is what the person meant.
 
-Where the chat shows panels, say and look show the mock right there, drawing live, and the person can click it and say changes in it themselves; those go straight to mockspeed, not through you. Never work the mock through a browser, a screenshot or computer use: every change you make goes through say, take_offer or undo. Each reply of mockspeed's starts with what the person changed since your last change: those are done, so build on them rather than redo or undo them.`;
+Where the chat shows panels, say and look show the mock right there, drawing live, and the person can click it and say changes in it themselves; those go straight to mockspeed, not through you. Never work the mock through a browser, a screenshot or computer use: every change you make goes through say, take_offer or undo. Each reply of mockspeed's starts with what the person changed since your last change: those are done, so build on them rather than redo or undo them.
+
+Each say is one of the person's changes for the day, the same as a sentence they type into mockspeed themselves; open_mock, take_offer, undo and look are not. When the day's changes run out, say tells you so and gives a link where the person can pay for more: pass it on and let them decide.`;
 
 const TOOLS = [
   {
@@ -174,6 +176,10 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
     const lines = [];
     if (theirs.length) lines.push("The person changed the mock themselves since your last change (already done; build on it, don't redo it):", ...theirs.map((t) => `  ${t}`), "");
     if (r?.note) lines.push(r.note);
+    // The day's changes are the account's, counted as the editor's are: the person decides whether to pay.
+    if (r?.upgrade) lines.push(`Tell the person: they can pay for more changes today at ${r.upgrade} — it's their choice; don't open it for them.`);
+    if (r?.limit || r?.paused) lines.push("Nothing was changed. Don't send more changes until the person says to.");
+    if (r?.allowance) lines.push(`(${r.allowance.text}.)`);
     const offered = s.question?.choices ?? s.offer ?? [];
     if (offered.length) {
       lines.push("", s.question ? `It asks: ${s.question.text} Answer with take_offer:` : "Offered instead (take_offer, if that is what the person meant):");
@@ -245,7 +251,7 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
     }
     const { r, p } = await change(row, route, input, { user, anon: null }, origin, { by: "ai", ...extra });
     console.error(`mcp: ${name} ${JSON.stringify(input.utterance ?? route)} on ${row.id} · at ${new Date(started).toISOString()} · ${Date.now() - started} ms · ${r.changed ? "changed" : "no change"}`);
-    const out = text(told(r, p, url, theirs), Boolean(r.error));
+    const out = text(told(r, p, url, theirs), Boolean(r.error || r.limit || r.paused));
     return name === "say" ? { ...out, _meta: forPanel(row, p, url, started, r) } : out;
   }
 

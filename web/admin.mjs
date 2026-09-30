@@ -37,7 +37,7 @@ function table(head, rows) {
   }</tbody></table>`;
 }
 
-export function adminPage(all, { since, now, keys }) {
+export function adminPage(all, { since, now, keys, switches = null }) {
   const rows = all.filter(MODELS);
   const today = day(now);
   const todays = rows.filter((r) => day(r.created_at) === today);
@@ -60,6 +60,10 @@ export function adminPage(all, { since, now, keys }) {
   const counted = days.flatMap((d) => group(anthropic.filter((r) => day(r.created_at) === d), (r) => `${r.origin ?? "—"}\u0000${r.model}`)
     .map(([k, s]) => [d, ...k.split("\u0000").map(esc), int(s.input), int(s.cacheWrite), int(s.cacheRead), int(s.output), usd(s.cost), int(s.calls)])).reverse();
   const people = (rs) => group(rs, who).map(([k, s]) => [esc(k), int(s.sentences.size), int(s.calls), usd(s.cost), perSentence(s)]);
+  // The day's changes, counted against allowances: where each was said.
+  const changes = events.filter((r) => r.purpose === "change" && day(r.created_at) === today);
+  const byVia = ["editor", "panel", "ai"].map((v) => `${v} ${int(changes.filter((r) => (r.via ?? "editor") === v).length)}`).join(" · ");
+  const sw = switches ? `<div class="sub">Changes a day: ${int(switches.perDay.free)} free, ${int(switches.perDay.paid)} paid · spend cap ${switches.spendCap == null ? "none" : usd(switches.spendCap)} a day · models ${switches.modelsOff ? "<b>OFF (MODELS_OFF)</b>" : switches.spendCap != null && t.cost >= switches.spendCap ? "<b>OFF (over the cap)</b>" : "on"} · paying: ${esc(switches.pay)}</div>` : "";
   const purposes = (rs) => group(rs, (r) => `${r.provider} · ${r.purpose}`).map(([k, s]) => [esc(k), int(s.calls), int(s.input), int(s.output), usd(s.cost), s.errors ? `<b>${int(s.errors)}</b>` : "0"]);
 
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin · usage</title>
@@ -76,11 +80,13 @@ export function adminPage(all, { since, now, keys }) {
 </style></head><body>
 <h1>Usage and cost</h1>
 <div class="sub">Every model call the app made, from ${esc(day(since))} to now (UTC). Writer: ${esc(keys.provider)} · ${esc(keys.buildModel)} builds, ${esc(keys.model)} pieces.</div>
+${sw}
 <div class="tiles">
   <div class="tile"><b>${usd(t.cost)}</b><span>today</span></div>
   <div class="tile"><b>${usd(w.cost)}</b><span>last 7 days</span></div>
   <div class="tile"><b>${int(t.sentences.size)}</b><span>sentences today</span></div>
   <div class="tile"><b>${perSentence(w)}</b><span>per sentence, 7 days</span></div>
+  <div class="tile"><b>${int(changes.length)}</b><span>changes today: ${byVia}</span></div>
   <div class="tile"><b>${int(jev.filter((r) => /429/.test(r.status)).length)}</b><span>Jev 429s, 7 days</span></div>
   <div class="tile"><b>${int(events.filter((r) => r.purpose === "signin").length)} · ${int(events.filter((r) => r.purpose.startsWith("export")).length)}</b><span>sign-ins · exports, 7 days</span></div>
 </div>

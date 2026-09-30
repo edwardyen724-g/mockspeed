@@ -84,12 +84,14 @@
   .signin p{margin:0 0 8px;font-size:12px;font-weight:600}
   .signin form{display:flex;gap:6px}
   .signin .note{color:#555}
+  .upgrade{display:inline-block;margin-top:8px;padding:6px 10px;border:1px solid #111;border-radius:4px;background:#111;color:#fff;font-size:12px;text-decoration:none}
+  .allowance{color:#777;font-size:11px}
 </style></head>
 <body>
 <iframe id="mock" src="mock"></iframe>
 <aside>
   <header><h1 id="title">{{title}}</h1><div class="sub" id="status">…</div>
-    <div class="acct web"><a href="/projects">{{projects}}</a><span id="acct"></span><button id="acctIn" type="button" hidden>{{signIn}}</button></div>
+    <div class="acct web"><a href="/projects">{{projects}}</a><span id="acct"></span><span class="allowance" id="allowance"></span><button id="acctIn" type="button" hidden>{{signIn}}</button></div>
     <div class="sub" id="watching" hidden>{{watching}}</div></header>
   <div class="marked" id="markedBox"><span class="none">{{selectHint}}</span></div>
   <div class="say">
@@ -427,6 +429,13 @@ function say(r) {
   if (DEBUG && r.debug) bits.push(r.debug);
   $("note").textContent = bits.filter(Boolean).join(" · ");
   $("note").className = "note" + (r.changed === false && !r.choices?.length && !r.mark ? " warn" : "");
+  // The web app: the day's changes, and the way to pay for more once they run out.
+  if (r.allowance) $("allowance").textContent = " · " + r.allowance.text;
+  if (r.upgrade) {
+    const a = document.createElement("a");
+    a.className = "upgrade"; a.href = r.upgrade; a.textContent = r.upgradeLabel;
+    $("note").append(document.createElement("br"), a);
+  }
   if (r.changed) redraw(); else load();
 }
 
@@ -545,6 +554,11 @@ try {
   if (new URLSearchParams(location.search).has("follow")) { sessionStorage.setItem("ms-follow", "1"); history.replaceState(null, "", location.pathname); }
   FOLLOW = sessionStorage.getItem("ms-follow") === "1";
 } catch {}
+// Back from paying (/upgrade/done): say so once.
+if (new URLSearchParams(location.search).get("note") === "paid") {
+  $("note").textContent = "{{paid}}";
+  history.replaceState(null, "", location.pathname);
+}
 window.msHeard = [];
 function heard(topic, event, m) {
   if (topic === LIVE.account && event === "open") {

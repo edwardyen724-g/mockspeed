@@ -13,6 +13,12 @@
 // The person's own AI reaches the same mocks through /mcp (web/mcp.mjs), with the key /connect shows
 // them. Every change, whoever makes it, also goes out live (web/live.mjs) to the tabs watching that
 // mock — the person's own, or one opened from the watch link (/w/…), which may look but not change.
+//
+// A day's changes are counted per account, the same wherever they are said: a sentence typed in the
+// editor or the chat's panel, or sent by the person's AI with `say`, is one change. The free plan has
+// FREE_CHANGES_PER_DAY; paying (web/billing.mjs, Stripe) raises it to PAID_CHANGES_PER_DAY. Before
+// anything that may call a model, the server also checks the kill switch: MODELS_OFF, or the day's
+// spend over SPEND_CAP_USD, stops every model call, the AI's included.
 
 import { randomBytes, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -29,6 +35,7 @@ import * as A from "./auth.mjs";
 import { adminPage } from "./admin.mjs";
 import { live as liveOf, projectTopic, accountTopic } from "./live.mjs";
 import { mcp } from "./mcp.mjs";
+import { billing } from "./billing.mjs";
 
 // Each read with its own literal path, so the bundler that deploys this finds every page.
 const PAGES = {
@@ -48,6 +55,10 @@ const CHANGES = new Set(["/ask", "/answer", "/swap", "/edit", "/undo", "/new"]);
 // What a browser with no account may do: its first mock, and the answers and swaps that come with it.
 const FIRST = new Set(["/ask", "/answer", "/swap"]);
 const LONGEST = 600;
+// What may call a model: a sentence, an answer to a question, a swap to the other reading. Of those,
+// only a sentence is a change counted against the day's; the other two carry on one already counted.
+const MODELS = new Set(["/ask", "/answer", "/swap"]);
+const PAY = /^\/upgrade\/(mspay_[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/;
 
 export function app(env) {
   const db = store(env);
@@ -64,6 +75,15 @@ export function app(env) {
   const admins = new Set((env.ADMIN_EMAILS ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean));
   const anonBuilds = Number(env.ANON_BUILDS_PER_DAY ?? 3);
   const open = (saved) => project({ saved, ...keys });
+  const perDay = { free: Number(env.FREE_CHANGES_PER_DAY ?? 20), paid: Number(env.PAID_CHANGES_PER_DAY ?? 300) };
+  const spendCap = env.SPEND_CAP_USD ? Number(env.SPEND_CAP_USD) : null;
+  const modelsOff = /^(1|true|on|yes)$/i.test(String(env.MODELS_OFF ?? ""));
+  const pay = billing(env);
+  const price = `$${pay.dollars % 1 ? pay.dollars.toFixed(2) : pay.dollars}`;
+  const say = (t, o) => t.replace(/\{(\w+)\}/g, (m, k) => (k in o ? o[k] : m));
+  // The link that pays for more changes: an account's own, so it works from any browser, and from
+  // the person's AI, which has no cookie to sign in with. It can only start a payment.
+  const payLink = (user, origin, back) => `${origin}/upgrade/${A.key("pay", user, secret)}?back=${encodeURIComponent(back)}`;
   const live = liveOf(env);
   // The connections a change needs, opened while its mock is read from the store: once idle for a
   // few seconds each is closed, and Jev's and the writer's handshakes one after the other cost a
@@ -158,11 +178,49 @@ export function app(env) {
         if (!id) { id = newId(); await db.create({ id, owner: owner.id, state: project().save() }); }
         return go(`/p/${id}/?follow=1`, { "set-cookie": A.watchCookie(w[1], secure) });
       }
+      // ---- paying ---------------------------------------------------------------------------
+      const u = path.match(PAY);
+      if ((u || path === "/upgrade") && req.method === "GET") {
+        const payer = u ? A.keyed("pay", u[1], secret) : who.user;
+        const back = safeBack(url.searchParams.get("back") ?? "/projects");
+        if (!payer) return go(`/projects`);
+        if (!pay.ready) return html(message(W.web.payClosed, back));
+        const acct = await db.account(payer.id);
+        if (acct?.plan === "paid") return go(withNote(back, "paid"));
+        return go(await pay.checkout(payer, url.origin, back, acct?.stripe_customer ?? null));
+      }
+      if (path === "/upgrade/done" && req.method === "GET") {
+        const back = safeBack(url.searchParams.get("back") ?? "/projects");
+        const done = pay.ready ? await pay.finished(String(url.searchParams.get("s") ?? "")).catch(() => null) : null;
+        if (!done) return html(message(W.web.payFailed, back));
+        await db.setPlan(done.user, done);
+        await db.use([{ user_id: done.user, sentence: randomUUID(), provider: "mockspeed", model: "stripe", purpose: "paid", status: done.status, cost_usd: 0, origin: url.host }]);
+        return go(withNote(back, "paid"));
+      }
+      if (path === "/billing" && req.method === "GET") {
+        const acct = who.user && pay.ready ? await db.account(who.user.id) : null;
+        if (!acct?.stripe_customer) return go("/projects");
+        return go(await pay.portal(acct.stripe_customer, `${url.origin}/projects`));
+      }
+      // Stripe, telling us a subscription changed: renewed, failing, cancelled.
+      if (path === "/api/stripe" && req.method === "POST") {
+        const ev = pay.event(await req.text(), req.headers.get("stripe-signature"));
+        if (!ev) return json({ ok: false }, 400);
+        const o = ev.data?.object ?? {};
+        if (ev.type === "checkout.session.completed" && o.client_reference_id && o.subscription) {
+          await db.setPlan(o.client_reference_id, { customer: o.customer, subscription: o.subscription, status: "active" });
+        } else if (ev.type?.startsWith("customer.subscription.")) {
+          const user = o.metadata?.user || (await db.subscriber(o.id));
+          if (user) await db.setPlan(user, { customer: o.customer, subscription: o.id, status: ev.type.endsWith(".deleted") ? "canceled" : o.status });
+        }
+        return json({ ok: true });
+      }
+
       if (path === "/admin" && req.method === "GET") {
         if (!who.user || !admins.has(who.user.email.toLowerCase())) return html(fill(page("missing"), words(who)), 404);
         const since = new Date(Date.now() - 7 * 24 * 3600 * 1000);
         since.setUTCHours(0, 0, 0, 0);
-        return html(adminPage(await db.usage(since.toISOString()), { since, now: new Date(), keys }));
+        return html(adminPage(await db.usage(since.toISOString()), { since, now: new Date(), keys, switches: { modelsOff, spendCap, perDay, pay: pay.ready ? (pay.test ? "Stripe, test mode" : "Stripe, live") : "off" } }));
       }
 
       // ---- signing in ----------------------------------------------------------------------
@@ -242,7 +300,7 @@ export function app(env) {
           if (route === "/ask" && (await db.anonBuilds(A.ipHash(req, secret))) >= anonBuilds) return json({ signin: true, note: W.web.anonLimit, changed: false }, 401);
         }
         if (route === "/ask" && String(input.utterance ?? "").length > LONGEST) return json({ note: W.web.tooLong, changed: false });
-        return act(row, route, input, who, url.host);
+        return act(row, route, input, who, url.origin);
       }
       return json({ note: W.web.notFound, changed: false }, 404);
     } catch (e) {
@@ -259,9 +317,28 @@ export function app(env) {
   // made it through web/mcp.mjs — `by: "ai"`, whose history entries are marked so, so the AI can be
   // told what the person changed since (mcp.mjs sinceAi); or `"panel"`, the person in the chat's
   // panel — and what only the AI brings: more of the conversation (`brief`).
+  // A change that may call a model waits first on the kill switch and, for a sentence from an
+  // account, on the day's allowance; either answers with the reply that says so, and nothing changes.
+  // `origin` is the site's (https://…); its host is kept on each row.
   // Returns the reply and the project as it is after.
   async function change(row, route, input, who, origin, { sentence = randomUUID(), frame = null, by = null, brief = "" } = {}) {
     const p = open(row.state);
+    const counts = route === "/ask" && Boolean(who.user);
+    let allowance = null;
+    if (MODELS.has(route)) {
+      const g = modelsOff ? null : await db.gate(who.user?.id ?? null);
+      if (!g || (spendCap != null && g.spend >= spendCap)) return { r: { note: W.web.paused, changed: false, paused: true }, p };
+      if (counts) {
+        const n = perDay[g.plan] ?? perDay.free;
+        if (g.changes >= n) {
+          const r = { note: say(g.plan === "paid" ? W.web.limitPaid : W.web.limitFree, { n }), changed: false, limit: true, plan: g.plan };
+          if (g.plan !== "paid" && pay.ready) Object.assign(r, { upgrade: payLink(who.user, origin, `/p/${row.id}/`), upgradeLabel: say(W.web.upgrade, { price }) });
+          return { r, p };
+        }
+        allowance = { used: g.changes + 1, of: n, plan: g.plan };
+      }
+    }
+    const host = new URL(origin).host;
     const log = p.state().log;
     const last = log.at(-1);
     const uses = [];
@@ -304,11 +381,15 @@ export function app(env) {
         user_id: who.user?.id ?? null, anon: who.user ? null : who.anon, project: row.id, sentence,
         provider: u.provider, model: u.model, purpose: u.purpose, input_tokens: u.input ?? 0, output_tokens: u.output ?? 0,
         cache_read_tokens: u.cacheRead ?? 0, cache_write_tokens: u.cacheWrite ?? 0, jev_questions: u.questions ?? null,
-        ms: u.ms ?? null, first_line_ms: u.firstLineMs ?? null, status: u.status ?? "ok", cost_usd: u.cost, origin,
-      })));
+        ms: u.ms ?? null, first_line_ms: u.firstLineMs ?? null, status: u.status ?? "ok", cost_usd: u.cost, origin: host, via: via(by),
+      })).concat(counts && !r.error && !r.blocked ? [{
+        user_id: who.user.id, project: row.id, sentence, provider: "mockspeed", model: "change", purpose: "change",
+        status: r.changed ? "ok" : "no change", cost_usd: 0, origin: host, via: via(by),
+      }] : []));
     } catch (e) {
       console.error(`web: usage for ${row.id} not kept: ${e.message}`);
     }
+    if (allowance && !r.error && !r.blocked) r.allowance = { ...allowance, text: say(allowance.plan === "paid" ? W.web.allowancePaid : W.web.allowanceFree, { used: allowance.used, n: allowance.of }) };
     // The last frame, once saved: the mock, the page's state and the reply, which a watching tab
     // shows as its own.
     await out.end({ html: mockPage(p.root), state: shared(), reply: r, done: true });
@@ -332,6 +413,12 @@ export function app(env) {
     return new Response(stream, { headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store", "x-accel-buffering": "no" } });
   }
 }
+
+const via = (by) => (by === "ai" ? "ai" : by === "panel" ? "panel" : "editor");
+// A place on this site with a word for the page to say when it opens (?note=paid).
+const withNote = (back, note) => `${back}${back.includes("?") ? "&" : "?"}note=${note}`;
+// A page of one sentence, and the way back.
+const message = (text, back) => `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>mockspeed</title><body style="font:15px/1.5 system-ui,sans-serif;max-width:520px;margin:15vh auto;padding:0 20px;color:#111"><p>${text.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]))}</p><p><a href="${back.replace(/"/g, "&quot;")}">← ${W.web.product}</a></p></body>`;
 
 // Where a sign-in link brings a person back to: a path on this site, never somewhere else.
 function safeBack(back) {

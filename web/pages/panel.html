@@ -277,6 +277,13 @@ function handle(r) {
   const offers = (r.offer ?? []).map((o) => ({ ...o, offer: true }));
   showChoices(r.choices?.length ? r.choices : offers, r.pick ?? []);
   say(esc(r.note ?? ""), r.changed === false && !r.choices?.length && !r.mark);
+  // The day's changes ran out: paying opens in the person's browser, through the host.
+  if (r.upgrade) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "go"; b.textContent = r.upgradeLabel;
+    b.onclick = () => request("ui/open-link", { url: r.upgrade }).catch(() => window.open(r.upgrade, "_blank"));
+    $("note").append(document.createElement("br"), b);
+  }
   if (r.mark && byId(r.mark)) { setMark(r.mark); reveal(byId(r.mark)); }
 }
 
