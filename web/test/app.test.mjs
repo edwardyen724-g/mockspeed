@@ -188,6 +188,13 @@ group("the web app", { skip: !ready && "no web/.env.local" }, () => {
     const bad = await post("/api/auth/session", { access_token: "not-a-token" });
     assert.equal(bad.status, 401);
     assert.equal(bad.headers.get("set-cookie"), null);
+    // The email's own link: a token_hash Supabase never issued, or a kind of link that isn't a sign-in.
+    for (const link of [{ token_hash: "0".repeat(56), type: "email" }, { token_hash: "0".repeat(56), type: "recovery" }]) {
+      const res = await post("/api/auth/session", link);
+      assert.equal(res.status, 401, link.type);
+      assert.equal((await res.json()).note, W.web.linkBad);
+      assert.equal(res.headers.get("set-cookie"), null);
+    }
   });
 
   test("a session cookie that was tampered with is nobody's", async () => {

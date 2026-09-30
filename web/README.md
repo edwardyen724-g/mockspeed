@@ -73,6 +73,19 @@ Environment variables; locally `web/.env.local` (never committed), in production
 Supabase Auth sends the sign-in email. Its URL configuration must allow
 `<site>/auth/callback` as a redirect, or the link lands on the Site URL instead.
 
+## The sign-in email
+
+Supabase sends it through Resend (custom SMTP, set up by Resend's Supabase integration), from
+`mockspeed <mockspeed@sealed.run>`: sealed.run is a domain already verified in Resend, borrowed until
+mockspeed has its own. `email/sign-in.html` is the email, pasted into two of Supabase's templates
+(Authentication → Emails): **Magic link or OTP** (someone signing in again) and **Confirm sign up**
+(someone's first time), both with the subject "Sign in to mockspeed".
+
+Its button is `{{ .RedirectTo }}#token_hash={{ .TokenHash }}&type=email`: this site's own
+`/auth/callback`, so the email points nowhere else, and the one-time token sits after the # where
+only the page sees it. The page hands it to `/api/auth/session`, which has Supabase check it once.
+Links from before (`{{ .ConfirmationURL }}`, through Supabase) still work.
+
 ## Run, test, deploy
 
 ```

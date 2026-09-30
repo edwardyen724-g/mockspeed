@@ -9,17 +9,19 @@
 <body>
 <div class="box"><p id="msg">{{signingIn}}</p><p id="bad" hidden>{{linkBad}} <a href="/projects">{{signIn}}</a></p></div>
 <script>
-// The email link lands here with the sign-in in the part after the #, which only this page sees;
-// it goes to the server once, which answers with the session cookie, and the address bar is
-// cleared of it.
+// The email link lands here with the sign-in in the part after the #, which only this page sees: the
+// link's token_hash (or, from an older email that went through Supabase first, an access token). It
+// goes to the server once, which answers with the session cookie, and the address bar is cleared of
+// it.
 (async () => {
   const hash = new URLSearchParams(location.hash.slice(1));
   const back = new URLSearchParams(location.search).get("back") || "/";
   history.replaceState(null, "", location.pathname + location.search);
-  const token = hash.get("access_token");
+  const link = hash.get("token_hash") ? { token_hash: hash.get("token_hash"), type: hash.get("type") || "email" }
+    : hash.get("access_token") ? { access_token: hash.get("access_token") } : null;
   const fail = () => { document.getElementById("msg").hidden = true; document.getElementById("bad").hidden = false; };
-  if (!token) return fail();
-  const r = await fetch("/api/auth/session", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ access_token: token, back }) }).then((r) => r.json()).catch(() => ({}));
+  if (!link) return fail();
+  const r = await fetch("/api/auth/session", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...link, back }) }).then((r) => r.json()).catch(() => ({}));
   if (!r.ok) return fail();
   location.replace(r.back || "/");
 })();

@@ -160,8 +160,9 @@ export function app(env) {
         return json({ ok: true, note: W.web.linkSent });
       }
       if (path === "/api/auth/session" && req.method === "POST") {
-        const { access_token: token, back = "/" } = await body(req);
-        const user = token ? await A.whose(env, String(token)) : null;
+        const { access_token: token, token_hash: hash, type, back = "/" } = await body(req);
+        const user = hash ? await A.verifyLink(env, String(hash), type ? String(type) : undefined)
+          : token ? await A.whose(env, String(token)) : null;
         if (!user) return json({ ok: false, note: W.web.linkBad }, 401);
         const claimed = await db.claim(user.id, who.anon, user.email);
         await db.use([{ user_id: user.id, anon: who.anon, sentence: randomUUID(), provider: "mockspeed", model: "auth", purpose: "signin", status: `claimed ${claimed}`, cost_usd: 0, origin: url.host }]);
