@@ -107,6 +107,9 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     assert.equal(init.body.result.protocolVersion, "2025-06-18");
     assert.equal(init.body.result.serverInfo.name, "mockspeed");
     assert.match(init.body.result.instructions, /never write markup/);
+    // Where the chat shows the panel, the AI neither opens the link nor works the mock in a browser.
+    assert.match(init.body.result.instructions, /panel[^.]*: don't open the link/);
+    assert.match(init.body.result.instructions, /Never work the mock through a browser/);
     assert.equal((await rpc("notifications/initialized", {})).status, 202);
     const list = await rpc("tools/list", {});
     assert.deepEqual(list.body.result.tools.map((t) => t.name), ["open_mock", "say", "take_offer", "undo", "look", "panel_open", "panel_change", "panel_tools"]);
@@ -159,6 +162,8 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     // With no model keys the engine says so, and nothing changes.
     const r = await tool("say", { mock: id, sentence: "make the prices bigger" });
     assert.ok(r.text.startsWith(W.reply.notSetUp));
+    // The panel under the call shows the reply once it is done, not the AI's sentence.
+    assert.equal(r._meta.mockspeed.reply.note, W.reply.notSetUp);
   });
 
   test("the watch link: this browser may look at the account's mocks and follow the AI, not change them", async () => {

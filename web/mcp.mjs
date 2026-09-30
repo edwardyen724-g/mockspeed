@@ -40,13 +40,13 @@ const INSTRUCTIONS = `mockspeed draws grey mocks of websites and apps, live, in 
 
 Use it while you and the person are talking an idea over. When you propose a shape — the pages of a site, what a screen shows, how something is laid out — and words alone won't make it clear, draw it as well as describing it:
 1. open_mock, with a brief of what the two of you have talked over: the product's name, who it is for, its pages, and the real names, words, prices, times and numbers mentioned. mockspeed puts those words on the mock instead of made-up ones.
-2. Give the person the link it returns (on a Mac, you can open it for them with: open <link>). One tab follows every mock you draw after that.
+2. If your chat shows mockspeed's panel (say and look draw the mock right in the chat), the person already sees it: don't open the link. If it doesn't, give the person the link it returns (on a Mac, you can open it for them with: open <link>). One tab follows every mock you draw after that.
 3. say what to draw, in plain words, the way the person would say it: "a site for Ferment, a sourdough club: classes, a schedule, sign up".
 4. Each follow-up the same way, as soon as it comes up: "what if those were cards", "put the prices under the names", "add a page for the starter swap". One change per call: several calls in a row are fine, and each is drawn as soon as it is said, where one sentence with several changes has to be cut apart first. Point at one element with its id when you mean that one.
 
 mockspeed's own engine decides what each sentence means and draws it; you never write markup, layout or code for the mock. When it offers something instead ("Put it on Classes instead"), take_offer takes it if that is what the person meant.
 
-Where the chat shows panels, say and look show the mock right there, drawing live, and the person can click it and say changes in it themselves; those go straight to mockspeed, not through you. Each reply of mockspeed's starts with what the person changed since your last change: those are done, so build on them rather than redo or undo them.`;
+Where the chat shows panels, say and look show the mock right there, drawing live, and the person can click it and say changes in it themselves; those go straight to mockspeed, not through you. Never work the mock through a browser, a screenshot or computer use: every change you make goes through say, take_offer or undo. Each reply of mockspeed's starts with what the person changed since your last change: those are done, so build on them rather than redo or undo them.`;
 
 const TOOLS = [
   {
@@ -246,7 +246,7 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
     const { r, p } = await change(row, route, input, { user, anon: null }, origin, { by: "ai", ...extra });
     console.error(`mcp: ${name} ${JSON.stringify(input.utterance ?? route)} on ${row.id} · at ${new Date(started).toISOString()} · ${Date.now() - started} ms · ${r.changed ? "changed" : "no change"}`);
     const out = text(told(r, p, url, theirs), Boolean(r.error));
-    return name === "say" ? { ...out, _meta: forPanel(row, p, url, started) } : out;
+    return name === "say" ? { ...out, _meta: forPanel(row, p, url, started, r) } : out;
   }
 
   async function answer(msg, user, origin) {
