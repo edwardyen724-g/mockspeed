@@ -152,6 +152,9 @@ const PANEL_TOOLS = [
   },
 ];
 
+// Each tool's title also in its annotations, where the directories' checks look for it.
+const LISTED = [...TOOLS, ...PANEL_TOOLS].map((t) => ({ ...t, annotations: { title: t.title, ...t.annotations } }));
+
 // Every change the person made since the AI's own last one, from the project's history: what they
 // said and what came of it, a toolbar edit, an undo. The AI's own changes are marked `by: "ai"`
 // (web/app.mjs change()).
@@ -267,7 +270,7 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
       return { jsonrpc: "2.0", id, result: { protocolVersion: /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : LATEST, capabilities: { tools: { listChanged: false }, resources: { listChanged: false }, extensions: { [EXT]: {} } }, serverInfo: { ...SERVER, title: "mockspeed", websiteUrl: origin, icons: [{ src: `${origin}/icon.svg`, mimeType: "image/svg+xml", sizes: ["any"] }] }, instructions: INSTRUCTIONS } };
     }
     if (method === "ping") return { jsonrpc: "2.0", id, result: {} };
-    if (method === "tools/list") return { jsonrpc: "2.0", id, result: { tools: [...TOOLS, ...PANEL_TOOLS] } };
+    if (method === "tools/list") return { jsonrpc: "2.0", id, result: { tools: LISTED } };
     if (method === "resources/list") return { jsonrpc: "2.0", id, result: { resources: [{ uri: PANEL, name: "mockspeed", title: "The mock, live", description: "The mock being drawn, live, and a place to change it.", mimeType: MIME }] } };
     if (method === "resources/templates/list") return { jsonrpc: "2.0", id, result: { resourceTemplates: [] } };
     if (method === "resources/read") {
