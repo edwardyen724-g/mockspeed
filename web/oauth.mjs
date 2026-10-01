@@ -96,14 +96,20 @@ export function oauth({ secret, page, noted = async () => {}, live = null, fetch
     try {
       const u = new URL(id);
       if (LOCAL.has(u.hostname) || /^[\d.]+$/.test(u.hostname) || u.hostname.includes(":")) return null;
-      const res = await get(id, { headers: { accept: "application/json" }, redirect: "error", signal: AbortSignal.timeout(4000) });
+      const res = await get(id, { headers: { accept: "application/json", "user-agent": "mockspeed/0.3 (+https://mockspeed.vercel.app)" }, redirect: "error", signal: AbortSignal.timeout(4000) });
       const text = res.ok ? await res.text() : "";
+      if (!res.ok) console.error(`oauth: client document ${id} answered ${res.status}`);
       if (text && text.length < 20000) {
         const doc = JSON.parse(text);
         const redirects = Array.isArray(doc.redirect_uris) ? doc.redirect_uris.filter(redirectOk).map(String) : [];
         if (doc.client_id === id && redirects.length) found = { name: String(doc.client_name || u.hostname).slice(0, 80), redirects, secret: false };
       }
-    } catch {}
+    } catch (e) {
+      console.error(`oauth: client document ${id}: ${e.message}`);
+    }
+    // A host's own documents that its front door may refuse a server's fetch (ChatGPT's, behind
+    // Cloudflare): what they say, as published, so a refused fetch doesn't stop the person connecting.
+    found ??= knownClient(id);
     documents.set(id, { client: found, until: Date.now() + 5 * 60 * 1000 });
     return found;
   }
@@ -256,6 +262,14 @@ const hostOf = (uri) => { try { return new URL(uri).host || new URL(uri).protoco
 export const challenge = (origin, error = null) =>
   `Bearer ${error ? `error="${error}", ` : ""}resource_metadata="${origin}/.well-known/oauth-protected-resource/mcp", scope="${SCOPE}"`;
 
+// ChatGPT's client documents (developers.openai.com/plugins/build/auth): the one for every connector,
+// whose redirect is connector_platform_oauth_redirect, and one per connector, whose redirect carries
+// the same callback id.
+export function knownClient(id) {
+  if (id === "https://chatgpt.com/oauth/client.json") return { name: "ChatGPT", redirects: ["https://chatgpt.com/connector_platform_oauth_redirect"], secret: false };
+  const m = /^https:\/\/chatgpt\.com\/oauth\/([A-Za-z0-9_-]{1,100})\/client\.json$/.exec(String(id));
+  return m ? { name: "ChatGPT", redirects: [`https://chatgpt.com/connector/oauth/${m[1]}`, "https://chatgpt.com/connector_platform_oauth_redirect"], secret: false } : null;
+}
 const handTopic = (secret, hand) => `ms-h-${createHmac("sha256", secret).update(`hand:${hand}`).digest("base64url").slice(0, 32)}`;
 const go = (location) => new Response(null, { status: 302, headers: { location, "cache-control": "no-store" } });
 function withQuery(uri, q) {

@@ -268,6 +268,23 @@ group("oauth on its own", () => {
     assert.equal(shown.at(-1).state, "consent");
   });
 
+  test("ChatGPT connects even when its client document can't be fetched from the server", async () => {
+    const refused = async () => new Response("Just a moment...", { status: 403 });
+    const shown = [];
+    const h = oauth({ secret: "s", page: (o, status = 200) => { shown.push(o); return new Response(o.state, { status }); }, fetch: refused });
+    const who = { id: "u1", email: "a@b.c" };
+    for (const [id, redirect] of [["https://chatgpt.com/oauth/client.json", "https://chatgpt.com/connector_platform_oauth_redirect"], ["https://chatgpt.com/oauth/cb_123/client.json", "https://chatgpt.com/connector/oauth/cb_123"]]) {
+      const q = form({ response_type: "code", client_id: id, redirect_uri: redirect, code_challenge: pkce().challenge, code_challenge_method: "S256" });
+      await h(new Request(`https://ms.example/oauth/authorize?${q}`), new URL(`https://ms.example/oauth/authorize?${q}`), who);
+      assert.equal(shown.at(-1).state, "consent", id);
+      assert.equal(shown.at(-1).client, "ChatGPT");
+    }
+    // …but only to ChatGPT's own redirects.
+    const q = form({ response_type: "code", client_id: "https://chatgpt.com/oauth/client.json", redirect_uri: "https://evil.example/cb", code_challenge: pkce().challenge, code_challenge_method: "S256" });
+    await h(new Request(`https://ms.example/oauth/authorize?${q}`), new URL(`https://ms.example/oauth/authorize?${q}`), who);
+    assert.equal(shown.at(-1).state, "badRedirect");
+  });
+
   test("where a client may be sent back to", () => {
     for (const ok of ["https://claude.ai/api/mcp/auth_callback", "http://localhost:3000/cb", "http://127.0.0.1:9/cb", "cursor://anysphere.cursor-retrieval/oauth/callback"]) assert.ok(redirectOk(ok), ok);
     for (const no of ["http://example.com/cb", "javascript:alert(1)", "data:text/html,x", "https://a.example/#x", "not a url"]) assert.ok(!redirectOk(no), no);
