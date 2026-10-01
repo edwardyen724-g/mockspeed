@@ -59,7 +59,7 @@ const TOOLS = [
   {
     name: "open_mock",
     title: "Open a mock",
-    description: "Start a grey mock of something you are proposing — a website, an app, a screen — that the person watches being drawn live in a browser tab. Returns the mock's id and the link to give the person. Then describe what to draw with say. Nothing is drawn until you do.",
+    description: "Start a grey mock of something you are proposing — a website, an app, a screen — that the person watches being drawn live in a browser tab. Returns the mock's id and the link to give the person. Nothing is drawn on it yet.",
     inputSchema: {
       type: "object",
       properties: {
