@@ -1,6 +1,6 @@
 {
   "name": "mockspeed",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Draws grey mocks of websites and apps, live in the chat, while you talk an idea over.",
   "author": {
     "name": "mockspeed",
@@ -84,7 +84,8 @@
               "expected_behavior": "mockspeed is not called."
             }
           ]
-        }
+        },
+        "demo_recording_url": "https://drive.google.com/file/d/1d4UH6R0aetUHCmmOuXC2jFVlD1nq8D61/view"
       }
     }
   }
