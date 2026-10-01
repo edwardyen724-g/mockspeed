@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="icon" href="/icon.svg"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{plansTitle}} · {{product}}</title>
+<style>
+  :root{--line:#e3e3e3;--faint:#8a8a8a}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 system-ui,-apple-system,sans-serif;color:#111;background:#f6f6f6}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+  a{color:inherit}
+  .brand{font-weight:600;text-decoration:none}
+  main{max-width:520px;margin:0 auto;padding:24px 16px 64px}
+  h1{font-size:22px;margin:0 0 14px}
+  section{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+  section p{margin:0 0 8px}
+  .small{color:#555;font-size:13px}
+  .btn,button{font:inherit;font-size:14px;padding:7px 14px;border-radius:8px;border:1px solid #111;background:#111;color:#fff;cursor:pointer;text-decoration:none;display:inline-block}
+  form{display:flex;gap:8px}
+  input{flex:1;font:inherit;padding:7px 10px;border:1px solid #ccc;border-radius:8px}
+  .note{margin-top:10px;font-size:13px;color:#555;min-height:18px}
+  [hidden]{display:none!important}
+</style></head>
+<body>
+<header><a class="brand" href="/">{{product}}</a><a href="/projects">{{projects}}</a></header>
+<main data-plan="{{plan}}" data-open="{{open}}">
+  <h1>{{plansTitle}}</h1>
+  <section>
+    <p>{{plansFree}}</p>
+    <p>{{plansPaid}}</p>
+    <p class="small">{{plansWhat}}</p>
+  </section>
+  <section data-for="free" hidden><p>{{plansYoursFree}}</p><a class="btn" id="up" href="/upgrade?back=/projects">{{upgrade}}</a><p class="small" id="closed" hidden>{{plansClosed}}</p></section>
+  <section data-for="paid" hidden><p>{{plansYoursPaid}}</p><a href="/billing">{{billing}}</a></section>
+  <section data-for="" hidden>
+    <p>{{plansSignIn}}</p>
+    <form id="form"><input id="email" type="email" placeholder="{{email}}" autocomplete="email" required><button type="submit">{{sendLink}}</button></form>
+    <div class="note" id="note"></div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const { plan, open } = document.querySelector("main").dataset;
+for (const s of document.querySelectorAll("[data-for]")) s.hidden = s.dataset.for !== plan;
+if (!open) { $("up").hidden = true; $("closed").hidden = false; }
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("note").textContent = "…";
+  const r = await fetch("/api/auth/link", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("email").value, back: "/plans" }) }).then((r) => r.json()).catch(() => ({}));
+  $("note").textContent = r.note || "";
+});
+</script>
+</body></html>

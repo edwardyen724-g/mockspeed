@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><link rel="icon" href="/icon.svg"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{connectTitle}} · {{product}}</title>
 <style>
   :root{--line:#e3e3e3;--faint:#8a8a8a}
@@ -20,7 +20,8 @@
     border-radius:6px;padding:8px 10px;overflow-wrap:anywhere;user-select:all}
   button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid #111;background:#111;color:#fff;cursor:pointer;white-space:nowrap}
   .small{color:var(--faint);font-size:13px;margin:0}
-  .signin{max-width:420px;margin:12vh auto 0}
+  h2{font-size:15px;margin:28px 0 10px;color:#444;font-weight:600}
+  .signin{margin-top:28px}
   .signin form{display:flex;gap:8px}
   .signin input{flex:1;font:inherit;padding:7px 10px;border:1px solid #ccc;border-radius:8px}
   .note{margin-top:10px;font-size:13px;color:#555;min-height:18px}
@@ -31,9 +32,18 @@
   <nav><a href="/projects">{{projects}}</a><span class="who">{{account}}</span></nav>
 </header>
 <main data-signed-in="{{signedIn}}">
+  <h1>{{connectTitle}}</h1>
+  <p class="lead">{{connectLead}}</p>
+  <section>
+    <p>{{connectByLink}}</p>
+    <div class="row"><code id="link">{{link}}</code><button type="button" data-copy="link">{{copy}}</button></div>
+  </section>
+  <section>
+    <p>{{connectByLinkCode}}</p>
+    <div class="row"><code id="link-command">{{linkCommand}}</code><button type="button" data-copy="link-command">{{copy}}</button></div>
+  </section>
   <div id="mine" hidden>
-    <h1>{{connectTitle}}</h1>
-    <p class="lead">{{connectLead}}</p>
+    <h2>{{connectKeys}}</h2>
     <section>
       <p>{{connectAdd}}</p>
       <div class="row"><code id="command">{{command}}</code><button type="button" data-copy="command">{{copy}}</button></div>
@@ -49,7 +59,7 @@
     <p class="small">{{connectPrivate}}</p>
   </div>
   <section class="signin" id="signin" hidden>
-    <p>{{connectSignIn}}</p>
+    <p>{{connectSignInKeys}}</p>
     <form id="form"><input id="email" type="email" placeholder="{{email}}" autocomplete="email" required><button type="submit">{{sendLink}}</button></form>
     <div class="note" id="note"></div>
   </section>

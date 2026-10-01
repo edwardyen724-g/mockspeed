@@ -103,7 +103,7 @@ const used = (who, id, k, via = "editor") => db.use(Array.from({ length: k }, ()
 })));
 
 group("a day's changes, paying for more, the kill switch", { skip: !ready && "no web/.env.local" }, () => {
-  test("changes count the same wherever they were said: at the limit the editor, the panel and the AI are all refused, with the way to pay", async () => {
+  test("changes count the same wherever they were said: at the limit the editor, the panel and the AI are all refused, with the way to pay (in the chat, the plans)", async () => {
     const who = newPerson();
     const id = await bakeryOf(who);
     assert.equal((await db.gate(who.id)).changes, 0);
@@ -118,13 +118,21 @@ group("a day's changes, paying for more, the kill switch", { skip: !ready && "no
     assert.equal(r.upgradeLabel, "Upgrade — $12 a month");
 
     const said = await tool("say", { mock: id, sentence: "make the title bigger" }, who);
+    // In the chat, the plans page and never a checkout: the directories ask that a plugin sells nothing.
+    const chatNote = W.web.limitFreeChat.replace("{n}", "2");
     assert.equal(said.isError, true);
-    assert.ok(said.text.includes(r.note), said.text);
-    assert.ok(said.text.includes("/upgrade/mspay_"), "the AI gets the link to pass on");
+    assert.ok(said.text.includes(chatNote), said.text);
+    assert.ok(said.text.includes(`${BASE}/plans`), "the AI gets the plans to pass on");
+    assert.ok(!said.text.includes("/upgrade"), said.text);
     assert.equal(said._meta.mockspeed.reply.limit, true, "the panel shows it too");
 
     const panel = await tool("panel_change", { mock: id, route: "/ask", body: { utterance: "make the title bigger" } }, who);
     assert.equal(panel.structuredContent.mockspeed.reply.limit, true);
+    assert.equal(panel.structuredContent.mockspeed.reply.upgrade, `${BASE}/plans`);
+    assert.equal(panel.structuredContent.mockspeed.reply.upgradeLabel, W.web.seePlans);
+    const plans = await (await get("/plans", who)).text();
+    assert.ok(plans.includes(W.web.plansYoursFree.replace("{account}", who.email)));
+    assert.ok(plans.includes("/upgrade?back=/projects"), "signed in, the plans page is where paying starts");
     // What carries on a change already counted is not refused: undo, a toolbar edit, look.
     assert.equal((await tool("look", { mock: id }, who)).isError, undefined);
     assert.equal((await db.gate(who.id)).changes, 2, "a refused change is not counted");

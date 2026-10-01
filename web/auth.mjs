@@ -51,12 +51,20 @@ export const signedOut = (secure) => cookie("ms_session", "", 0, secure);
 // call to web/mcp.mjs (Authorization: Bearer …) and which may change their mocks; and `watch`, the
 // link that shows their mocks as the AI draws them, which may only look. Neither expires; a new
 // SESSION_SECRET ends every one.
-export function key(kind, { id, email }, secret) {
-  const body = b64(JSON.stringify({ u: id, e: email }));
-  return `ms${kind}_${body}.${sign(`${kind}:${body}`, secret)}`;
-}
+export const key = (kind, { id, email }, secret) => seal(kind, { u: id, e: email }, secret);
 // The account a key is for, { id, email }, or null.
 export function keyed(kind, token, secret) {
+  const s = unseal(kind, token, secret);
+  return s?.u ? { id: s.u, email: s.e ?? null } : null;
+}
+// Anything this server hands out and takes back unchanged, signed so no one else can make one:
+// `ms<kind>_<body>.<mac>`. A body with `x` (seconds) stops being good then. The keys above, and what
+// signing in from inside the AI hands out (web/oauth.mjs): a client's registration, a code, tokens.
+export function seal(kind, body, secret) {
+  const b = b64(JSON.stringify(body));
+  return `ms${kind}_${b}.${sign(`${kind}:${b}`, secret)}`;
+}
+export function unseal(kind, token, secret) {
   const m = /^ms([a-z]+)_([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/.exec(String(token ?? "").trim());
   if (!m || m[1] !== kind || !secret) return null;
   const want = Buffer.from(sign(`${kind}:${m[2]}`, secret));
@@ -64,9 +72,10 @@ export function keyed(kind, token, secret) {
   if (want.length !== got.length || !timingSafeEqual(want, got)) return null;
   try {
     const s = JSON.parse(Buffer.from(m[2], "base64url").toString("utf8"));
-    return s.u ? { id: s.u, email: s.e ?? null } : null;
+    return s && typeof s === "object" && !(s.x && s.x <= Date.now() / 1000) ? s : null;
   } catch { return null; }
 }
+export const hmac = (text, secret) => sign(text, secret);
 export const bearer = (req) => (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
 // A browser that opened a watch link: whose mocks it may look at.
 export const watcher = (req, secret) => keyed("watch", cookies(req).ms_watch, secret);

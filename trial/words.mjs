@@ -469,6 +469,18 @@ export const web = {
   limitFree: "That's today's {n} free changes. Upgrade to keep going, or come back tomorrow — your mock is saved.",
   limitPaid: "That's today's {n} changes, the most in a day. They start again at midnight UTC — your mock is saved.",
   upgrade: "Upgrade — {price} a month",
+  // Inside the person's chat (their AI, or the panel) the limit points at the plans, never a checkout:
+  // the directories ask that a plugin sells nothing itself.
+  limitFreeChat: "That's today's {n} free changes. mockspeed's plans are on its site — or come back tomorrow; the mock is saved.",
+  seePlans: "See plans",
+  plansTitle: "Plans",
+  plansFree: "Free: {n} changes a day.",
+  plansPaid: "Paid: {n} changes a day, {price} a month, cancel any time.",
+  plansYoursFree: "You're on the free plan, signed in as {account}.",
+  plansYoursPaid: "You're on the paid plan, signed in as {account}.",
+  plansSignIn: "Sign in to upgrade:",
+  plansClosed: "Paying isn't open yet.",
+  plansWhat: "A change is one sentence said to a mock — typed here, in the panel in your chat, or sent by your AI. Undo, the toolbar and looking are free. The day starts at midnight UTC.",
   allowanceFree: "{used} of {n} free changes today",
   allowancePaid: "{used} of {n} changes today",
   paused: "mockspeed has paused new changes for a while. Your mock is saved; try again later.",
@@ -487,11 +499,11 @@ export const web = {
   connectLink: "Use it from your AI",
   connectTitle: "Use mockspeed from your own AI",
   connectLead: "While you talk an idea over with your AI, it can draw what it proposes. You watch the mock come together in a tab, and each follow-up shows up there as it's said.",
-  connectConnector: "Or in Claude (the desktop app or claude.ai) or ChatGPT: add a custom connector with this link. The mock then draws right in the chat, and you can change it there yourself:",
-  connectAdd: "Add mockspeed to Claude Code, in a terminal:",
+  connectConnector: "In Claude or ChatGPT, a custom connector with your key in the link:",
+  connectAdd: "In Claude Code, with your key:",
   connectWatch: "Keep this link open in a tab. Every mock your AI starts shows up there as it's drawn:",
   connectPrivate: "All three are yours alone. With either of the first two, anyone can make mocks on your account; with the last, anyone can watch them.",
-  connectSignIn: "Sign in to connect your AI.",
+  connectSignInKeys: "For a key instead, sign in here:",
   // The panel inside Claude or ChatGPT (web/pages/panel.html).
   panelDescription: "The grey mock being talked over, drawn live. The person can click it and say changes in it; the next reply from mockspeed says what they changed.",
   panelSay: "Change it yourself: “make the prices bigger”",
@@ -503,6 +515,33 @@ export const web = {
   panelShowHere: "Show it here",
   panelOffline: "Can't reach mockspeed from here. It will catch up on the next change.",
   copy: "Copy",
+  // Signing in from inside the person's AI (web/oauth.mjs, web/pages/authorize.html). {client} is
+  // the app asking (Claude, ChatGPT…), {account} the address signed in.
+  authTitle: "Connect your AI",
+  authSignIn: "{client} wants to draw mocks with mockspeed while you talk. Sign in to connect it — the mocks it makes are kept in your account.",
+  authConsent: "Let {client} draw mocks on your mockspeed account?",
+  authConsentMore: "It can start mocks, change them and look at them, and each change it makes counts toward your day's changes, the same as one you type. You can see every mock in your projects.",
+  authAs: "Signed in as {account}.",
+  authBackTo: "You'll go back to {host} after.",
+  authPassword: "Reviewing mockspeed? Sign in with the password you were given",
+  authPasswordGo: "Sign in",
+  authPasswordBad: "That email and password don't match.",
+  authNotYou: "Not you?",
+  authYes: "Connect",
+  authNo: "Cancel",
+  authWaiting: "Once you've clicked the link in the email, carry on in the tab it opens — or here.",
+  authUnknownClient: "This connection request doesn't say which app it's for, or the app isn't one we can reach. Go back to your AI and add mockspeed again.",
+  authBadRedirect: "This connection request would send you somewhere the app didn't register. Go back to your AI and add mockspeed again.",
+  authExpired: "That took a while, so nothing was connected. Try again:",
+  authAgain: "Start again",
+  // The person's own AI: how to add mockspeed now that it signs in by itself (/connect).
+  connectByLink: "In Claude (claude.ai or the desktop app) or ChatGPT, add a custom connector with this link. It asks you to sign in to mockspeed the first time, and the mock then draws right in the chat:",
+  connectByLinkCode: "In Claude Code, in a terminal (it opens the sign-in in your browser):",
+  connectKeys: "Or with a key instead of signing in (for apps that can't sign in):",
+  // The pages the directories ask for (web/pages/privacy.html, terms.html).
+  privacy: "Privacy",
+  terms: "Terms",
+  support: "Support",
 };
 
 // The line under the app's name: how many pages it has.

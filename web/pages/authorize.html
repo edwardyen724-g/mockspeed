@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="icon" href="/icon.svg"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{authTitle}} · {{product}}</title>
+<style>
+  :root{--line:#e3e3e3;--faint:#8a8a8a}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;font:15px/1.5 system-ui,-apple-system,sans-serif;color:#111;background:#f6f6f6;padding:16px}
+  .brand{font-weight:600;margin:6vh 0 14px}
+  .box{width:100%;max-width:440px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px}
+  h1{font-size:18px;margin:0 0 10px}
+  p{margin:0 0 12px}
+  .small{color:#555;font-size:13px}
+  a{color:inherit}
+  form.row{display:flex;gap:8px}
+  input[type=email],input[type=password]{flex:1;font:inherit;padding:7px 10px;border:1px solid #ccc;border-radius:8px}
+  button{font:inherit;font-size:14px;padding:7px 14px;border-radius:8px;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
+  button.plain{background:#fff;color:#111;border-color:#d6d6d6}
+  .answer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+  .note{margin-top:10px;font-size:13px;color:#555;min-height:18px}
+  details{margin-top:16px}
+  details form{margin-top:8px}
+  [hidden]{display:none!important}
+</style></head>
+<body>
+<div class="brand">{{product}}</div>
+<main class="box" data-state="{{state}}" data-back="{{back}}" data-fields="{{fields}}" data-waiting="{{authWaiting}}" data-reviewing="{{reviewing}}">
+  <section data-for="signIn" hidden>
+    <h1>{{authTitle}}</h1>
+    <p>{{authSignIn}}</p>
+    <form class="row" id="email-form"><input id="email" type="email" placeholder="{{email}}" autocomplete="email" required><button type="submit">{{sendLink}}</button></form>
+    <div class="note" id="note"></div>
+    <details id="review" hidden><summary class="small">{{authPassword}}</summary>
+      <form class="row" id="password-form"><input id="r-email" type="email" placeholder="{{email}}" required><input id="r-password" type="password" required><button type="submit">{{authPasswordGo}}</button></form>
+      <div class="note" id="r-note"></div>
+    </details>
+  </section>
+  <section data-for="consent" hidden>
+    <h1>{{authConsent}}</h1>
+    <p class="small">{{authConsentMore}}</p>
+    <p class="small">{{authAs}} <a href="#" id="not-you">{{authNotYou}}</a> {{authBackTo}}</p>
+    <form method="post" action="/oauth/authorize" id="consent">
+      <div class="answer"><button class="plain" type="submit" name="answer" value="no">{{authNo}}</button><button type="submit" name="answer" value="yes">{{authYes}}</button></div>
+    </form>
+  </section>
+  <section data-for="unknownClient" hidden><p>{{authUnknownClient}}</p></section>
+  <section data-for="badRedirect" hidden><p>{{authBadRedirect}}</p></section>
+  <section data-for="expired" hidden><p>{{authExpired}} <a id="again" href="#">{{authAgain}}</a></p></section>
+</main>
+<p class="small"><a href="/privacy">{{privacy}}</a> · <a href="/terms">{{terms}}</a></p>
+<script>
+// One page for each step of connecting the person's AI (web/oauth.mjs): sign in, then say yes.
+const $ = (id) => document.getElementById(id);
+const main = document.querySelector("main");
+const { state, back, fields } = main.dataset;
+for (const s of document.querySelectorAll("[data-for]")) s.hidden = s.dataset.for !== state;
+if (state === "expired") $("again").href = back;
+if (state === "consent") {
+  for (const [k, v] of Object.entries(JSON.parse(fields || "{}"))) {
+    const i = document.createElement("input");
+    Object.assign(i, { type: "hidden", name: k, value: v });
+    $("consent").append(i);
+  }
+  $("not-you").onclick = async (e) => {
+    e.preventDefault();
+    await fetch("/api/auth/out", { method: "POST" });
+    location.reload();
+  };
+}
+if (state === "signIn" && main.dataset.reviewing) {
+  $("review").hidden = false;
+  $("password-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const r = await fetch("/api/auth/password", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("r-email").value, password: $("r-password").value, back }) }).then((r) => r.json()).catch(() => ({}));
+    if (r.ok) location.reload(); else $("r-note").textContent = r.note || "";
+  });
+}
+if (state === "signIn") {
+  $("email-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("note").textContent = "…";
+    const r = await fetch("/api/auth/link", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("email").value, back }) }).then((r) => r.json()).catch(() => ({}));
+    $("note").textContent = r.ok ? `${r.note} ${main.dataset.waiting || ""}` : (r.note || "");
+    // The email's link signs in this browser; once it has, this tab carries on too.
+    if (r.ok) {
+      const tick = setInterval(async () => {
+        const me = await fetch("/api/me").then((r) => r.json()).catch(() => ({}));
+        if (me.signedIn) { clearInterval(tick); location.reload(); }
+      }, 2500);
+    }
+  });
+}
+</script>
+</body></html>

@@ -34,11 +34,20 @@ mock: its tools are the engine's own actions, and Jev decides what every sentenc
 | `take_offer { mock, offer }` | one of the offers after a change ("Just this one", "Undo"), by number |
 | `undo { mock }`, `look { mock }` | take back the last change; the pages, elements and ids as they are now |
 
-- **The key.** `/connect`, signed in, shows the line to add it to Claude Code:
-  `claude mcp add --transport http mockspeed <site>/mcp --header "Authorization: Bearer msai_…"`.
-  The key is the account, signed with `SESSION_SECRET` (`auth.mjs` `key`); the mocks it makes are the
-  account's, in its list of projects. Until sign-in from inside the AI (phase M3), that is the only
-  way in.
+- **Signing in** (`oauth.mjs`). The person adds `<site>/mcp` to Claude, ChatGPT or Claude Code and
+  nothing else: the first call gets a 401 pointing at `/.well-known/oauth-protected-resource/mcp`,
+  their app registers (`/oauth/register`, or a CIMD client_id) and opens `/oauth/authorize`, where
+  they sign in with the site's email link and say yes (`pages/authorize.html`); the app trades the
+  code (PKCE S256) at `/oauth/token` for an hour's access token and a 90-day refresh token. Nothing
+  is stored: registrations, codes and tokens are sealed with `SESSION_SECRET` (`auth.mjs` `seal`).
+  The directories' reviewers can't open an email link, so `REVIEW_EMAIL` + `REVIEW_PASSWORD` (16+
+  characters) turn on one password account on that page; unset, it isn't offered.
+- **The key**, for apps that can't sign in. `/connect`, signed in, shows
+  `claude mcp add --transport http mockspeed <site>/mcp --header "Authorization: Bearer msai_…"` and
+  `<site>/mcp/msai_…`. The key is the account, signed with `SESSION_SECRET` (`auth.mjs` `key`).
+  Either way, the mocks are the account's, in its list of projects, and each `say` is one of its
+  day's changes. In the chat (the AI or the panel) the limit points at `/plans`, never a checkout:
+  ChatGPT's directory forbids selling inside a plugin.
 - **The brief** is kept with the project (`trial/engine.mjs` `brief` / `inform`) and given to the
   writer, which uses its names, words and numbers instead of making its own up. Jev is not shown it.
 - **Watching.** Every change, whoever makes it — the AI, the person's tab, another tab — sends its
@@ -60,9 +69,9 @@ Where the chat shows MCP Apps (Claude desktop and claude.ai, ChatGPT), `say` and
 panel, `ui://mockspeed/mock` (`pages/panel.html`): the mock drawn live right in the chat, and a place
 for the person to change it themselves.
 
-- **Connecting.** Their connectors take a link and no header, so `/connect` also shows
-  `<site>/mcp/msai_…`: the same key, in the address (a custom connector with no authentication).
-  Until sign-in from inside the AI (phase M3), that is how Claude and ChatGPT get in.
+- **Connecting.** A custom connector with `<site>/mcp` signs in (above); `<site>/mcp/msai_…`, the key
+  in the address, still works with no sign-in. The panel's resource names its own origin for ChatGPT
+  (`openai/widgetDomain`); Claude derives its own, so `ui.domain` is left out.
 - **Drawing live.** The panel learns its mock from the tool call (`tool-input`, then the result's
   `_meta.mockspeed`: the mock, the page's state and its Realtime channel) and then hears every
   change's frames on that channel, as a watching tab does. It paints them into a shadow root, since

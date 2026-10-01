@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><link rel="icon" href="/icon.svg"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{product}}</title>
 <style>
   :root{--line:#e3e3e3;--faint:#8a8a8a}
@@ -24,6 +24,9 @@
   .chips button:hover{border-color:#bbb}
   .fine{margin:22px 0 0;color:var(--faint);font-size:13px}
   .note{min-height:20px;margin-top:10px;color:#8a3a00;font-size:13px}
+  footer{text-align:center;padding:0 16px 18px;font-size:13px;color:var(--faint)}
+  footer a{text-decoration:none;margin:0 6px}
+  footer a:hover{text-decoration:underline}
   @media (max-width:520px){h1{font-size:26px}}
 </style></head>
 <body>
@@ -42,6 +45,7 @@
   <div class="note" id="note"></div>
   <p class="fine">{{wordsOnly}}</p>
 </main>
+<footer><a href="/connect">{{connectLink}}</a> <a href="/privacy">{{privacy}}</a> <a href="/terms">{{terms}}</a></footer>
 <script>
 // A sign-in link that Supabase sent back to the site's root rather than to /auth/callback (its list of
 // allowed return addresses did not match) still signs the person in.

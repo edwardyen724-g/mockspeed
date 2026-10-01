@@ -96,6 +96,8 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     const none = await rpc("initialize", {}, { key: null });
     assert.equal(none.status, 401);
     assert.match(none.body.error.message, /\/connect/);
+    // …and its app where to sign in (web/oauth.mjs).
+    assert.equal(none.headers.get("www-authenticate"), `Bearer resource_metadata="${BASE}/.well-known/oauth-protected-resource/mcp", scope="mocks"`);
     assert.equal((await rpc("tools/list", {}, { key: watchKey(person) })).status, 401);
     const forged = aiKey(person).replace(/\.[^.]+$/, ".AAAA");
     assert.equal((await rpc("tools/list", {}, { key: forged })).status, 401);
@@ -282,7 +284,7 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     assert.equal(forged.status, 401);
   });
 
-  test("/connect shows the signed-in person their AI key and watch link, and asks anyone else to sign in", async () => {
+  test("/connect shows everyone the link to add, and the signed-in person their AI key and watch link", async () => {
     const cookie = A.sessionCookie(person, env.SESSION_SECRET, false).split(";")[0];
     const html = await (await page("/connect", cookie)).text();
     assert.ok(html.includes(`claude mcp add --transport http mockspeed ${BASE}/mcp --header &quot;Authorization: Bearer ${aiKey(person)}&quot;`));
@@ -291,6 +293,8 @@ group("the person's own AI", { skip: !ready && "no web/.env.local" }, () => {
     assert.ok(!/\{\{\w+\}\}/.test(html), "every word filled in");
     const out = await (await page("/connect")).text();
     assert.ok(!out.includes("msai_"));
-    assert.ok(out.includes(W.web.connectSignIn));
+    assert.ok(out.includes(W.web.connectSignInKeys));
+    // Adding it by its link alone, which signs in from the AI's app, is shown to everyone.
+    for (const h of [html, out]) assert.ok(h.includes(`<code id="link">${BASE}/mcp</code>`));
   });
 });

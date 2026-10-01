@@ -1,0 +1,46 @@
+{
+  "name": "mockspeed",
+  "version": "0.3.0",
+  "description": "Draws grey mocks of websites and apps, live in the chat, while you talk an idea over.",
+  "author": { "name": "mockspeed", "url": "https://mockspeed.vercel.app" },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "mockspeed",
+        "shortDescription": "Grey mocks as you talk",
+        "longDescription": "mockspeed draws a grey mock of the website or app you're talking over, right in the chat, while you talk. Say what you have in mind — \"a site for Ferment, a sourdough club: classes, a schedule, sign up\" — and the pages appear in a few seconds, using the names, prices and times from your conversation instead of placeholder text. Then keep talking: \"what if those were cards\", \"put the prices under the names\", \"add a page for the starter swap\". Each change is drawn as it's said. You can also click the mock and change it yourself in the panel. Every mock is kept in your mockspeed account, where you can open it in a browser and export it. Mocks are rough grey sketches for thinking an idea through, not finished designs.",
+        "developerName": "mockspeed",
+        "category": "Design",
+        "websiteURL": "https://mockspeed.vercel.app",
+        "supportURL": "https://mockspeed.vercel.app/connect",
+        "privacyPolicyURL": "https://mockspeed.vercel.app/privacy",
+        "termsOfServiceURL": "https://mockspeed.vercel.app/terms",
+        "defaultPrompt": [
+          "I'm starting a sourdough club called Ferment, classes Saturdays at £25. Sketch the site.",
+          "Mock up a booking app for my barber shop: services, a calendar, a confirmation screen.",
+          "What would a landing page for my newsletter look like?"
+        ],
+        "brandColor": "#111111",
+        "logo": "icon.svg",
+        "composerIcon": "icon.svg"
+      },
+      "review": {
+        "commerce": false,
+        "test_cases": {
+          "positive": [
+            { "description": "Start a mock from the conversation", "prompt": "Sketch a site for Ferment, a sourdough club: classes, schedule, sign up", "tools_triggered": ["open_mock", "say"], "expected_behavior": "A 3-4 page grey mock titled Ferment draws in the panel." },
+            { "description": "Change the layout", "prompt": "What if the classes were cards?", "tools_triggered": ["say"], "expected_behavior": "The class list is redrawn as cards." },
+            { "description": "Add a page", "prompt": "Add a page for the starter swap", "tools_triggered": ["say"], "expected_behavior": "A new page for the starter swap appears." },
+            { "description": "Take a change back", "prompt": "Undo that", "tools_triggered": ["undo"], "expected_behavior": "The last change is taken back." },
+            { "description": "See the mock as it is", "prompt": "What's on the mock now?", "tools_triggered": ["look"], "expected_behavior": "Its pages and elements are listed and the mock is shown again." }
+          ],
+          "negative": [
+            { "description": "Code, not a mock", "prompt": "Write me a CSS file for a navbar", "expected_behavior": "mockspeed is not called." },
+            { "description": "Unrelated question", "prompt": "What's the weather in Leeds?", "expected_behavior": "mockspeed is not called." },
+            { "description": "Unrelated task", "prompt": "Summarize this article for me", "expected_behavior": "mockspeed is not called." }
+          ]
+        }
+      }
+    }
+  }
+}

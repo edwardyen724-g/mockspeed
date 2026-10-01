@@ -11,9 +11,10 @@
 // the conversation: `brief`, the names, words and numbers the two of them have talked over, which
 // the writer uses instead of making its own up. Jev is not shown it.
 //
-// Each call carries the person's AI key (Authorization: Bearer msai_…, from /connect; or in the
-// address, /mcp/msai_…, for Claude's and ChatGPT's connectors, which take no header); the mocks it
-// makes are that account's, in its list of projects.
+// Each call carries the account it is for: a token from signing in inside the AI (web/oauth.mjs —
+// adding <site>/mcp to Claude, ChatGPT or Claude Code is all the person does), or the person's AI key
+// from /connect (Authorization: Bearer msai_…, or in the address, /mcp/msai_…). The mocks it makes are
+// that account's, in its list of projects.
 //
 // Where the host shows MCP Apps (Claude, ChatGPT), `say` and `look` come with a panel
 // (web/pages/panel.html, `ui://mockspeed/mock`): the mock drawn live in the chat. The person's own
@@ -23,8 +24,9 @@
 
 import * as A from "./auth.mjs";
 import * as W from "../trial/words.mjs";
+import { tokenFor, challenge } from "./oauth.mjs";
 
-const SERVER = { name: "mockspeed", version: "0.2.0" };
+const SERVER = { name: "mockspeed", version: "0.3.0" };
 const LATEST = "2025-06-18";
 const LONGEST = 600;
 // The panel: one resource, the same page for every mock; what it shows comes with each tool result.
@@ -48,8 +50,11 @@ mockspeed's own engine decides what each sentence means and draws it; you never 
 
 Where the chat shows panels, say and look show the mock right there, drawing live, and the person can click it and say changes in it themselves; those go straight to mockspeed, not through you. Never work the mock through a browser, a screenshot or computer use: every change you make goes through say, take_offer or undo. Each reply of mockspeed's starts with what the person changed since your last change: those are done, so build on them rather than redo or undo them.
 
-Each say is one of the person's changes for the day, the same as a sentence they type into mockspeed themselves; open_mock, take_offer, undo and look are not. When the day's changes run out, say tells you so and gives a link where the person can pay for more: pass it on and let them decide.`;
+Each say is one of the person's changes for the day, the same as a sentence they type into mockspeed themselves; open_mock, take_offer, undo and look are not. When the day's changes run out, say tells you so and where the person can see mockspeed's plans: pass it on once and let them decide.`;
 
+// Each tool says what it does to the account (every hint given, as the directories ask): open_mock
+// adds a mock; say, take_offer and undo change one and may take things out of it — undoable, but
+// still a change to what the person has; look only reads. None reaches outside mockspeed.
 const TOOLS = [
   {
     name: "open_mock",
@@ -79,7 +84,7 @@ const TOOLS = [
       },
       required: ["mock", "sentence"],
     },
-    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
   },
   {
     name: "take_offer",
@@ -90,14 +95,14 @@ const TOOLS = [
       properties: { mock: { type: "string" }, offer: { type: "integer", minimum: 1, description: "The offer's number, from the last reply." } },
       required: ["mock", "offer"],
     },
-    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
   },
   {
     name: "undo",
     title: "Undo",
     description: "Take back the last change to the mock.",
     inputSchema: { type: "object", properties: { mock: { type: "string" } }, required: ["mock"] },
-    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
   },
   {
     name: "look",
@@ -105,7 +110,7 @@ const TOOLS = [
     _meta: SHOWS,
     description: "The mock as it is now — including changes the person made in their tab or the panel: its pages, its elements with their ids, and anything offered. Where the chat shows panels, it shows the mock here again.",
     inputSchema: { type: "object", properties: { mock: { type: "string" } }, required: ["mock"] },
-    annotations: { readOnlyHint: true, openWorldHint: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
   },
 ];
 
@@ -119,7 +124,7 @@ const PANEL_TOOLS = [
     description: "Only the mockspeed panel calls this; not for you (use look). The mock as it is now and where its changes are heard live.",
     inputSchema: { type: "object", properties: { mock: { type: "string" } }, required: ["mock"] },
     _meta: PANEL_ONLY,
-    annotations: { readOnlyHint: true, openWorldHint: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
   },
   {
     name: "panel_change",
@@ -135,7 +140,7 @@ const PANEL_TOOLS = [
       required: ["mock", "route"],
     },
     _meta: PANEL_ONLY,
-    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
   },
   {
     name: "panel_tools",
@@ -143,7 +148,7 @@ const PANEL_TOOLS = [
     description: "Only the mockspeed panel calls this; not for you. Which edits would change the element the person clicked.",
     inputSchema: { type: "object", properties: { mock: { type: "string" }, id: { type: "string" } }, required: ["mock", "id"] },
     _meta: PANEL_ONLY,
-    annotations: { readOnlyHint: true, openWorldHint: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
   },
 ];
 
@@ -177,7 +182,7 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
     if (theirs.length) lines.push("The person changed the mock themselves since your last change (already done; build on it, don't redo it):", ...theirs.map((t) => `  ${t}`), "");
     if (r?.note) lines.push(r.note);
     // The day's changes are the account's, counted as the editor's are: the person decides whether to pay.
-    if (r?.upgrade) lines.push(`Tell the person: they can pay for more changes today at ${r.upgrade} — it's their choice; don't open it for them.`);
+    if (r?.upgrade) lines.push(`Tell the person once: mockspeed's plans are at ${r.upgrade} — it's their choice; don't open it for them.`);
     if (r?.limit || r?.paused) lines.push("Nothing was changed. Don't send more changes until the person says to.");
     if (r?.allowance) lines.push(`(${r.allowance.text}.)`);
     const offered = s.question?.choices ?? s.offer ?? [];
@@ -259,7 +264,7 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
     const { id = null, method, params = {} } = msg ?? {};
     if (method === "initialize") {
       const asked = String(params.protocolVersion ?? "");
-      return { jsonrpc: "2.0", id, result: { protocolVersion: /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : LATEST, capabilities: { tools: { listChanged: false }, resources: { listChanged: false }, extensions: { [EXT]: {} } }, serverInfo: SERVER, instructions: INSTRUCTIONS } };
+      return { jsonrpc: "2.0", id, result: { protocolVersion: /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : LATEST, capabilities: { tools: { listChanged: false }, resources: { listChanged: false }, extensions: { [EXT]: {} } }, serverInfo: { ...SERVER, title: "mockspeed", websiteUrl: origin, icons: [{ src: `${origin}/icon.svg`, mimeType: "image/svg+xml", sizes: ["any"] }] }, instructions: INSTRUCTIONS } };
     }
     if (method === "ping") return { jsonrpc: "2.0", id, result: {} };
     if (method === "tools/list") return { jsonrpc: "2.0", id, result: { tools: [...TOOLS, ...PANEL_TOOLS] } };
@@ -267,7 +272,7 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
     if (method === "resources/templates/list") return { jsonrpc: "2.0", id, result: { resourceTemplates: [] } };
     if (method === "resources/read") {
       if (params.uri !== PANEL) return failed(id, -32002, `no resource ${params.uri}`);
-      return { jsonrpc: "2.0", id, result: { contents: [{ uri: PANEL, mimeType: MIME, text: panel.page(), _meta: panel.meta() }] } };
+      return { jsonrpc: "2.0", id, result: { contents: [{ uri: PANEL, mimeType: MIME, text: panel.page(), _meta: panel.meta(origin) }] } };
     }
     if (method === "tools/call") {
       try {
@@ -285,8 +290,10 @@ export function mcp({ secret, db, open, change, start, link, panel, live }) {
   return async function handle(req, url, key = null) {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     if (req.method !== "POST") return json(null, 405, { allow: "POST" });
-    const user = A.keyed("ai", A.bearer(req) || key, secret);
-    if (!user) return json({ jsonrpc: "2.0", id: null, error: { code: -32001, message: `mockspeed needs your AI key: sign in at ${url.origin}/connect and add it as shown there.` } }, 401, { "www-authenticate": "Bearer" });
+    // Signed in from inside the AI (web/oauth.mjs), or the key from /connect, in a header or the address.
+    const given = A.bearer(req) || key;
+    const user = tokenFor(given, secret, url.origin) ?? A.keyed("ai", given, secret);
+    if (!user) return json({ jsonrpc: "2.0", id: null, error: { code: -32001, message: `mockspeed needs you to sign in: your app should open it for you; or add mockspeed with the key at ${url.origin}/connect.` } }, 401, { "www-authenticate": challenge(url.origin, given ? "invalid_token" : null) });
     let body;
     try { body = await req.json(); } catch { return json(failed(null, -32700, "not JSON"), 400); }
     const one = async (m) => (m && m.id === undefined ? null : answer(m, user, url.origin));

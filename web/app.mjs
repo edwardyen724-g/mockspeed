@@ -20,7 +20,7 @@
 // anything that may call a model, the server also checks the kill switch: MODELS_OFF, or the day's
 // spend over SPEND_CAP_USD, stops every model call, the AI's included.
 
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomBytes, randomUUID, createHash, timingSafeEqual } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { project } from "../trial/engine.mjs";
 import { metered } from "../trial/meter.mjs";
@@ -35,6 +35,7 @@ import * as A from "./auth.mjs";
 import { adminPage } from "./admin.mjs";
 import { live as liveOf, projectTopic, accountTopic } from "./live.mjs";
 import { mcp } from "./mcp.mjs";
+import { oauth } from "./oauth.mjs";
 import { billing } from "./billing.mjs";
 
 // Each read with its own literal path, so the bundler that deploys this finds every page.
@@ -45,6 +46,11 @@ const PAGES = {
   missing: readFileSync(new URL("./pages/missing.html", import.meta.url), "utf8"),
   connect: readFileSync(new URL("./pages/connect.html", import.meta.url), "utf8"),
   panel: readFileSync(new URL("./pages/panel.html", import.meta.url), "utf8"),
+  authorize: readFileSync(new URL("./pages/authorize.html", import.meta.url), "utf8"),
+  privacy: readFileSync(new URL("./pages/privacy.html", import.meta.url), "utf8"),
+  terms: readFileSync(new URL("./pages/terms.html", import.meta.url), "utf8"),
+  plans: readFileSync(new URL("./pages/plans.html", import.meta.url), "utf8"),
+  icon: readFileSync(new URL("./pages/icon.svg", import.meta.url), "utf8"),
 };
 const page = (name) => PAGES[name];
 const PROJECT = /^\/p\/([a-z0-9]{8,40})(\/.*)?$/;
@@ -90,6 +96,11 @@ export function app(env) {
   // follow-up 0.2-0.4 s before anything is drawn. A HEAD request costs nothing.
   const warm = () => { for (const u of [JEV, PROVIDERS[provider]?.endpoint]) if (u) fetch(u, { method: "HEAD" }).then((r) => r.body?.cancel()).catch(() => {}); };
   const newId = () => randomBytes(6).toString("hex");
+  const supportEmail = env.SUPPORT_EMAIL || "mockspeed@sealed.run";
+  // The directories' reviewers can't open an email link: one account they sign in to with a password,
+  // REVIEW_EMAIL and REVIEW_PASSWORD (16 characters or more), only while both are set.
+  const review = env.REVIEW_EMAIL && String(env.REVIEW_PASSWORD ?? "").length >= 16
+    ? { email: env.REVIEW_EMAIL.trim().toLowerCase(), password: env.REVIEW_PASSWORD, id: uuidOf(`review:${env.REVIEW_EMAIL.trim().toLowerCase()}`) } : null;
 
   const html = (body, status = 200, headers = {}) => new Response(body, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", ...headers } });
   const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", ...headers } });
@@ -131,9 +142,12 @@ export function app(env) {
   const realtime = env.SUPABASE_URL ? [env.SUPABASE_URL, env.SUPABASE_URL.replace(/^http/, "ws")] : [];
   const panel = {
     page: () => fill(page("panel"), W.web),
-    meta: () => ({
+    // ChatGPT asks for the panel's own origin (`openai/widgetDomain`) and the links it may open (this
+    // site's); Claude derives the panel's from the connector's address itself, so `ui.domain` is left out.
+    meta: (origin) => ({
       ui: { csp: { connectDomains: realtime, resourceDomains: [] }, prefersBorder: true },
-      "openai/widgetCSP": { connect_domains: realtime, resource_domains: [] },
+      "openai/widgetCSP": { connect_domains: realtime, resource_domains: [], redirect_domains: [origin] },
+      "openai/widgetDomain": origin,
       "openai/widgetDescription": W.web.panelDescription,
     }),
     html: (p) => mockPage(p.root),
@@ -141,6 +155,15 @@ export function app(env) {
     state: (p) => { const s = p.state(); return { ...s, log: s.log.slice(-8), version: p.version }; },
   };
   const forAi = mcp({ secret, db, open, change, start: startForAi, link: watchLink, panel, live: liveFor });
+  // Signing in from inside the person's AI: the page for each step, and a row when an AI is let in.
+  const signInForAi = oauth({
+    secret,
+    page: ({ state, client = "", account = "", host = "", back = "", fields = null }, status = 200) => html(fill(page("authorize"), {
+      ...W.web, state, back, fields: fields ? JSON.stringify(fields) : "", reviewing: review ? "yes" : "",
+      authSignIn: say(W.web.authSignIn, { client }), authConsent: say(W.web.authConsent, { client }), authAs: say(W.web.authAs, { account }), authBackTo: host ? say(W.web.authBackTo, { host }) : "",
+    }), status, { "x-frame-options": "DENY", "content-security-policy": "frame-ancestors 'none'" }),
+    noted: (user, client) => db.use([{ user_id: user.id, sentence: randomUUID(), provider: "mockspeed", model: "oauth", purpose: "connect", status: String(client).slice(0, 80), cost_usd: 0 }]),
+  });
 
   return async function handle(req) {
     const url = new URL(req.url);
@@ -158,10 +181,23 @@ export function app(env) {
         return html(fill(page("projects"), { ...words(who), list: JSON.stringify(list) }));
       }
       if (path === "/auth/callback" && req.method === "GET") return html(fill(page("callback"), words(who)));
+      if ((path === "/privacy" || path === "/terms") && req.method === "GET") return html(fill(page(path.slice(1)), { ...words(who), support: supportEmail }));
+      if ((path === "/icon.svg" || path === "/favicon.ico") && req.method === "GET") return new Response(page("icon"), { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
+      // What each plan gives; from the person's chat this is where the limit points, not at paying.
+      if (path === "/plans" && req.method === "GET") {
+        const plan = who.user ? ((await db.account(who.user.id))?.plan === "paid" ? "paid" : "free") : "";
+        return html(fill(page("plans"), { ...words(who), plan, open: pay.ready ? "yes" : "", plansFree: say(W.web.plansFree, { n: perDay.free }), plansPaid: say(W.web.plansPaid, { n: perDay.paid, price }), plansYoursFree: say(W.web.plansYoursFree, { account: who.user?.email ?? "" }), plansYoursPaid: say(W.web.plansYoursPaid, { account: who.user?.email ?? "" }), upgrade: say(W.web.upgrade, { price }) }));
+      }
+      // ChatGPT's check that this site is ours, before it lists mockspeed.
+      if (path === "/.well-known/openai-apps-challenge" && req.method === "GET") {
+        return env.OPENAI_APPS_CHALLENGE ? new Response(env.OPENAI_APPS_CHALLENGE.trim(), { headers: { "content-type": "text/plain; charset=utf-8" } }) : html(fill(page("missing"), words(who)), 404);
+      }
+      const signing = await signInForAi(req, url, who.user);
+      if (signing) return signing;
       // What the person adds to their AI, and the link to keep open while it draws.
       if (path === "/connect" && req.method === "GET") {
         const ai = who.user ? A.key("ai", who.user, secret) : "";
-        return html(fill(page("connect"), { ...words(who), command: ai ? `claude mcp add --transport http mockspeed ${url.origin}/mcp --header "Authorization: Bearer ${ai}"` : "", connector: ai ? `${url.origin}/mcp/${ai}` : "", watch: ai ? `${url.origin}/w/${A.key("watch", who.user, secret)}` : "" }));
+        return html(fill(page("connect"), { ...words(who), link: `${url.origin}/mcp`, linkCommand: `claude mcp add --transport http mockspeed ${url.origin}/mcp`, command: ai ? `claude mcp add --transport http mockspeed ${url.origin}/mcp --header "Authorization: Bearer ${ai}"` : "", connector: ai ? `${url.origin}/mcp/${ai}` : "", watch: ai ? `${url.origin}/w/${A.key("watch", who.user, secret)}` : "" }));
       }
       const m = path.match(MCP);
       if (m) {
@@ -246,6 +282,14 @@ export function app(env) {
         const claimed = await db.claim(user.id, who.anon, user.email);
         await db.use([{ user_id: user.id, anon: who.anon, sentence: randomUUID(), provider: "mockspeed", model: "auth", purpose: "signin", status: `claimed ${claimed}`, cost_usd: 0, origin: url.host }]);
         return json({ ok: true, back: safeBack(back), claimed }, 200, { "set-cookie": A.sessionCookie(user, secret, secure) });
+      }
+      if (path === "/api/auth/password" && req.method === "POST") {
+        const { email = "", password = "", back = "/projects" } = await body(req);
+        const ok = review && String(email).trim().toLowerCase() === review.email && same(String(password), review.password);
+        if (!ok) return json({ ok: false, note: W.web.authPasswordBad }, 401);
+        const user = { id: review.id, email: review.email };
+        await db.use([{ user_id: user.id, sentence: randomUUID(), provider: "mockspeed", model: "auth", purpose: "signin", status: "review password", cost_usd: 0, origin: url.host }]);
+        return json({ ok: true, back: safeBack(back) }, 200, { "set-cookie": A.sessionCookie(user, secret, secure) });
       }
       if (path === "/api/auth/out" && req.method === "POST") return json({ ok: true }, 200, { "set-cookie": A.signedOut(secure) });
 
@@ -334,8 +378,11 @@ export function app(env) {
       if (counts) {
         const n = perDay[g.plan] ?? perDay.free;
         if (g.changes >= n) {
-          const r = { note: say(g.plan === "paid" ? W.web.limitPaid : W.web.limitFree, { n }), changed: false, limit: true, plan: g.plan };
-          if (g.plan !== "paid" && pay.ready) Object.assign(r, { upgrade: payLink(who.user, origin, `/p/${row.id}/`), upgradeLabel: say(W.web.upgrade, { price }) });
+          // In the person's chat — their AI, or the panel — it points at the plans, never at paying.
+          const inChat = by === "ai" || by === "panel";
+          const r = { note: say(g.plan === "paid" ? W.web.limitPaid : inChat ? W.web.limitFreeChat : W.web.limitFree, { n }), changed: false, limit: true, plan: g.plan };
+          if (g.plan !== "paid" && inChat) Object.assign(r, { upgrade: `${origin}/plans`, upgradeLabel: W.web.seePlans });
+          else if (g.plan !== "paid" && pay.ready) Object.assign(r, { upgrade: payLink(who.user, origin, `/p/${row.id}/`), upgradeLabel: say(W.web.upgrade, { price }) });
           return { r, p };
         }
         allowance = { used: g.changes + 1, of: n, plan: g.plan };
@@ -417,6 +464,10 @@ export function app(env) {
   }
 }
 
+// The same text, compared in the same time whatever it is.
+const same = (a, b) => { const x = createHash("sha256").update(a).digest(), y = createHash("sha256").update(b).digest(); return timingSafeEqual(x, y); };
+// A fixed account id for a name: the reviewers' account is the same one every time.
+const uuidOf = (name) => { const h = createHash("sha256").update(name).digest("hex"); return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20, 32)}`; };
 const via = (by) => (by === "ai" ? "ai" : by === "panel" ? "panel" : "editor");
 // A place on this site with a word for the page to say when it opens (?note=paid).
 const withNote = (back, note) => `${back}${back.includes("?") ? "&" : "?"}note=${note}`;
