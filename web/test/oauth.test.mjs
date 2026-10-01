@@ -81,7 +81,10 @@ group("signing in from inside the AI", { skip: !ready && "no web/.env.local" }, 
     const out = await (await get(`/oauth/authorize?${form(ask)}`)).text();
     assert.match(out, /data-state="signIn"/);
     assert.ok(out.includes("Claude wants to draw mocks"));
-    assert.ok(out.includes(`data-back="/oauth/authorize?${form(ask).replace(/&/g, "&amp;")}"`));
+    const link = new URL(BASE + out.match(/data-back="([^"]+)"/)[1].replace(/&amp;/g, "&"));
+    assert.equal(link.pathname, "/oauth/authorize");
+    for (const [k, v] of Object.entries(ask)) assert.equal(link.searchParams.get(k), v, k);
+    assert.match(link.searchParams.get("hand"), /^[a-f0-9]{32}$/, "the link hands the sign-in back to this tab");
     assert.ok(!/\{\{\w+\}\}/.test(out), "every word filled in");
 
     // Signed in: yes or no, for this account.
@@ -233,6 +236,36 @@ group("oauth on its own", () => {
     await h(new Request(`https://ms.example/oauth/authorize?${local}`), new URL(`https://ms.example/oauth/authorize?${local}`), who);
     assert.equal(shown.at(-1).state, "unknownClient");
     assert.equal(asked, 1);
+  });
+
+  test("the email's link, opened in another tab, hands the sign-in back to the tab the app opened", async () => {
+    const sent = [];
+    const live = { config: (t) => ({ url: "https://x.supabase.co", key: "k", ...t }), send: async (topic, event, payload) => sent.push({ topic, event, payload }) };
+    const shown = [];
+    const h = oauth({ secret: "s", live, page: (o, status = 200) => { shown.push(o); return new Response(o.state, { status }); } });
+    const reg = await (await h(new Request("https://ms.example/oauth/register", { method: "POST", body: JSON.stringify({ redirect_uris: ["https://claude.ai/api/mcp/auth_callback"] }) }), new URL("https://ms.example/oauth/register"), null)).json();
+    const q = form({ response_type: "code", client_id: reg.client_id, redirect_uri: "https://claude.ai/api/mcp/auth_callback", code_challenge: pkce().challenge, code_challenge_method: "S256", state: "z" });
+    const at = (query, who) => h(new Request(`https://ms.example/oauth/authorize?${query}`), new URL(`https://ms.example/oauth/authorize?${query}`), who);
+    // The tab the app opened: signed out, listening on its hand's channel; the link carries the hand.
+    await at(q, null);
+    const start = shown.at(-1);
+    assert.equal(start.state, "signIn");
+    const hand = new URL(`https://ms.example${start.back}`).searchParams.get("hand");
+    assert.match(hand, /^[a-f0-9]{32}$/);
+    assert.match(start.live.hand, /^ms-h-/);
+    // The tab the link opened, signed in: it says so on that channel and doesn't ask yes or no itself.
+    const who = { id: "u1", email: "a@b.c" };
+    await at(start.back.split("?")[1], who);
+    assert.equal(shown.at(-1).state, "handed");
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0].topic, start.live.hand);
+    // The first tab trades the grant for its own session, then asks yes or no where the app can hear it.
+    const traded = await h(new Request("https://ms.example/oauth/hand", { method: "POST", body: JSON.stringify(sent[0].payload) }), new URL("https://ms.example/oauth/hand"), null);
+    assert.equal(traded.status, 200);
+    assert.equal(A.person(new Request("https://ms.example/", { headers: { cookie: traded.headers.get("set-cookie").split(";")[0] } }), "s").id, "u1");
+    assert.equal((await h(new Request("https://ms.example/oauth/hand", { method: "POST", body: JSON.stringify({ grant: "mshand_x.y" }) }), new URL("https://ms.example/oauth/hand"), null)).status, 401);
+    await at(q, who);
+    assert.equal(shown.at(-1).state, "consent");
   });
 
   test("where a client may be sent back to", () => {

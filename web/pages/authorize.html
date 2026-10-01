@@ -23,7 +23,7 @@
 </style></head>
 <body>
 <div class="brand">{{product}}</div>
-<main class="box" data-state="{{state}}" data-back="{{back}}" data-fields="{{fields}}" data-waiting="{{authWaiting}}" data-reviewing="{{reviewing}}">
+<main class="box" data-state="{{state}}" data-back="{{back}}" data-fields="{{fields}}" data-waiting="{{authWaiting}}" data-reviewing="{{reviewing}}" data-live="{{live}}">
   <section data-for="signIn" hidden>
     <h1>{{authTitle}}</h1>
     <p>{{authSignIn}}</p>
@@ -42,6 +42,7 @@
       <div class="answer"><button class="plain" type="submit" name="answer" value="no">{{authNo}}</button><button type="submit" name="answer" value="yes">{{authYes}}</button></div>
     </form>
   </section>
+  <section data-for="handed" hidden><p>{{authHanded}}</p><p class="small"><a id="here" href="#">{{authHereInstead}}</a></p></section>
   <section data-for="unknownClient" hidden><p>{{authUnknownClient}}</p></section>
   <section data-for="badRedirect" hidden><p>{{authBadRedirect}}</p></section>
   <section data-for="expired" hidden><p>{{authExpired}} <a id="again" href="#">{{authAgain}}</a></p></section>
@@ -54,6 +55,7 @@ const main = document.querySelector("main");
 const { state, back, fields } = main.dataset;
 for (const s of document.querySelectorAll("[data-for]")) s.hidden = s.dataset.for !== state;
 if (state === "expired") $("again").href = back;
+if (state === "handed") $("here").href = back;
 if (state === "consent") {
   for (const [k, v] of Object.entries(JSON.parse(fields || "{}"))) {
     const i = document.createElement("input");
@@ -74,14 +76,35 @@ if (state === "signIn" && main.dataset.reviewing) {
     if (r.ok) location.reload(); else $("r-note").textContent = r.note || "";
   });
 }
+let listening = false;
+function listen() {
+  const live = main.dataset.live ? JSON.parse(main.dataset.live) : null;
+  if (!live || listening) return;
+  listening = true;
+  const ws = new WebSocket(`${live.url.replace(/^http/, "ws")}/realtime/v1/websocket?apikey=${encodeURIComponent(live.key)}&vsn=1.0.0`);
+  const send = (topic, event, payload, ref) => ws.send(JSON.stringify({ topic, event, payload, ref }));
+  ws.onopen = () => {
+    send(`realtime:${live.hand}`, "phx_join", { config: { broadcast: { self: false }, presence: { key: "" }, private: false } }, "1");
+    setInterval(() => send("phoenix", "heartbeat", {}, "hb"), 25000);
+  };
+  ws.onmessage = async (e) => {
+    const m = JSON.parse(e.data);
+    if (m.event !== "broadcast" || m.payload?.event !== "signed") return;
+    const r = await fetch("/oauth/hand", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ grant: m.payload.payload.grant }) }).then((r) => r.json()).catch(() => ({}));
+    if (r.ok) location.reload();
+  };
+  ws.onclose = () => { listening = false; setTimeout(listen, 2000); };
+}
 if (state === "signIn") {
   $("email-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     $("note").textContent = "…";
     const r = await fetch("/api/auth/link", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("email").value, back }) }).then((r) => r.json()).catch(() => ({}));
     $("note").textContent = r.ok ? `${r.note} ${main.dataset.waiting || ""}` : (r.note || "");
-    // The email's link signs in this browser; once it has, this tab carries on too.
+    // The email's link signs in wherever it opens; this tab hears so on its channel (web/oauth.mjs) —
+    // or, in the same browser, sees the session — and carries on to the yes-or-no itself.
     if (r.ok) {
+      listen();
       const tick = setInterval(async () => {
         const me = await fetch("/api/me").then((r) => r.json()).catch(() => ({}));
         if (me.signedIn) { clearInterval(tick); location.reload(); }

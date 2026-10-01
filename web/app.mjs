@@ -158,8 +158,10 @@ export function app(env) {
   // Signing in from inside the person's AI: the page for each step, and a row when an AI is let in.
   const signInForAi = oauth({
     secret,
-    page: ({ state, client = "", account = "", host = "", back = "", fields = null }, status = 200) => html(fill(page("authorize"), {
-      ...W.web, state, back, fields: fields ? JSON.stringify(fields) : "", reviewing: review ? "yes" : "",
+    live,
+    page: ({ state, client = "", account = "", host = "", back = "", fields = null, live: hear = null }, status = 200) => html(fill(page("authorize"), {
+      ...W.web, state, back, fields: fields ? JSON.stringify(fields) : "", reviewing: review ? "yes" : "", live: hear ? JSON.stringify(hear) : "",
+      authHanded: say(W.web.authHanded, { client }),
       authSignIn: say(W.web.authSignIn, { client }), authConsent: say(W.web.authConsent, { client }), authAs: say(W.web.authAs, { account }), authBackTo: host ? say(W.web.authBackTo, { host }) : "",
     }), status, { "x-frame-options": "DENY", "content-security-policy": "frame-ancestors 'none'" }),
     noted: (user, client) => db.use([{ user_id: user.id, sentence: randomUUID(), provider: "mockspeed", model: "oauth", purpose: "connect", status: String(client).slice(0, 80), cost_usd: 0 }]),

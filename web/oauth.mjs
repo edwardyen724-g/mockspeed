@@ -16,7 +16,7 @@
 // its redirect_uri and its PKCE challenge; an access token lasts an hour, a refresh token 90 days,
 // renewed each time it is used. A new SESSION_SECRET ends all of them.
 
-import { createHash } from "node:crypto";
+import { createHash, createHmac, randomBytes } from "node:crypto";
 import * as A from "./auth.mjs";
 
 const SCOPE = "mocks";
@@ -51,7 +51,8 @@ function sameRedirect(given, registered) {
 }
 
 // `deps`: the page to show (sign in, or say yes), and what to note when an AI is let in.
-export function oauth({ secret, page, noted = async () => {}, fetch: get = fetch }) {
+// `live` (web/live.mjs) hands a sign-in back to the tab the AI's app opened (below).
+export function oauth({ secret, page, noted = async () => {}, live = null, fetch: get = fetch }) {
   const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", "access-control-allow-origin": "*", ...headers } });
   const bad = (error, description, status = 400) => json({ error, error_description: description }, status);
   const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type, authorization, mcp-protocol-version" };
@@ -156,7 +157,21 @@ export function oauth({ secret, page, noted = async () => {}, fetch: get = fetch
     if (a.error) return go(a.error);
     const it = a.ok;
     if (req.method === "GET") {
-      if (!user) return page({ state: "signIn", client: it.client.name, back: url.pathname + url.search });
+      // The email's link may open in another tab, another browser or the mail app's own: the app (Claude,
+      // ChatGPT) only takes the answer back in the tab it opened, so the sign-in is handed back there. The
+      // page here listens on a channel named for a random `hand`, which rides along in the link; the tab
+      // the link opens, once signed in, says so on that channel with a sealed two-minute grant, which this
+      // tab trades for its own session (/oauth/hand), and it carries on to the yes-or-no itself.
+      if (!user) {
+        const hand = randomBytes(16).toString("hex");
+        const rest = new URLSearchParams(params(q));
+        rest.set("hand", hand);
+        return page({ state: "signIn", client: it.client.name, back: `${url.pathname}?${rest}`, live: live?.config({ hand: handTopic(secret, hand) }) ?? null });
+      }
+      if (/^[a-f0-9]{32}$/.test(q.hand ?? "") && live) {
+        await live.send(handTopic(secret, q.hand), "signed", { grant: A.seal("hand", { u: user.id, e: user.email, x: now() + 120 }, secret) });
+        return page({ state: "handed", client: it.client.name, back: `${url.pathname}?${new URLSearchParams(params(q))}` });
+      }
       return page({ state: "consent", client: it.client.name, account: user.email, host: hostOf(it.redirect), fields: { ...params(q), csrf: csrf(user, it) } });
     }
     if (!user || q.csrf !== csrf(user, it)) return page({ state: "expired", back: `${url.pathname}?${new URLSearchParams(params(q))}` }, 400);
@@ -212,10 +227,17 @@ export function oauth({ secret, page, noted = async () => {}, fetch: get = fetch
     const path = url.pathname;
     const meta = path === "/.well-known/oauth-protected-resource" || path.startsWith("/.well-known/oauth-protected-resource/") ? resource(url.origin)
       : path === "/.well-known/oauth-authorization-server" || path === "/.well-known/oauth-authorization-server/mcp" ? server(url.origin) : null;
-    const ours = meta || ["/oauth/register", "/oauth/token", "/oauth/authorize"].includes(path);
+    const ours = meta || ["/oauth/register", "/oauth/token", "/oauth/authorize", "/oauth/hand"].includes(path);
     if (!ours) return null;
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     if (meta) return req.method === "GET" ? json(meta, 200, { "cache-control": "public, max-age=3600" }) : json({ error: "GET" }, 405);
+    if (path === "/oauth/hand") {
+      let g = {};
+      try { g = await req.json(); } catch {}
+      const who = req.method === "POST" ? A.unseal("hand", g.grant, secret) : null;
+      if (!who?.u) return json({ ok: false }, 401);
+      return json({ ok: true }, 200, { "set-cookie": A.sessionCookie({ id: who.u, email: who.e }, secret, url.protocol === "https:") });
+    }
     if (path === "/oauth/register") return req.method === "POST" ? register(req) : json({ error: "POST" }, 405);
     if (path === "/oauth/token") return req.method === "POST" ? token(req) : json({ error: "POST" }, 405);
     return req.method === "GET" || req.method === "POST" ? authorize(req, url, user) : json({ error: "GET or POST" }, 405);
@@ -234,6 +256,7 @@ const hostOf = (uri) => { try { return new URL(uri).host || new URL(uri).protoco
 export const challenge = (origin, error = null) =>
   `Bearer ${error ? `error="${error}", ` : ""}resource_metadata="${origin}/.well-known/oauth-protected-resource/mcp", scope="${SCOPE}"`;
 
+const handTopic = (secret, hand) => `ms-h-${createHmac("sha256", secret).update(`hand:${hand}`).digest("base64url").slice(0, 32)}`;
 const go = (location) => new Response(null, { status: 302, headers: { location, "cache-control": "no-store" } });
 function withQuery(uri, q) {
   const u = new URL(uri);
